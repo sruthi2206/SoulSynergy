@@ -8,7 +8,12 @@ import {
   UserRecommendation, InsertUserRecommendation
 } from "@shared/schema";
 
+import session from "express-session";
+
 export interface IStorage {
+  // Session storage for authentication
+  sessionStore: session.Store;
+  
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -62,6 +67,9 @@ export class MemStorage implements IStorage {
   private coachConversationIdCounter: number;
   private healingRitualIdCounter: number;
   private userRecommendationIdCounter: number;
+  
+  // Session store for authentication
+  sessionStore: session.Store;
 
   constructor() {
     this.users = new Map();
@@ -79,6 +87,12 @@ export class MemStorage implements IStorage {
     this.coachConversationIdCounter = 1;
     this.healingRitualIdCounter = 1;
     this.userRecommendationIdCounter = 1;
+    
+    // Create in-memory session store
+    const MemoryStore = require('memorystore')(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    });
     
     // Initialize with default healing rituals
     this.initializeHealingRituals();
@@ -383,4 +397,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Import the database storage implementation
+import { DatabaseStorage } from './storage-db';
+
+// Use database storage for production use
+export const storage = new DatabaseStorage();
