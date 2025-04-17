@@ -156,6 +156,19 @@ export class DatabaseStorage implements IStorage {
     const [ritual] = await db.insert(healingRituals).values(insertRitual).returning();
     return ritual;
   }
+  
+  async updateHealingRitual(id: number, ritualUpdate: InsertHealingRitual): Promise<HealingRitual | undefined> {
+    const [updatedRitual] = await db
+      .update(healingRituals)
+      .set(ritualUpdate)
+      .where(eq(healingRituals.id, id))
+      .returning();
+    return updatedRitual;
+  }
+  
+  async deleteHealingRitual(id: number): Promise<void> {
+    await db.delete(healingRituals).where(eq(healingRituals.id, id));
+  }
 
   async getUserRecommendations(userId: number): Promise<UserRecommendation[]> {
     return await db

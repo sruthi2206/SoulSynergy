@@ -44,6 +44,8 @@ export interface IStorage {
   getHealingRitual(id: number): Promise<HealingRitual | undefined>;
   getHealingRitualsByTarget(targetChakra?: string, targetEmotion?: string): Promise<HealingRitual[]>;
   createHealingRitual(ritual: InsertHealingRitual): Promise<HealingRitual>;
+  updateHealingRitual(id: number, ritual: InsertHealingRitual): Promise<HealingRitual | undefined>;
+  deleteHealingRitual(id: number): Promise<void>;
 
   // User recommendation operations
   getUserRecommendations(userId: number): Promise<UserRecommendation[]>;
@@ -275,6 +277,23 @@ export class MemStorage implements IStorage {
     };
     this.healingRituals.set(id, ritual);
     return ritual;
+  }
+  
+  async updateHealingRitual(id: number, ritualUpdate: InsertHealingRitual): Promise<HealingRitual | undefined> {
+    const ritual = this.healingRituals.get(id);
+    if (!ritual) return undefined;
+    
+    const updatedRitual: HealingRitual = {
+      ...ritual,
+      ...ritualUpdate
+    };
+    
+    this.healingRituals.set(id, updatedRitual);
+    return updatedRitual;
+  }
+  
+  async deleteHealingRitual(id: number): Promise<void> {
+    this.healingRituals.delete(id);
   }
 
   // User recommendation operations

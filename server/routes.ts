@@ -8,7 +8,8 @@ import {
   insertChakraProfileSchema,
   insertJournalEntrySchema,
   insertEmotionTrackingSchema,
-  insertCoachConversationSchema
+  insertCoachConversationSchema,
+  insertHealingRitualSchema
 } from "@shared/schema";
 import { analyzeJournalEntry, generateChatResponse } from "./openai";
 import { setupAuth } from "./auth";
