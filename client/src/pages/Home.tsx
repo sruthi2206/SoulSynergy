@@ -30,7 +30,7 @@ export default function Home() {
                 </Button>
               </Link>
             ) : (
-              <Link href="/onboarding">
+              <Link href="/auth">
                 <Button className="bg-[#483D8B] text-white hover:bg-opacity-90 transition-colors">
                   Sign In
                 </Button>

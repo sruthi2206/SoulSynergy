@@ -56,44 +56,79 @@ export default function Onboarding() {
     
     try {
       // Create user
-      const userResponse = await apiRequest("POST", "/api/users", {
-        ...userData
-      });
-      
-      const user = await userResponse.json();
-      
-      // Create chakra profile
-      await apiRequest("POST", "/api/chakra-profiles", {
-        userId: user.id,
-        crownChakra: chakraValues.crown || 5,
-        thirdEyeChakra: chakraValues.thirdEye || 5,
-        throatChakra: chakraValues.throat || 5,
-        heartChakra: chakraValues.heart || 5,
-        solarPlexusChakra: chakraValues.solarPlexus || 5,
-        sacralChakra: chakraValues.sacral || 5,
-        rootChakra: chakraValues.root || 5,
-      });
-      
-      // Set user in context
-      setUser({
-        id: user.id,
-        name: user.name
-      });
-      
-      toast({
-        title: "Welcome to SoulSync!",
-        description: "Your spiritual healing journey begins now.",
-      });
-      
-      // Navigate to dashboard
-      setLocation("/dashboard");
+      try {
+        const userResponse = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...userData
+          })
+        });
+        
+        if (!userResponse.ok) {
+          // Handle HTTP error responses
+          const errorData = await userResponse.json();
+          if (userResponse.status === 409) {
+            throw new Error(`Username "${userData.username}" already exists. Please choose a different username.`);
+          } else {
+            throw new Error(errorData.message || "Failed to create user");
+          }
+        }
+        
+        const user = await userResponse.json();
+        
+        // Create chakra profile
+        const chakraResponse = await fetch("/api/chakra-profiles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.id,
+            crownChakra: chakraValues.crown || 5,
+            thirdEyeChakra: chakraValues.thirdEye || 5,
+            throatChakra: chakraValues.throat || 5,
+            heartChakra: chakraValues.heart || 5,
+            solarPlexusChakra: chakraValues.solarPlexus || 5,
+            sacralChakra: chakraValues.sacral || 5,
+            rootChakra: chakraValues.root || 5,
+          })
+        });
+        
+        if (!chakraResponse.ok) {
+          throw new Error("Failed to create chakra profile");
+        }
+        
+        // Set user in context
+        setUser({
+          id: user.id,
+          name: user.name
+        });
+        
+        toast({
+          title: "Welcome to SoulSync!",
+          description: "Your spiritual healing journey begins now.",
+        });
+        
+        // Navigate to dashboard
+        setLocation("/dashboard");
+      } catch (error) {
+        throw error;
+      }
     } catch (error) {
       console.error("Error creating profile:", error);
       toast({
-        title: "Error",
-        description: "There was a problem creating your profile. Please try again.",
+        title: "Registration Error",
+        description: error instanceof Error ? error.message : "There was a problem creating your profile. Please try again.",
         variant: "destructive",
       });
+      
+      // If it's a username conflict, reset the form to the first step
+      if (error instanceof Error && error.message.includes("already exists")) {
+        setStep(1);
+        form.setError("username", { 
+          type: "manual", 
+          message: "This username is already taken" 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
