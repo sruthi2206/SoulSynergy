@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -15,15 +14,8 @@ import Community from "@/pages/Community";
 import Membership from "@/pages/Membership";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
-
-// User context for app-wide state
-export const UserContext = React.createContext<{
-  user: { id: number; name: string } | null;
-  setUser: (user: { id: number; name: string } | null) => void;
-}>({
-  user: null,
-  setUser: () => {}
-});
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
   const [location] = useLocation();
@@ -35,12 +27,12 @@ function Router() {
       <AnimatePresence mode="wait">
         <Switch>
           <Route path="/" component={Home} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/onboarding" component={Onboarding} />
-          <Route path="/journal" component={Journal} />
-          <Route path="/coach/:type" component={Coach} />
-          <Route path="/community" component={Community} />
-          <Route path="/membership" component={Membership} />
+          <ProtectedRoute path="/dashboard" component={Dashboard} />
+          <ProtectedRoute path="/onboarding" component={Onboarding} />
+          <ProtectedRoute path="/journal" component={Journal} />
+          <ProtectedRoute path="/coach/:type" component={Coach} />
+          <ProtectedRoute path="/community" component={Community} />
+          <ProtectedRoute path="/membership" component={Membership} />
           <Route path="/auth" component={AuthPage} />
           <Route component={NotFound} />
         </Switch>
@@ -50,40 +42,12 @@ function Router() {
 }
 
 function App() {
-  // Simple user state management - would be replaced with more robust auth in production
-  const [user, setUser] = useState<{ id: number; name: string } | null>(null);
-  
-  useEffect(() => {
-    // Check for user in localStorage (simplified demo)
-    const savedUser = localStorage.getItem('soulsync_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem('soulsync_user');
-      }
-    }
-  }, []);
-  
-  // App context providers for user state management
-  const userContextValue = {
-    user,
-    setUser: (userData: { id: number; name: string } | null) => {
-      setUser(userData);
-      if (userData) {
-        localStorage.setItem('soulsync_user', JSON.stringify(userData));
-      } else {
-        localStorage.removeItem('soulsync_user');
-      }
-    }
-  };
-  
   return (
     <QueryClientProvider client={queryClient}>
-      <UserContext.Provider value={userContextValue}>
+      <AuthProvider>
         <Router />
         <Toaster />
-      </UserContext.Provider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

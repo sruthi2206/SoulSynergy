@@ -1,7 +1,7 @@
 import { useParams, useLocation } from "wouter";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
 import CoachChat from "@/components/CoachChat";
 
@@ -31,7 +31,7 @@ const coachInfo: Record<string, { title: string; description: string }> = {
 export default function Coach() {
   const { type } = useParams<{ type: string }>();
   const [, setLocation] = useLocation();
-  const { user } = useContext(UserContext);
+  const { user } = useAuth();
   
   // Redirect if coach type is invalid
   useEffect(() => {
@@ -39,13 +39,6 @@ export default function Coach() {
       setLocation("/dashboard");
     }
   }, [type, setLocation]);
-  
-  // Redirect to onboarding if no user
-  useEffect(() => {
-    if (!user) {
-      setLocation("/onboarding");
-    }
-  }, [user, setLocation]);
   
   if (!validCoachTypes.includes(type) || !user) {
     return null; // Don't render anything while redirecting
