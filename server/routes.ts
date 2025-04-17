@@ -11,6 +11,7 @@ import {
   insertCoachConversationSchema
 } from "@shared/schema";
 import { analyzeJournalEntry, generateChatResponse } from "./openai";
+import { setupAuth } from "./auth";
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
