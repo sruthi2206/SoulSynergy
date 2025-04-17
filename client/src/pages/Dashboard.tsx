@@ -26,25 +26,81 @@ export default function Dashboard() {
 
   // Fetch user's chakra profile
   const { data: chakraProfile, isLoading: isLoadingChakraProfile } = useQuery({
-    queryKey: [`/api/users/${user?.id}/chakra-profile`],
+    queryKey: ['/api/users', user?.id, 'chakra-profile'],
+    queryFn: async () => {
+      if (!user) return null;
+      try {
+        const res = await fetch(`/api/users/${user.id}/chakra-profile`);
+        if (!res.ok) {
+          if (res.status === 404) {
+            // If profile not found, return null instead of throwing an error
+            return null;
+          }
+          throw new Error('Failed to fetch chakra profile');
+        }
+        return await res.json();
+      } catch (error) {
+        console.error('Error fetching chakra profile:', error);
+        return null;
+      }
+    },
     enabled: !!user,
   });
 
   // Fetch user's journal entries
   const { data: journalEntries, isLoading: isLoadingJournalEntries } = useQuery({
-    queryKey: [`/api/users/${user?.id}/journal-entries`],
+    queryKey: ['/api/users', user?.id, 'journal-entries'],
+    queryFn: async () => {
+      if (!user) return [];
+      try {
+        const res = await fetch(`/api/users/${user.id}/journal-entries`);
+        if (!res.ok) {
+          return [];
+        }
+        return await res.json();
+      } catch (error) {
+        console.error('Error fetching journal entries:', error);
+        return [];
+      }
+    },
     enabled: !!user,
   });
 
   // Fetch user's emotion tracking
   const { data: emotionTrackings, isLoading: isLoadingEmotionTrackings } = useQuery({
-    queryKey: [`/api/users/${user?.id}/emotion-tracking`],
+    queryKey: ['/api/users', user?.id, 'emotion-tracking'],
+    queryFn: async () => {
+      if (!user) return [];
+      try {
+        const res = await fetch(`/api/users/${user.id}/emotion-tracking`);
+        if (!res.ok) {
+          return [];
+        }
+        return await res.json();
+      } catch (error) {
+        console.error('Error fetching emotion tracking:', error);
+        return [];
+      }
+    },
     enabled: !!user,
   });
 
   // Fetch user's recommendations
   const { data: recommendations, isLoading: isLoadingRecommendations } = useQuery({
-    queryKey: [`/api/users/${user?.id}/recommendations`],
+    queryKey: ['/api/users', user?.id, 'recommendations'],
+    queryFn: async () => {
+      if (!user) return [];
+      try {
+        const res = await fetch(`/api/users/${user.id}/recommendations`);
+        if (!res.ok) {
+          return [];
+        }
+        return await res.json();
+      } catch (error) {
+        console.error('Error fetching recommendations:', error);
+        return [];
+      }
+    },
     enabled: !!user,
   });
 

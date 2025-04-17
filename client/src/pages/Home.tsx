@@ -30,7 +30,7 @@ export default function Home() {
                 </Button>
               </Link>
             ) : (
-              <Link href="/onboarding">
+              <Link href="/auth">
                 <Button className="bg-[#483D8B] text-white hover:bg-opacity-90 transition-colors">
                   Sign In
                 </Button>
@@ -74,7 +74,7 @@ export default function Home() {
                 Discover your path to emotional balance, chakra alignment, and inner peace through AI-guided self-discovery.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/onboarding">
+                <Link href="/auth">
                   <Button className="bg-[#008080] text-white px-8 py-6 rounded-full font-heading font-medium hover:bg-opacity-90 transition-all shadow-lg hover:shadow-xl">
                     Begin Your Journey
                   </Button>
