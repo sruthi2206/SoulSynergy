@@ -17,35 +17,56 @@ interface Question {
   reverse?: boolean;
 }
 
-// Questions for chakra assessment
+// Questions for comprehensive chakra assessment
 const questions: Question[] = [
-  // Root Chakra
-  { id: 1, text: "I feel grounded and secure in my daily life.", chakra: "root" },
-  { id: 2, text: "I often worry about my basic needs (food, shelter, finances).", chakra: "root", reverse: true },
+  // Root Chakra (Muladhara) - Security, survival, grounding, foundation
+  { id: 1, text: "I feel secure and grounded in my daily life.", chakra: "root" },
+  { id: 2, text: "I often worry about financial security or basic survival needs.", chakra: "root", reverse: true },
+  { id: 3, text: "I feel connected to my body and physical environment.", chakra: "root" },
+  { id: 4, text: "I struggle with feelings of anxiety or restlessness without clear cause.", chakra: "root", reverse: true },
+  { id: 5, text: "I feel I have a solid foundation in my life and know where I belong.", chakra: "root" },
   
-  // Sacral Chakra
-  { id: 3, text: "I feel comfortable expressing my emotions and creativity.", chakra: "sacral" },
-  { id: 4, text: "I struggle with guilt or shame around pleasure and enjoyment.", chakra: "sacral", reverse: true },
+  // Sacral Chakra (Svadhisthana) - Creativity, pleasure, emotion, sexuality
+  { id: 6, text: "I can express my emotions freely and appropriately.", chakra: "sacral" },
+  { id: 7, text: "I experience guilt or shame around pleasure or creativity.", chakra: "sacral", reverse: true },
+  { id: 8, text: "I enjoy sensual experiences and have a healthy relationship with pleasure.", chakra: "sacral" },
+  { id: 9, text: "I find it difficult to go with the flow and adapt to change.", chakra: "sacral", reverse: true },
+  { id: 10, text: "I can access my creativity easily when needed.", chakra: "sacral" },
   
-  // Solar Plexus Chakra
-  { id: 5, text: "I feel confident in my personal power and decision-making.", chakra: "solarPlexus" },
-  { id: 6, text: "I often let others make decisions for me or doubt my abilities.", chakra: "solarPlexus", reverse: true },
+  // Solar Plexus Chakra (Manipura) - Personal power, confidence, self-esteem
+  { id: 11, text: "I feel confident in my abilities and personal power.", chakra: "solarPlexus" },
+  { id: 12, text: "I often let others make decisions for me or feel controlled by others.", chakra: "solarPlexus", reverse: true },
+  { id: 13, text: "I can set boundaries and stand up for myself effectively.", chakra: "solarPlexus" },
+  { id: 14, text: "I struggle with self-doubt or feelings of inadequacy.", chakra: "solarPlexus", reverse: true },
+  { id: 15, text: "I have a clear sense of my personal identity and purpose.", chakra: "solarPlexus" },
   
-  // Heart Chakra
-  { id: 7, text: "I can give and receive love with ease.", chakra: "heart" },
-  { id: 8, text: "I hold onto past hurts and find it difficult to forgive.", chakra: "heart", reverse: true },
+  // Heart Chakra (Anahata) - Love, compassion, empathy, forgiveness
+  { id: 16, text: "I can give and receive love with ease.", chakra: "heart" },
+  { id: 17, text: "I hold onto past hurts and find it difficult to forgive myself or others.", chakra: "heart", reverse: true },
+  { id: 18, text: "I feel compassion for myself and others, even in difficult situations.", chakra: "heart" },
+  { id: 19, text: "I experience frequent grief or feelings of isolation from others.", chakra: "heart", reverse: true },
+  { id: 20, text: "I nurture my relationships and feel connected to others.", chakra: "heart" },
   
-  // Throat Chakra
-  { id: 9, text: "I express my truth freely and communicate clearly.", chakra: "throat" },
-  { id: 10, text: "I often feel unheard or struggle to speak up for myself.", chakra: "throat", reverse: true },
+  // Throat Chakra (Vishuddha) - Communication, self-expression, truth
+  { id: 21, text: "I express my truth clearly and communicate my needs effectively.", chakra: "throat" },
+  { id: 22, text: "I often feel misunderstood or unable to find the right words.", chakra: "throat", reverse: true },
+  { id: 23, text: "I listen to others and communicate with authenticity.", chakra: "throat" },
+  { id: 24, text: "I frequently hold back from speaking my truth out of fear.", chakra: "throat", reverse: true },
+  { id: 25, text: "I feel comfortable sharing my ideas and opinions with others.", chakra: "throat" },
   
-  // Third Eye Chakra
-  { id: 11, text: "I trust my intuition and inner wisdom.", chakra: "thirdEye" },
-  { id: 12, text: "I find it difficult to see the bigger picture or trust my insights.", chakra: "thirdEye", reverse: true },
+  // Third Eye Chakra (Ajna) - Intuition, insight, imagination, perception
+  { id: 26, text: "I trust my intuition and inner guidance.", chakra: "thirdEye" },
+  { id: 27, text: "I dismiss intuitive insights and rely only on logical reasoning.", chakra: "thirdEye", reverse: true },
+  { id: 28, text: "I can visualize outcomes and possibilities with clarity.", chakra: "thirdEye" },
+  { id: 29, text: "I have difficulty seeing the bigger picture or different perspectives.", chakra: "thirdEye", reverse: true },
+  { id: 30, text: "I am open to insights and understand deeper patterns in my life.", chakra: "thirdEye" },
   
-  // Crown Chakra
-  { id: 13, text: "I feel connected to something greater than myself.", chakra: "crown" },
-  { id: 14, text: "I often feel disconnected from meaning or purpose in life.", chakra: "crown", reverse: true }
+  // Crown Chakra (Sahasrara) - Spiritual connection, consciousness, awareness
+  { id: 31, text: "I feel connected to something greater than myself.", chakra: "crown" },
+  { id: 32, text: "I feel disconnected from any sense of higher purpose or meaning.", chakra: "crown", reverse: true },
+  { id: 33, text: "I experience moments of profound peace or unity consciousness.", chakra: "crown" },
+  { id: 34, text: "I am skeptical about spiritual experiences or dismiss their significance.", chakra: "crown", reverse: true },
+  { id: 35, text: "I am open to spiritual growth and higher awareness.", chakra: "crown" }
 ];
 
 export default function OnboardingQuiz({ onComplete, isSubmitting }: OnboardingQuizProps) {
