@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { UserContext } from "@/App";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import ChakraVisualization from "@/components/ChakraVisualization";
 import EmotionTracker from "@/components/EmotionTracker";
 import JournalEntry from "@/components/JournalEntry";
@@ -14,15 +14,15 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function Dashboard() {
   const { user } = useContext(UserContext);
-  const [navigate] = useNavigate();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
 
   // Redirect to onboarding if no user
   useEffect(() => {
     if (!user) {
-      navigate("/onboarding");
+      setLocation("/onboarding");
     }
-  }, [user, navigate]);
+  }, [user, setLocation]);
 
   // Fetch user's chakra profile
   const { data: chakraProfile, isLoading: isLoadingChakraProfile } = useQuery({

@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import Stripe from "stripe";
 import { 
   insertUserSchema, 
   insertChakraProfileSchema,
@@ -10,6 +11,15 @@ import {
   insertCoachConversationSchema
 } from "@shared/schema";
 import { analyzeJournalEntry, generateChatResponse } from "./openai";
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.warn('Missing Stripe secret key - payment features will not work');
+}
+
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" }) 
+  : null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes prefix
@@ -336,6 +346,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(updatedRecommendation);
     } catch (error) {
       res.status(500).json({ message: 'Failed to update user recommendation', error: (error as Error).message });
+    }
+  });
+
+  // Stripe payment routes
+  app.post(`${apiRouter}/create-payment-intent`, async (req, res) => {
+    try {
+      if (!stripe) {
+        return res.status(500).json({ message: 'Stripe is not configured' });
+      }
+
+      const { amount, interval } = req.body;
+      
+      if (!amount) {
+        return res.status(400).json({ message: 'Missing amount field' });
+      }
+
+      // Create a payment intent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: 'usd',
+        payment_method_types: ['card'],
+        metadata: {
+          plan: interval || 'one-time'
+        }
+      });
+      
+      res.status(200).json({
+        clientSecret: paymentIntent.client_secret
+      });
+    } catch (error) {
+      console.error('Stripe error:', error);
+      res.status(500).json({ 
+        message: 'Failed to create payment intent', 
+        error: (error as Error).message 
+      });
     }
   });
 

@@ -9,6 +9,8 @@ import Dashboard from "@/pages/Dashboard";
 import Onboarding from "@/pages/Onboarding";
 import Journal from "@/pages/Journal";
 import Coach from "@/pages/Coach";
+import Community from "@/pages/Community";
+import Membership from "@/pages/Membership";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect } from "react";
 
@@ -26,6 +28,8 @@ function Router() {
           <Route path="/onboarding" component={Onboarding} />
           <Route path="/journal" component={Journal} />
           <Route path="/coach/:type" component={Coach} />
+          <Route path="/community" component={Community} />
+          <Route path="/membership" component={Membership} />
           <Route component={NotFound} />
         </Switch>
       </AnimatePresence>

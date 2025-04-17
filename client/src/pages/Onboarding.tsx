@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ export default function Onboarding() {
   const [userData, setUserData] = useState<FormValues | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setUser } = useContext(UserContext);
-  const [navigate] = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   // Initialize form
@@ -86,7 +86,7 @@ export default function Onboarding() {
       });
       
       // Navigate to dashboard
-      navigate("/dashboard");
+      setLocation("/dashboard");
     } catch (error) {
       console.error("Error creating profile:", error);
       toast({
