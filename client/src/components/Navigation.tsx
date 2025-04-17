@@ -26,8 +26,18 @@ export default function Navigation() {
     return location === path;
   };
   
-  // Create base items that all users see
-  const baseNavItems = [
+  // Define a type for navigation items
+  interface NavItem {
+    name: string;
+    path: string;
+    icon: JSX.Element;
+    dropdownItems?: Array<{
+      name: string;
+      path: string;
+    }>;
+  }
+
+  const navItems: NavItem[] = [
     {
       name: "Dashboard",
       path: "/dashboard",
@@ -65,18 +75,6 @@ export default function Navigation() {
       icon: <CreditCard className="h-5 w-5" />
     }
   ];
-  
-  // Add admin items if user is admin
-  const adminNavItem = {
-    name: "Admin",
-    path: "/admin",
-    icon: <ShieldCheck className="h-5 w-5" />
-  };
-  
-  // Final nav items array
-  const navItems = user?.isAdmin 
-    ? [...baseNavItems, adminNavItem] 
-    : baseNavItems;
 
   return (
     <>
