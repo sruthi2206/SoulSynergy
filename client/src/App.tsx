@@ -1,3 +1,5 @@
+import * as React from 'react';
+import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -12,7 +14,15 @@ import Coach from "@/pages/Coach";
 import Community from "@/pages/Community";
 import Membership from "@/pages/Membership";
 import NotFound from "@/pages/not-found";
-import { useState, useEffect } from "react";
+
+// User context for app-wide state
+export const UserContext = React.createContext<{
+  user: { id: number; name: string } | null;
+  setUser: (user: { id: number; name: string } | null) => void;
+}>({
+  user: null,
+  setUser: () => {}
+});
 
 function Router() {
   const [location] = useLocation();
@@ -76,16 +86,4 @@ function App() {
   );
 }
 
-// User context for app-wide state
-export const UserContext = React.createContext<{
-  user: { id: number; name: string } | null;
-  setUser: (user: { id: number; name: string } | null) => void;
-}>({
-  user: null,
-  setUser: () => {}
-});
-
 export default App;
-
-// Create React namespace for context
-import * as React from 'react';

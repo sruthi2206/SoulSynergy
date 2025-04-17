@@ -1,5 +1,4 @@
-// Explicitly import React first to avoid initialization issues
-import * as React from "react";
+import React from "react";
 import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -641,7 +640,7 @@ export default function Membership() {
                       </div>
                       <div className="flex justify-center mb-4">
                         <div className="flex">
-                          {[...Array(5)].map((_, i) => (
+                          {[1, 2, 3, 4, 5].map((_, i) => (
                             <Star key={i} className="h-4 w-4 fill-[#483D8B] text-[#483D8B]" />
                           ))}
                         </div>
