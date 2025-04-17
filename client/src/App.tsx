@@ -12,6 +12,7 @@ import Journal from "@/pages/Journal";
 import Coach from "@/pages/Coach";
 import Community from "@/pages/Community";
 import Membership from "@/pages/Membership";
+import AdminDashboard from "@/pages/AdminDashboard";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -33,6 +34,7 @@ function Router() {
           <ProtectedRoute path="/coach/:type" component={Coach} />
           <ProtectedRoute path="/community" component={Community} />
           <ProtectedRoute path="/membership" component={Membership} />
+          <ProtectedRoute path="/admin" component={AdminDashboard} />
           <Route path="/auth" component={AuthPage} />
           <Route component={NotFound} />
         </Switch>

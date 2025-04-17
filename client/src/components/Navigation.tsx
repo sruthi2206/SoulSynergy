@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { Menu, X, ChevronDown, LayoutDashboard, BookOpen, MessageSquare, Sparkles, LogOut, Users, CreditCard } from "lucide-react";
+import { Menu, X, ChevronDown, LayoutDashboard, BookOpen, MessageSquare, Sparkles, LogOut, Users, CreditCard, ShieldCheck } from "lucide-react";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +26,8 @@ export default function Navigation() {
     return location === path;
   };
   
-  const navItems = [
+  // Create base items that all users see
+  const baseNavItems = [
     {
       name: "Dashboard",
       path: "/dashboard",
@@ -64,6 +65,18 @@ export default function Navigation() {
       icon: <CreditCard className="h-5 w-5" />
     }
   ];
+  
+  // Add admin items if user is admin
+  const adminNavItem = {
+    name: "Admin",
+    path: "/admin",
+    icon: <ShieldCheck className="h-5 w-5" />
+  };
+  
+  // Final nav items array
+  const navItems = user?.isAdmin 
+    ? [...baseNavItems, adminNavItem] 
+    : baseNavItems;
 
   return (
     <>
