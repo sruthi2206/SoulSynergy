@@ -251,6 +251,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Middleware to check if user is admin
+  const isAdmin = (req: Request, res: Response, next: any) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    
+    const user = req.user as { isAdmin?: boolean };
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    
+    next();
+  };
+
   // Healing ritual routes
   app.get(`${apiRouter}/healing-rituals`, async (req, res) => {
     try {
@@ -276,6 +290,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(ritual);
     } catch (error) {
       res.status(500).json({ message: 'Failed to get healing ritual', error: (error as Error).message });
+    }
+  });
+  
+  // Admin-only routes for healing rituals management
+  app.post(`${apiRouter}/healing-rituals`, isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertHealingRitualSchema.parse(req.body);
+      const newRitual = await storage.createHealingRitual(validatedData);
+      res.status(201).json(newRitual);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid ritual data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to create ritual', error: (error as Error).message });
+      }
+    }
+  });
+  
+  app.put(`${apiRouter}/healing-rituals/:id`, isAdmin, async (req, res) => {
+    try {
+      const ritualId = parseInt(req.params.id);
+      const existingRitual = await storage.getHealingRitual(ritualId);
+      
+      if (!existingRitual) {
+        return res.status(404).json({ message: 'Healing ritual not found' });
+      }
+      
+      const validatedData = insertHealingRitualSchema.parse(req.body);
+      // Add updateHealingRitual to storage interface later
+      const updatedRitual = await storage.updateHealingRitual(ritualId, validatedData);
+      
+      res.status(200).json(updatedRitual);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid ritual data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to update ritual', error: (error as Error).message });
+      }
+    }
+  });
+  
+  app.delete(`${apiRouter}/healing-rituals/:id`, isAdmin, async (req, res) => {
+    try {
+      const ritualId = parseInt(req.params.id);
+      const existingRitual = await storage.getHealingRitual(ritualId);
+      
+      if (!existingRitual) {
+        return res.status(404).json({ message: 'Healing ritual not found' });
+      }
+      
+      // Add deleteHealingRitual to storage interface later
+      await storage.deleteHealingRitual(ritualId);
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete ritual', error: (error as Error).message });
     }
   });
 
