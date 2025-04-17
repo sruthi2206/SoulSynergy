@@ -13,6 +13,7 @@ import Journal from "@/pages/Journal";
 import Coach from "@/pages/Coach";
 import Community from "@/pages/Community";
 import Membership from "@/pages/Membership";
+import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 
 // User context for app-wide state
@@ -40,6 +41,7 @@ function Router() {
           <Route path="/coach/:type" component={Coach} />
           <Route path="/community" component={Community} />
           <Route path="/membership" component={Membership} />
+          <Route path="/auth" component={AuthPage} />
           <Route component={NotFound} />
         </Switch>
       </AnimatePresence>
