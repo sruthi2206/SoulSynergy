@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Star, CheckCircle2, Calendar, Users, Shield, BookOpen, Video, Infinity, ArrowRight, AlertTriangle, Loader2 } from "lucide-react";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { loadStripe } from "@stripe/stripe-js";
@@ -304,7 +304,7 @@ export default function Membership() {
   const [billingInterval, setBillingInterval] = useState<"month" | "year">("year");
   const [showCheckout, setShowCheckout] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
-  const { user } = useContext(UserContext);
+  const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   

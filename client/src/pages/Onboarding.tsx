@@ -1,11 +1,11 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { apiRequest } from "@/lib/queryClient";
-import { UserContext } from "@/App";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [userData, setUserData] = useState<FormValues | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { setUser } = useContext(UserContext);
+  const { registerMutation } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -55,81 +55,66 @@ export default function Onboarding() {
     setIsSubmitting(true);
     
     try {
-      // Create user
-      try {
-        const userResponse = await fetch("/api/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...userData
-          })
-        });
-        
-        if (!userResponse.ok) {
-          // Handle HTTP error responses
-          const errorData = await userResponse.json();
-          if (userResponse.status === 409) {
-            throw new Error(`Username "${userData.username}" already exists. Please choose a different username.`);
-          } else {
-            throw new Error(errorData.message || "Failed to create user");
+      // Register the user with the new auth system
+      registerMutation.mutate(userData as any, {
+        onSuccess: async (user) => {
+          try {
+            // Create chakra profile
+            const chakraResponse = await apiRequest("POST", "/api/chakra-profiles", {
+              userId: user.id,
+              crownChakra: chakraValues.crown || 5,
+              thirdEyeChakra: chakraValues.thirdEye || 5,
+              throatChakra: chakraValues.throat || 5,
+              heartChakra: chakraValues.heart || 5,
+              solarPlexusChakra: chakraValues.solarPlexus || 5,
+              sacralChakra: chakraValues.sacral || 5,
+              rootChakra: chakraValues.root || 5,
+            });
+            
+            if (!chakraResponse.ok) {
+              throw new Error("Failed to create chakra profile");
+            }
+            
+            toast({
+              title: "Welcome to SoulSync!",
+              description: "Your spiritual healing journey begins now.",
+            });
+            
+            // Navigate to dashboard
+            setLocation("/dashboard");
+          } catch (error) {
+            console.error("Error creating chakra profile:", error);
+            toast({
+              title: "Profile Creation Error",
+              description: "Your account was created but we couldn't set up your chakra profile. Please try again.",
+              variant: "destructive",
+            });
+          } finally {
+            setIsSubmitting(false);
           }
+        },
+        onError: (error) => {
+          console.error("Error registering user:", error);
+          toast({
+            title: "Registration Error",
+            description: error.message || "There was a problem creating your account. Please try again.",
+            variant: "destructive",
+          });
+          
+          // If it's a username conflict, reset the form to the first step
+          if (error.message.includes("409") || error.message.includes("already exists")) {
+            setStep(1);
+            form.setError("username", { 
+              type: "manual", 
+              message: "This username is already taken" 
+            });
+          }
+          
+          setIsSubmitting(false);
         }
-        
-        const user = await userResponse.json();
-        
-        // Create chakra profile
-        const chakraResponse = await fetch("/api/chakra-profiles", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: user.id,
-            crownChakra: chakraValues.crown || 5,
-            thirdEyeChakra: chakraValues.thirdEye || 5,
-            throatChakra: chakraValues.throat || 5,
-            heartChakra: chakraValues.heart || 5,
-            solarPlexusChakra: chakraValues.solarPlexus || 5,
-            sacralChakra: chakraValues.sacral || 5,
-            rootChakra: chakraValues.root || 5,
-          })
-        });
-        
-        if (!chakraResponse.ok) {
-          throw new Error("Failed to create chakra profile");
-        }
-        
-        // Set user in context
-        setUser({
-          id: user.id,
-          name: user.name
-        });
-        
-        toast({
-          title: "Welcome to SoulSync!",
-          description: "Your spiritual healing journey begins now.",
-        });
-        
-        // Navigate to dashboard
-        setLocation("/dashboard");
-      } catch (error) {
-        throw error;
-      }
-    } catch (error) {
-      console.error("Error creating profile:", error);
-      toast({
-        title: "Registration Error",
-        description: error instanceof Error ? error.message : "There was a problem creating your profile. Please try again.",
-        variant: "destructive",
       });
-      
-      // If it's a username conflict, reset the form to the first step
-      if (error instanceof Error && error.message.includes("already exists")) {
-        setStep(1);
-        form.setError("username", { 
-          type: "manual", 
-          message: "This username is already taken" 
-        });
-      }
-    } finally {
+    } catch (error) {
+      console.error("Unexpected error:", error);
       setIsSubmitting(false);
     }
   };
