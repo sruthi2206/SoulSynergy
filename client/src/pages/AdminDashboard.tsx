@@ -353,7 +353,7 @@ export default function AdminDashboard() {
                       <SelectValue placeholder="Select target chakra (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem key="none-chakra" value="none">None</SelectItem>
                       {CHAKRAS.map(chakra => (
                         <SelectItem key={chakra.value} value={chakra.value}>
                           {chakra.label}
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
                       <SelectValue placeholder="Select target emotion (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem key="none-emotion" value="none">None</SelectItem>
                       {EMOTIONS.map(emotion => (
                         <SelectItem key={emotion.value} value={emotion.value}>
                           {emotion.label}
