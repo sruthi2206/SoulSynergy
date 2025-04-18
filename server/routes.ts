@@ -96,18 +96,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch(`${apiRouter}/chakra-profiles/:id`, async (req, res) => {
     try {
       const profileId = parseInt(req.params.id);
-      const existingProfile = await storage.getChakraProfile(profileId);
+      
+      console.log("Updating chakra profile with ID:", profileId);
+      console.log("Request body:", req.body);
+      
+      // First try to find the profile by ID directly
+      let existingProfile = await storage.getChakraProfileById(profileId);
       
       if (!existingProfile) {
+        console.log("Profile not found by ID, trying to find by userId");
+        // If not found, try to find by userId as a fallback
+        existingProfile = await storage.getChakraProfile(profileId);
+      }
+      
+      if (!existingProfile) {
+        console.log("Profile not found");
         return res.status(404).json({ message: 'Chakra profile not found' });
       }
+      
+      console.log("Found existing profile:", existingProfile);
       
       // Validate only the fields that are provided
       const validatedData = insertChakraProfileSchema.partial().parse(req.body);
       
-      const updatedProfile = await storage.updateChakraProfile(profileId, validatedData);
+      console.log("Validated data:", validatedData);
+      
+      const updatedProfile = await storage.updateChakraProfile(existingProfile.id, validatedData);
+      
+      console.log("Updated profile:", updatedProfile);
+      
       res.status(200).json(updatedProfile);
     } catch (error) {
+      console.error("Error updating chakra profile:", error);
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: 'Invalid chakra profile data', errors: error.errors });
       } else {

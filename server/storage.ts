@@ -21,6 +21,7 @@ export interface IStorage {
 
   // Chakra profile operations
   getChakraProfile(userId: number): Promise<ChakraProfile | undefined>;
+  getChakraProfileById(id: number): Promise<ChakraProfile | undefined>;
   createChakraProfile(profile: InsertChakraProfile): Promise<ChakraProfile>;
   updateChakraProfile(id: number, profile: Partial<InsertChakraProfile>): Promise<ChakraProfile | undefined>;
 
@@ -129,6 +130,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.chakraProfiles.values()).find(
       (profile) => profile.userId === userId
     );
+  }
+  
+  async getChakraProfileById(id: number): Promise<ChakraProfile | undefined> {
+    return this.chakraProfiles.get(id);
   }
 
   async createChakraProfile(insertProfile: InsertChakraProfile): Promise<ChakraProfile> {
