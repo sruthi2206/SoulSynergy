@@ -95,10 +95,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get(`${apiRouter}/users/:userId/chakra-profile`, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
-      const profile = await storage.getChakraProfile(userId);
+      let profile = await storage.getChakraProfile(userId);
       
+      // If no profile exists, create a default one
       if (!profile) {
-        return res.status(404).json({ message: 'Chakra profile not found' });
+        // Create a default profile with balanced values (5)
+        const defaultProfileData = {
+          userId,
+          crownChakra: 5,
+          thirdEyeChakra: 5,
+          throatChakra: 5,
+          heartChakra: 5,
+          solarPlexusChakra: 5,
+          sacralChakra: 5,
+          rootChakra: 5
+        };
+        
+        try {
+          // Create the profile
+          profile = await storage.createChakraProfile(defaultProfileData);
+          console.log("Created default chakra profile for user:", userId);
+        } catch (createError) {
+          console.error("Error creating default chakra profile:", createError);
+          return res.status(500).json({ 
+            message: 'Failed to create default chakra profile', 
+            error: (createError as Error).message 
+          });
+        }
       }
       
       res.status(200).json(profile);
