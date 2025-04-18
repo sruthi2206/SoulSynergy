@@ -13,6 +13,8 @@ import Coach from "@/pages/Coach";
 import Community from "@/pages/Community";
 import Membership from "@/pages/Membership";
 import AdminDashboard from "@/pages/AdminDashboard";
+import ChakraAssessment from "@/pages/ChakraAssessment";
+import ChakraReport from "@/pages/ChakraReport";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -35,6 +37,8 @@ function Router() {
           <ProtectedRoute path="/community" component={Community} />
           <ProtectedRoute path="/membership" component={Membership} />
           <ProtectedRoute path="/admin" component={AdminDashboard} />
+          <ProtectedRoute path="/chakra-assessment" component={ChakraAssessment} />
+          <ProtectedRoute path="/chakra-report" component={ChakraReport} />
           <Route path="/auth" component={AuthPage} />
           <Route component={NotFound} />
         </Switch>

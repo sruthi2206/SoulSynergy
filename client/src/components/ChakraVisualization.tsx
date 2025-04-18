@@ -286,10 +286,23 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
               <p className="text-neutral-700">{overallBalance.description}</p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full" onClick={generatePdfReport}>
-                <Download className="w-4 h-4 mr-2" />
-                Download Full Report
-              </Button>
+              <div className="flex flex-col md:flex-row gap-3">
+                <Button 
+                  variant="outline" 
+                  className="flex-1" 
+                  onClick={() => window.location.href = "/chakra-assessment"}
+                >
+                  Update Assessment
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1" 
+                  onClick={() => window.location.href = "/chakra-report"}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  View Detailed Report
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </TabsContent>
