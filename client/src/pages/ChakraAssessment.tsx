@@ -83,42 +83,59 @@ export default function ChakraAssessment() {
     mutationFn: async () => {
       if (!user) throw new Error("User not authenticated");
       
-      if (chakraProfile) {
-        // Update existing profile
-        return await apiRequest("PATCH", `/api/chakra-profiles/${chakraProfile.id}`, {
-          crownChakra: chakraValues.crown,
-          thirdEyeChakra: chakraValues.thirdEye,
-          throatChakra: chakraValues.throat,
-          heartChakra: chakraValues.heart,
-          solarPlexusChakra: chakraValues.solarPlexus,
-          sacralChakra: chakraValues.sacral,
-          rootChakra: chakraValues.root
-        });
-      } else {
-        // Create new profile
-        return await apiRequest("POST", "/api/chakra-profiles", {
-          userId: user.id,
-          crownChakra: chakraValues.crown,
-          thirdEyeChakra: chakraValues.thirdEye,
-          throatChakra: chakraValues.throat,
-          heartChakra: chakraValues.heart,
-          solarPlexusChakra: chakraValues.solarPlexus,
-          sacralChakra: chakraValues.sacral,
-          rootChakra: chakraValues.root
-        });
+      try {
+        if (chakraProfile) {
+          // Update existing profile
+          console.log("Updating existing profile:", chakraProfile.id);
+          console.log("With values:", chakraValues);
+          
+          const response = await apiRequest("PATCH", `/api/chakra-profiles/${chakraProfile.id}`, {
+            crownChakra: chakraValues.crown,
+            thirdEyeChakra: chakraValues.thirdEye,
+            throatChakra: chakraValues.throat,
+            heartChakra: chakraValues.heart,
+            solarPlexusChakra: chakraValues.solarPlexus,
+            sacralChakra: chakraValues.sacral,
+            rootChakra: chakraValues.root
+          });
+          
+          return await response.json();
+        } else {
+          // Create new profile
+          console.log("Creating new profile for user:", user.id);
+          console.log("With values:", chakraValues);
+          
+          const response = await apiRequest("POST", "/api/chakra-profiles", {
+            userId: user.id,
+            crownChakra: chakraValues.crown,
+            thirdEyeChakra: chakraValues.thirdEye,
+            throatChakra: chakraValues.throat,
+            heartChakra: chakraValues.heart,
+            solarPlexusChakra: chakraValues.solarPlexus,
+            sacralChakra: chakraValues.sacral,
+            rootChakra: chakraValues.root
+          });
+          
+          return await response.json();
+        }
+      } catch (err) {
+        console.error("Error in mutation function:", err);
+        throw err;
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Profile saved successfully:", data);
       queryClient.invalidateQueries({ queryKey: [`/api/users/${user?.id}/chakra-profile`] });
       toast({
         title: "Chakra Profile Saved",
         description: "Your chakra assessment has been successfully saved.",
       });
       setTimeout(() => {
-        setLocation("/chakra-report");
+        window.location.href = "/chakra-report";
       }, 500);
     },
     onError: (error) => {
+      console.error("Error in saveProfileMutation:", error);
       toast({
         title: "Error Saving Profile",
         description: `There was a problem saving your chakra assessment: ${error.message}`,
