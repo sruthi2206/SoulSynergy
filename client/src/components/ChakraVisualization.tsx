@@ -290,14 +290,20 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                 <Button 
                   variant="outline" 
                   className="flex-1" 
-                  onClick={() => window.location.href = "/chakra-assessment"}
+                  onClick={() => {
+                    const loc = window.location;
+                    loc.assign(`${loc.protocol}//${loc.host}/chakra-assessment`);
+                  }}
                 >
                   Update Assessment
                 </Button>
                 <Button 
                   variant="outline" 
                   className="flex-1" 
-                  onClick={() => window.location.href = "/chakra-report"}
+                  onClick={() => {
+                    const loc = window.location;
+                    loc.assign(`${loc.protocol}//${loc.host}/chakra-report`);
+                  }}
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   View Detailed Report
