@@ -91,6 +91,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
+  
+  // Update chakra profile
+  app.patch(`${apiRouter}/chakra-profiles/:id`, async (req, res) => {
+    try {
+      const profileId = parseInt(req.params.id);
+      const existingProfile = await storage.getChakraProfile(profileId);
+      
+      if (!existingProfile) {
+        return res.status(404).json({ message: 'Chakra profile not found' });
+      }
+      
+      // Validate only the fields that are provided
+      const validatedData = insertChakraProfileSchema.partial().parse(req.body);
+      
+      const updatedProfile = await storage.updateChakraProfile(profileId, validatedData);
+      res.status(200).json(updatedProfile);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid chakra profile data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to update chakra profile', error: (error as Error).message });
+      }
+    }
+  });
 
   app.get(`${apiRouter}/users/:userId/chakra-profile`, async (req, res) => {
     try {
