@@ -120,12 +120,18 @@ export default function DashboardOverview({
                   </span>
                 </div>
                 
-                <Link href="/dashboard?tab=chakra">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Info className="h-4 w-4 mr-2" />
-                    View Details
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => {
+                    const loc = window.location;
+                    loc.assign(`${loc.protocol}//${loc.host}/chakra-report`);
+                  }}
+                >
+                  <Info className="h-4 w-4 mr-2" />
+                  View Details
+                </Button>
               </div>
             </CardContent>
           </Card>
