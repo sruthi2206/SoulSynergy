@@ -61,7 +61,7 @@ export default function Navigation() {
     },
     {
       name: "Healing Rituals",
-      path: "/dashboard?tab=rituals",
+      path: "/healing-rituals",
       icon: <Sparkles className="h-5 w-5" />
     },
     {

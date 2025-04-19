@@ -133,12 +133,7 @@ export default function Dashboard() {
             >
               Chakra Balance
             </TabsTrigger>
-            <TabsTrigger 
-              value="emotions" 
-              className="rounded-none border-b-2 border-transparent px-6 py-3 text-sm font-medium transition-colors hover:text-neutral-900 data-[state=active]:border-[#483D8B] data-[state=active]:text-[#483D8B] data-[state=active]:shadow-none"
-            >
-              Emotional Map
-            </TabsTrigger>
+
             <TabsTrigger 
               value="journal" 
               className="rounded-none border-b-2 border-transparent px-6 py-3 text-sm font-medium transition-colors hover:text-neutral-900 data-[state=active]:border-[#483D8B] data-[state=active]:text-[#483D8B] data-[state=active]:shadow-none"
@@ -183,13 +178,7 @@ export default function Dashboard() {
                   </Card>
                 </TabsContent>
                 
-                <TabsContent value="emotions" className="mt-0">
-                  <Card>
-                    <CardContent className="p-6">
-                      <EmotionTracker emotionTrackings={emotionTrackings} userId={user.id} />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+
                 
                 <TabsContent value="journal" className="mt-0">
                   <Card>
