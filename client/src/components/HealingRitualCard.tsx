@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 
 interface HealingRitualCardProps {
   title: string;
@@ -23,46 +22,82 @@ export function HealingRitualCard({
   onAdd,
   onComplete
 }: HealingRitualCardProps) {
+  // Get chakra icon emoji based on chakra name
+  const getChakraEmoji = (chakraName: string) => {
+    const chakraName_lower = chakraName.toLowerCase();
+    if (chakraName_lower.includes('crown')) return '👑';
+    if (chakraName_lower.includes('third eye')) return '👁️';
+    if (chakraName_lower.includes('throat')) return '🗣️';
+    if (chakraName_lower.includes('heart')) return '💚';
+    if (chakraName_lower.includes('solar plexus')) return '☀️';
+    if (chakraName_lower.includes('sacral')) return '🧡';
+    if (chakraName_lower.includes('root')) return '🔴';
+    return '✨';
+  };
+
+  // Get first chakra tag if available
+  const primaryChakra = chakraTags.length > 0 ? chakraTags[0] : '';
+  const chakraEmoji = getChakraEmoji(primaryChakra);
+
   return (
-    <div className="border rounded-md overflow-hidden shadow-sm bg-white">
-      <div className="flex flex-col md:flex-row">
-        {/* Left side - image */}
-        <div className="md:w-1/3 bg-gray-100 h-32 md:h-auto flex items-center justify-center">
-          <img 
-            src="/images/crown_chakra.jpg" 
-            alt={title} 
-            className="w-full h-full object-cover"
-          />
+    <div className="border border-gray-200 rounded-lg mb-4 bg-white overflow-hidden">
+      <div className="p-4">
+        <div className="flex items-center mb-2">
+          <span className="text-xl mr-2">{chakraEmoji}</span>
+          <h3 className="font-medium text-lg">{title}</h3>
+          
+          {isCompleted && (
+            <span className="ml-auto bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+              Completed
+            </span>
+          )}
         </div>
         
-        {/* Right side - content */}
-        <div className="md:w-2/3 p-4">
-          <div className="flex-1">
-            <h3 className="font-medium text-lg">{title}</h3>
-            <p className="text-sm text-gray-500 mt-1 line-clamp-2">{description}</p>
-            
-            <div className="flex flex-wrap gap-1 mt-2">
-              {chakraTags.map((tag) => (
-                <Badge key={tag} variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-1 mb-2">
+          {chakraTags.map((tag) => (
+            <Badge 
+              key={tag} 
+              variant="outline" 
+              className="bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100"
+            >
+              {tag}
+            </Badge>
+          ))}
           
-          <div className="flex justify-between mt-3 pt-3 border-t">
-            <Button variant="ghost" size="sm" className="text-indigo-600" onClick={onDetails}>
-              View Details
+          {emotionTags.map((tag) => (
+            <Badge 
+              key={tag} 
+              variant="outline" 
+              className="bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100"
+            >
+              {tag}
+            </Badge>
+          ))}
+          
+          <Badge 
+            variant="outline" 
+            className="bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100"
+          >
+            {primaryChakra.includes('crown') || primaryChakra.includes('third eye') ? 'meditation' : 'visualization'}
+          </Badge>
+        </div>
+        
+        <p className="text-gray-600 mb-4">{description}</p>
+        
+        <div className="flex justify-between pt-2">
+          <Button variant="ghost" size="sm" onClick={onDetails}>
+            View Details
+          </Button>
+          
+          {isCompleted ? (
+            <Button variant="outline" size="sm" onClick={onComplete}>
+              Mark Complete
             </Button>
-            
-            {isCompleted ? (
-              <Badge className="bg-green-500">Completed</Badge>
-            ) : (
-              <Button variant="outline" size="sm" onClick={onAdd}>
-                <Plus className="h-4 w-4 mr-1" /> Add to Practices
-              </Button>
-            )}
-          </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={onAdd}>
+              Add to Practices
+            </Button>
+          )}
         </div>
       </div>
     </div>
