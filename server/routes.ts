@@ -3,13 +3,18 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import Stripe from "stripe";
+import path from "path";
+import fs from "fs";
+import { randomUUID } from "crypto";
+import multer from "multer";
 import { 
   insertUserSchema, 
   insertChakraProfileSchema,
   insertJournalEntrySchema,
   insertEmotionTrackingSchema,
   insertCoachConversationSchema,
-  insertHealingRitualSchema
+  insertHealingRitualSchema,
+  insertMediaSchema
 } from "@shared/schema";
 import { analyzeJournalEntry, generateChatResponse, getCoachSystemPrompt } from "./openai";
 import { setupAuth } from "./auth";
@@ -29,10 +34,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // API routes prefix
   const apiRouter = '/api';
+  
+  // Middleware to check if user is admin
+  const isAdmin = (req: Request, res: Response, next: any) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    
+    const user = req.user as { isAdmin?: boolean };
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    
+    next();
+  };
+  
+  // Create uploads directory if it doesn't exist
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  
+  // Configure multer storage
+  const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const fileExt = path.extname(file.originalname);
+      const fileName = `${randomUUID()}${fileExt}`;
+      cb(null, fileName);
+    }
+  });
+  
+  // File filter to check allowed file types
+  const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm'];
+    
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`File type not allowed. Allowed types: ${allowedMimeTypes.join(', ')}`));
+    }
+  };
+  
+  const upload = multer({
+    storage: multerStorage,
+    fileFilter,
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB limit
+    }
+  });
 
   // Health check endpoint
   app.get(`${apiRouter}/health`, (req, res) => {
     res.status(200).json({ status: 'ok' });
+  });
+  
+  // File upload endpoint
+  app.post(`${apiRouter}/upload`, isAdmin, upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+      }
+      
+      // Get authenticated user
+      const user = req.user;
+      
+      // Create relative URL for the uploaded file
+      const relativeFilePath = `/uploads/${req.file.filename}`;
+      
+      // Create a new media entry in the database
+      if (user) {
+        try {
+          const mediaData = {
+            fileName: req.file.originalname,
+            fileType: req.file.mimetype,
+            fileUrl: relativeFilePath,
+            fileSize: req.file.size,
+            altText: req.body.altText || req.file.originalname,
+            uploadedById: user.id
+          };
+          
+          // Store the media in the database
+          const mediaItem = await storage.uploadMedia(mediaData);
+          
+          res.status(201).json({
+            success: true,
+            url: relativeFilePath,
+            fileName: req.file.originalname,
+            mediaId: mediaItem.id
+          });
+        } catch (error) {
+          console.error("Failed to save media to database:", error);
+          // Even if DB storage fails, still return the file URL
+          res.status(201).json({
+            success: true,
+            url: relativeFilePath,
+            fileName: req.file.originalname,
+            warning: "File saved but database entry failed"
+          });
+        }
+      } else {
+        // User not found in request
+        res.status(201).json({
+          success: true,
+          url: relativeFilePath,
+          fileName: req.file.originalname,
+          warning: "User not authenticated, file saved without database entry"
+        });
+      }
+    } catch (error) {
+      console.error("File upload error:", error);
+      res.status(500).json({
+        success: false,
+        message: `File upload failed: ${(error as Error).message}`
+      });
+    }
   });
 
   // User routes
@@ -382,20 +500,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
-  // Middleware to check if user is admin
-  const isAdmin = (req: Request, res: Response, next: any) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: 'Authentication required' });
-    }
-    
-    const user = req.user as { isAdmin?: boolean };
-    if (!user.isAdmin) {
-      return res.status(403).json({ message: 'Admin access required' });
-    }
-    
-    next();
-  };
 
   // Healing ritual routes
   app.get(`${apiRouter}/healing-rituals`, async (req, res) => {
