@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Check, CheckCircle, Clock, Play, Flame, Droplets, Music, Brain, BookOpen, Heart } from "lucide-react";
+import { Check, CheckCircle, Clock, Play, Plus, Flame, Droplets, Music, Brain, BookOpen, Heart } from "lucide-react";
 import { chakras } from "@/lib/chakras";
 
 interface HealingRitualsProps {
@@ -676,10 +676,11 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                                 
                                 <div className="flex justify-between">
                                   <Button 
-                                    variant="ghost"
                                     onClick={() => handleAddRitual(ritual.id)}
+                                    className="bg-[#483D8B] hover:bg-opacity-90"
                                     disabled={addRecommendationMutation.isPending}
                                   >
+                                    <Plus className="h-4 w-4 mr-2" />
                                     Add to My Practices
                                   </Button>
                                   
