@@ -659,6 +659,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Media Library routes
+  app.get(`${apiRouter}/media`, async (req, res) => {
+    try {
+      const mediaItems = await storage.getMediaItems();
+      res.status(200).json(mediaItems);
+    } catch (error) {
+      console.error('Error fetching media items:', error);
+      res.status(500).json({ message: 'Failed to fetch media items', error: (error as Error).message });
+    }
+  });
+
+  app.get(`${apiRouter}/media/:id`, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const mediaItem = await storage.getMediaItem(id);
+      
+      if (!mediaItem) {
+        return res.status(404).json({ message: 'Media item not found' });
+      }
+      
+      res.status(200).json(mediaItem);
+    } catch (error) {
+      console.error('Error fetching media item:', error);
+      res.status(500).json({ message: 'Failed to fetch media item', error: (error as Error).message });
+    }
+  });
+  
+  app.delete(`${apiRouter}/media/:id`, isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const mediaItem = await storage.getMediaItem(id);
+      
+      if (!mediaItem) {
+        return res.status(404).json({ message: 'Media item not found' });
+      }
+      
+      // Delete from filesystem if it exists
+      try {
+        const filePath = path.join(process.cwd(), 'public', mediaItem.fileUrl);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted file from filesystem: ${filePath}`);
+        }
+      } catch (fileError) {
+        console.error('Error deleting file from filesystem:', fileError);
+        // Continue processing even if file deletion fails
+      }
+      
+      // Delete from database
+      await storage.deleteMedia(id);
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting media item:', error);
+      res.status(500).json({ message: 'Failed to delete media item', error: (error as Error).message });
+    }
+  });
+
   // Stripe payment routes
   app.post(`${apiRouter}/create-payment-intent`, async (req, res) => {
     try {

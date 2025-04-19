@@ -978,7 +978,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {mediaItems
-                    .filter(item => {
+                    .filter((item: MediaItem) => {
                       // Filter by search term
                       if (mediaSearchTerm && !item.fileName.toLowerCase().includes(mediaSearchTerm.toLowerCase())) {
                         return false;
@@ -989,7 +989,7 @@ export default function AdminDashboard() {
                       }
                       return true;
                     })
-                    .map(item => (
+                    .map((item: MediaItem) => (
                       <Card key={item.id} className="overflow-hidden">
                         <div className="aspect-square bg-gray-100 relative">
                           {item.fileType.includes('image') ? (
