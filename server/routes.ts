@@ -341,10 +341,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = parseInt(req.params.userId);
       const coachType = req.query.coachType as string | undefined;
       
+      // Validate that we have a valid coach type parameter
+      if (!coachType) {
+        return res.status(400).json({ message: 'Missing coachType parameter' });
+      }
+      
       const conversations = await storage.getCoachConversations(userId, coachType);
       res.status(200).json(conversations);
     } catch (error) {
       res.status(500).json({ message: 'Failed to get coach conversations', error: (error as Error).message });
+    }
+  });
+  
+  // Delete coach conversation route
+  app.delete(`${apiRouter}/coach-conversations/:id`, async (req, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      
+      // Check if the conversation exists
+      const conversation = await storage.getCoachConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ message: 'Conversation not found' });
+      }
+      
+      // Delete the conversation
+      await storage.deleteCoachConversation(conversationId);
+      
+      res.status(200).json({ message: 'Conversation deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ 
+        message: 'Failed to delete conversation', 
+        error: (error as Error).message 
+      });
     }
   });
 

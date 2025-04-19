@@ -130,6 +130,12 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updatedConversation;
   }
+  
+  async deleteCoachConversation(id: number): Promise<void> {
+    await db
+      .delete(coachConversations)
+      .where(eq(coachConversations.id, id));
+  }
 
   async getHealingRituals(): Promise<HealingRitual[]> {
     return await db.select().from(healingRituals);

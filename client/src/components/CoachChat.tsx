@@ -5,9 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Mic, MicOff, RefreshCw } from "lucide-react";
+import { Send, Mic, MicOff, RefreshCw, Trash2, AlertTriangle, History } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface CoachChatProps {
   coachType: string;
@@ -220,6 +229,43 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       description: `You're now in a fresh conversation with your ${coach.name}.`
     });
   };
+  
+  // Delete conversation mutation
+  const deleteConversationMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/coach-conversations/${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to delete conversation");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Refresh conversation list
+      refetchConversations();
+      
+      // Start a new conversation
+      startNewConversation();
+      
+      toast({
+        title: "Conversation History Deleted",
+        description: "Your conversation history has been successfully removed.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Deletion Failed",
+        description: `Unable to delete conversation: ${error.message}`,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Handle conversation deletion
+  const handleDeleteConversation = () => {
+    if (conversationId) {
+      deleteConversationMutation.mutate(conversationId);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -316,6 +362,7 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
             variant={isVoiceActive ? "destructive" : "outline"}
             onClick={toggleVoiceInput}
             className="flex-shrink-0"
+            title="Voice input"
           >
             {isVoiceActive ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </Button>
@@ -330,6 +377,63 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
+          
+          {conversationId && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="flex-shrink-0"
+                  title="Delete conversation history"
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    Delete Conversation History
+                  </DialogTitle>
+                  <DialogDescription>
+                    Deleting your conversation history may impact the coach's ability to provide
+                    accurate healing guidance based on your past interactions. Your coach learns
+                    about your specific healing needs through your conversations.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
+                  <p className="font-medium">Important:</p>
+                  <p className="mt-1">Your healing journey is progressive, and past conversations help your coach provide personalized guidance. Deleting history may reduce the effectiveness of future healing insights.</p>
+                </div>
+                <DialogFooter className="gap-2 sm:justify-end">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {}}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeleteConversation}
+                    disabled={deleteConversationMutation.isPending}
+                  >
+                    {deleteConversationMutation.isPending ? (
+                      <>
+                        <span className="mr-2">Deleting...</span>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      </>
+                    ) : (
+                      'Delete History'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
           
           <div className="relative flex-grow">
             <Input
