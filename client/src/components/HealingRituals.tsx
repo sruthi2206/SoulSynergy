@@ -446,61 +446,95 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center">
-                          <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center mr-2"
-                            style={{ 
-                              backgroundColor: ritual.targetChakra 
-                                ? `${getChakraColor(ritual.targetChakra)}20` 
-                                : "#E6E6FA20" 
-                            }}
-                          >
-                            {getRitualIcon(ritual.type)}
-                          </div>
-                          {ritual.name}
-                        </CardTitle>
-                        <CardDescription>{ritual.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="outline">
-                              {ritual.type.replace('_', ' ')}
-                            </Badge>
-                            {ritual.targetChakra && (
-                              <Badge 
-                                variant="outline"
-                                style={{ 
-                                  color: getChakraColor(ritual.targetChakra),
-                                  borderColor: `${getChakraColor(ritual.targetChakra)}40`
-                                }}
-                              >
-                                {ritual.targetChakra}
+                    <Card className="overflow-hidden">
+                      <div className="flex flex-col md:flex-row">
+                        {/* Left side: image/thumbnail */}
+                        <div className="md:w-1/3 relative">
+                          {(() => {
+                            const thumbnailUrl = getYoutubeThumbnail(ritual.videoUrl);
+                            
+                            if (thumbnailUrl) {
+                              return (
+                                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                                  <img 
+                                    src={thumbnailUrl} 
+                                    alt={ritual.name} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                    <Play className="h-10 w-10 text-white" />
+                                  </div>
+                                </div>
+                              );
+                            } else if (ritual.featuredImage) {
+                              return (
+                                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                                  <img 
+                                    src={ritual.featuredImage} 
+                                    alt={ritual.name} 
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              );
+                            } else {
+                              return (
+                                <div 
+                                  className="relative aspect-[4/3] w-full flex items-center justify-center"
+                                  style={{ 
+                                    backgroundColor: ritual.targetChakra 
+                                      ? `${getChakraColor(ritual.targetChakra)}20` 
+                                      : "#E6E6FA20" 
+                                  }}
+                                >
+                                  <div className="w-16 h-16 rounded-full flex items-center justify-center bg-white/90">
+                                    {getRitualIcon(ritual.type)}
+                                  </div>
+                                </div>
+                              );
+                            }
+                          })()}
+                        </div>
+                        
+                        {/* Right side: content */}
+                        <div className="md:w-2/3 p-6">
+                          <div className="mb-4">
+                            <h3 className="text-xl font-medium mb-1">{ritual.name}</h3>
+                            <p className="text-neutral-500 mb-3">{ritual.description}</p>
+                            
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              <Badge variant="outline">
+                                {ritual.type.replace('_', ' ')}
                               </Badge>
-                            )}
-                            {ritual.targetEmotion && (
-                              <Badge variant="outline" className="bg-[#FF69B4]/10 text-[#FF69B4] border-[#FF69B4]/20">
-                                {ritual.targetEmotion}
-                              </Badge>
-                            )}
+                              {ritual.targetChakra && (
+                                <Badge 
+                                  variant="outline"
+                                  style={{ 
+                                    color: getChakraColor(ritual.targetChakra),
+                                    borderColor: `${getChakraColor(ritual.targetChakra)}40`
+                                  }}
+                                >
+                                  {ritual.targetChakra}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           
-                          <div className="bg-neutral-50 p-3 rounded-md text-sm mt-2">
-                            {ritual.instructions}
+                          <div className="flex justify-between">
+                            <Button 
+                              onClick={() => handleAddRitual(ritual.id)} 
+                              className="bg-[#483D8B] hover:bg-opacity-90"
+                              disabled={addRecommendationMutation.isPending}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add to My Practices
+                            </Button>
+                            
+                            <Button variant="outline">
+                              Learn More
+                            </Button>
                           </div>
                         </div>
-                      </CardContent>
-                      <CardFooter>
-                        <Button 
-                          onClick={() => handleAddRitual(ritual.id)} 
-                          className="w-full bg-[#483D8B] hover:bg-opacity-90"
-                          disabled={addRecommendationMutation.isPending}
-                        >
-                          Add to My Practices
-                        </Button>
-                      </CardFooter>
+                      </div>
                     </Card>
                   </motion.div>
                 ))}
