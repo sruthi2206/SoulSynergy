@@ -100,17 +100,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Updating chakra profile with ID:", profileId);
       console.log("Request body:", req.body);
       
-      // First try to find the profile by ID directly
-      let existingProfile = await storage.getChakraProfileById(profileId);
+      // Try to find the profile by ID (which is equal to userId in this case)
+      let existingProfile = await storage.getChakraProfile(profileId);
       
       if (!existingProfile) {
-        console.log("Profile not found by ID, trying to find by userId");
-        // If not found, try to find by userId as a fallback
-        existingProfile = await storage.getChakraProfile(profileId);
-      }
-      
-      if (!existingProfile) {
-        console.log("Profile not found");
+        console.log("Profile not found by userId:", profileId);
         return res.status(404).json({ message: 'Chakra profile not found' });
       }
       
@@ -269,10 +263,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Save the history (exclude system message for history context)
-        conversationHistory = conversation.messages.filter(msg => msg.role !== 'system');
+        // Handle conversation.messages being unknown type
+        const messages = conversation.messages || [];
+        if (Array.isArray(messages)) {
+          conversationHistory = messages.filter((msg: any) => msg.role !== 'system');
+          
+          // Current session messages (including system message)
+          currentMessages = [...messages];
+        } else {
+          console.warn('Conversation messages is not an array:', typeof messages);
+          // Create default messages with system prompt if messages aren't available
+          currentMessages = [
+            { role: 'system', content: getCoachSystemMessage(coachType) }
+          ];
+        }
         
-        // Current session messages (including system message)
-        currentMessages = [...conversation.messages];
+        // Add the new user message
         currentMessages.push({ role: 'user', content: message });
       } else {
         // Start a new conversation
@@ -289,8 +295,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Get messages from most recent conversation (excluding this new one)
           const recentConversation = pastConversations[0];
           if (recentConversation && recentConversation.messages) {
-            // Use the previous conversation for context
-            conversationHistory = recentConversation.messages.filter(msg => msg.role !== 'system');
+            // Handle messages being potentially any type
+            const messages = recentConversation.messages;
+            if (Array.isArray(messages)) {
+              // Use the previous conversation for context
+              conversationHistory = messages.filter((msg: any) => msg.role !== 'system');
+            } else {
+              console.warn('Recent conversation messages is not an array:', typeof messages);
+            }
           }
         }
         
