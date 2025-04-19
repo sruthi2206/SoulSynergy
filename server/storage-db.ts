@@ -11,13 +11,19 @@ import {
   coachConversations,
   healingRituals,
   userRecommendations,
+  communityEvents,
+  eventAttendees,
+  mediaLibrary,
   User, InsertUser,
   ChakraProfile, InsertChakraProfile,
   JournalEntry, InsertJournalEntry,
   EmotionTracking, InsertEmotionTracking,
   CoachConversation, InsertCoachConversation,
   HealingRitual, InsertHealingRitual,
-  UserRecommendation, InsertUserRecommendation
+  UserRecommendation, InsertUserRecommendation,
+  CommunityEvent, InsertCommunityEvent,
+  EventAttendee, InsertEventAttendee,
+  MediaItem, InsertMediaItem
 } from "@shared/schema";
 import { IStorage } from './storage';
 
@@ -213,6 +219,78 @@ export class DatabaseStorage implements IStorage {
       .where(eq(userRecommendations.id, id))
       .returning();
     return updatedRecommendation;
+  }
+  
+  // Community event operations
+  async getCommunityEvents(): Promise<CommunityEvent[]> {
+    return await db.select().from(communityEvents);
+  }
+
+  async getCommunityEvent(id: number): Promise<CommunityEvent | undefined> {
+    const [event] = await db.select().from(communityEvents).where(eq(communityEvents.id, id));
+    return event;
+  }
+
+  async createCommunityEvent(event: InsertCommunityEvent): Promise<CommunityEvent> {
+    const [newEvent] = await db.insert(communityEvents).values(event).returning();
+    return newEvent;
+  }
+
+  async updateCommunityEvent(id: number, event: Partial<InsertCommunityEvent>): Promise<CommunityEvent | undefined> {
+    const [updatedEvent] = await db
+      .update(communityEvents)
+      .set({ ...event, updatedAt: new Date() })
+      .where(eq(communityEvents.id, id))
+      .returning();
+    
+    return updatedEvent;
+  }
+
+  async deleteCommunityEvent(id: number): Promise<void> {
+    await db.delete(communityEvents).where(eq(communityEvents.id, id));
+  }
+  
+  // Event attendee operations
+  async getEventAttendees(eventId: number): Promise<EventAttendee[]> {
+    return await db.select().from(eventAttendees).where(eq(eventAttendees.eventId, eventId));
+  }
+
+  async getUserEventRegistrations(userId: number): Promise<EventAttendee[]> {
+    return await db.select().from(eventAttendees).where(eq(eventAttendees.userId, userId));
+  }
+
+  async registerForEvent(attendee: InsertEventAttendee): Promise<EventAttendee> {
+    const [newAttendee] = await db.insert(eventAttendees).values(attendee).returning();
+    return newAttendee;
+  }
+
+  async markAttendance(id: number, attended: boolean): Promise<EventAttendee | undefined> {
+    const [updatedAttendee] = await db
+      .update(eventAttendees)
+      .set({ attended })
+      .where(eq(eventAttendees.id, id))
+      .returning();
+    
+    return updatedAttendee;
+  }
+  
+  // Media library operations
+  async getMediaItems(): Promise<MediaItem[]> {
+    return await db.select().from(mediaLibrary);
+  }
+
+  async getMediaItem(id: number): Promise<MediaItem | undefined> {
+    const [mediaItem] = await db.select().from(mediaLibrary).where(eq(mediaLibrary.id, id));
+    return mediaItem;
+  }
+
+  async uploadMedia(media: InsertMediaItem): Promise<MediaItem> {
+    const [newMedia] = await db.insert(mediaLibrary).values(media).returning();
+    return newMedia;
+  }
+
+  async deleteMedia(id: number): Promise<void> {
+    await db.delete(mediaLibrary).where(eq(mediaLibrary.id, id));
   }
 
   // Initialize healing rituals - only called if table is empty

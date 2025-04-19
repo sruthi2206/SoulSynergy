@@ -53,6 +53,25 @@ export interface IStorage {
   getUserRecommendations(userId: number): Promise<UserRecommendation[]>;
   createUserRecommendation(recommendation: InsertUserRecommendation): Promise<UserRecommendation>;
   updateUserRecommendation(id: number, completed: boolean): Promise<UserRecommendation | undefined>;
+  
+  // Community event operations
+  getCommunityEvents(): Promise<CommunityEvent[]>;
+  getCommunityEvent(id: number): Promise<CommunityEvent | undefined>;
+  createCommunityEvent(event: InsertCommunityEvent): Promise<CommunityEvent>;
+  updateCommunityEvent(id: number, event: Partial<InsertCommunityEvent>): Promise<CommunityEvent | undefined>;
+  deleteCommunityEvent(id: number): Promise<void>;
+  
+  // Event attendee operations
+  getEventAttendees(eventId: number): Promise<EventAttendee[]>;
+  getUserEventRegistrations(userId: number): Promise<EventAttendee[]>;
+  registerForEvent(attendee: InsertEventAttendee): Promise<EventAttendee>;
+  markAttendance(id: number, attended: boolean): Promise<EventAttendee | undefined>;
+  
+  // Media library operations
+  getMediaItems(): Promise<MediaItem[]>;
+  getMediaItem(id: number): Promise<MediaItem | undefined>;
+  uploadMedia(media: InsertMediaItem): Promise<MediaItem>;
+  deleteMedia(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
