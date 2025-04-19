@@ -56,9 +56,12 @@ import {
   Image as ImageIcon, 
   Video, 
   Calendar, 
-  Link, 
+  Link as LinkIcon, 
   Check, 
-  X 
+  X,
+  Search,
+  Files,
+  Copy
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -273,6 +276,11 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // State for the dashboard
+  const [dashboardTab, setDashboardTab] = useState("rituals");
+  const [mediaSearchTerm, setMediaSearchTerm] = useState("");
+  const [selectedMediaType, setSelectedMediaType] = useState<string | null>(null);
+  
   // State for the form dialog
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingRitual, setEditingRitual] = useState<HealingRitual | null>(null);
@@ -296,12 +304,32 @@ export default function AdminDashboard() {
   // Query to fetch all healing rituals
   const {
     data: rituals,
-    isLoading,
-    error,
+    isLoading: ritualsLoading,
+    error: ritualsError,
   } = useQuery({
     queryKey: ["/api/healing-rituals"],
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/healing-rituals");
+      return response.json();
+    },
+  });
+  
+  // Query to fetch media items
+  const {
+    data: mediaItems,
+    isLoading: mediaLoading,
+    error: mediaError,
+  } = useQuery({
+    queryKey: ["/api/media"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/media");
+      if (!response.ok) {
+        if (response.status === 404) {
+          // If the endpoint doesn't exist yet, return an empty array
+          return [];
+        }
+        throw new Error("Failed to fetch media items");
+      }
       return response.json();
     },
   });
@@ -354,8 +382,8 @@ export default function AdminDashboard() {
     },
   });
 
-  // Delete mutation
-  const deleteMutation = useMutation({
+  // Delete ritual mutation
+  const deleteRitualMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await apiRequest("DELETE", `/api/healing-rituals/${id}`);
       return response.status === 204;
@@ -371,6 +399,28 @@ export default function AdminDashboard() {
       toast({
         title: "Error",
         description: `Failed to delete ritual: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Delete media mutation
+  const deleteMediaMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/media/${id}`);
+      return response.status === 204;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Media file deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/media"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete media: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -497,10 +547,26 @@ export default function AdminDashboard() {
   };
 
   // Confirm deletion of a ritual
-  const handleDelete = (id: number) => {
+  const handleDeleteRitual = (id: number) => {
     if (window.confirm("Are you sure you want to delete this ritual?")) {
-      deleteMutation.mutate(id);
+      deleteRitualMutation.mutate(id);
     }
+  };
+  
+  // Confirm deletion of a media item
+  const handleDeleteMedia = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this media file?")) {
+      deleteMediaMutation.mutate(id);
+    }
+  };
+  
+  // Handle media file selection
+  const handleSelectMedia = (mediaUrl: string) => {
+    navigator.clipboard.writeText(mediaUrl);
+    toast({
+      title: "Media URL Copied",
+      description: "Media URL has been copied to your clipboard"
+    });
   };
 
   if (authLoading) {
@@ -515,14 +581,14 @@ export default function AdminDashboard() {
     return null; // Will be redirected by useEffect
   }
 
-  const isPending = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || deleteRitualMutation.isPending;
 
   return (
     <div className="container py-10">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage healing rituals</p>
+          <p className="text-muted-foreground">Manage healing rituals and media files</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -762,82 +828,223 @@ export default function AdminDashboard() {
         </Dialog>
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : error ? (
-        <Card>
-          <CardContent className="py-10">
-            <p className="text-center text-destructive">
-              Error loading healing rituals: {(error as Error).message}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableCaption>List of all healing rituals</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Target Chakra</TableHead>
-                <TableHead>Target Emotion</TableHead>
-                <TableHead className="w-[200px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rituals?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10">
-                    No healing rituals found. Create one to get started.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                rituals?.map((ritual: HealingRitual) => (
-                  <TableRow key={ritual.id}>
-                    <TableCell className="font-medium">{ritual.name}</TableCell>
-                    <TableCell>
-                      {RITUAL_TYPES.find(t => t.value === ritual.type)?.label || ritual.type}
-                    </TableCell>
-                    <TableCell>
-                      {ritual.targetChakra 
-                        ? CHAKRAS.find(c => c.value === ritual.targetChakra)?.label 
-                        : "—"}
-                    </TableCell>
-                    <TableCell>
-                      {ritual.targetEmotion 
-                        ? EMOTIONS.find(e => e.value === ritual.targetEmotion)?.label 
-                        : "—"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEdit(ritual)}
-                          disabled={isPending}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          onClick={() => handleDelete(ritual.id)}
-                          disabled={isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+      <Tabs value={dashboardTab} onValueChange={setDashboardTab} className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="rituals">Healing Rituals</TabsTrigger>
+          <TabsTrigger value="media">Media Library</TabsTrigger>
+        </TabsList>
+        
+        {/* Rituals Tab */}
+        <TabsContent value="rituals">
+          {ritualsLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : ritualsError ? (
+            <Card>
+              <CardContent className="py-10">
+                <p className="text-center text-destructive">
+                  Error loading healing rituals: {(ritualsError as Error).message}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableCaption>List of all healing rituals</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Target Chakra</TableHead>
+                    <TableHead>Target Emotion</TableHead>
+                    <TableHead className="w-[200px]">Actions</TableHead>
                   </TableRow>
-                ))
+                </TableHeader>
+                <TableBody>
+                  {rituals?.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-10">
+                        No healing rituals found. Create one to get started.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    rituals?.map((ritual: HealingRitual) => (
+                      <TableRow key={ritual.id}>
+                        <TableCell className="font-medium">{ritual.name}</TableCell>
+                        <TableCell>
+                          {RITUAL_TYPES.find(t => t.value === ritual.type)?.label || ritual.type}
+                        </TableCell>
+                        <TableCell>
+                          {ritual.targetChakra 
+                            ? CHAKRAS.find(c => c.value === ritual.targetChakra)?.label 
+                            : "—"}
+                        </TableCell>
+                        <TableCell>
+                          {ritual.targetEmotion 
+                            ? EMOTIONS.find(e => e.value === ritual.targetEmotion)?.label 
+                            : "—"}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleEdit(ritual)}
+                              disabled={isPending}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm" 
+                              onClick={() => handleDeleteRitual(ritual.id)}
+                              disabled={isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TabsContent>
+        
+        {/* Media Library Tab */}
+        <TabsContent value="media">
+          <Card>
+            <CardHeader>
+              <CardTitle>Media Library</CardTitle>
+              <CardDescription>
+                Upload and manage media files for your healing rituals
+              </CardDescription>
+              <div className="mt-4 flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search media files..."
+                    className="pl-8"
+                    value={mediaSearchTerm}
+                    onChange={(e) => setMediaSearchTerm(e.target.value)}
+                  />
+                </div>
+                <Select
+                  value={selectedMediaType || ""}
+                  onValueChange={(value) => setSelectedMediaType(value === "all" ? null : value)}
+                >
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Filter by type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="image">Images</SelectItem>
+                    <SelectItem value="video">Videos</SelectItem>
+                    <SelectItem value="audio">Audio</SelectItem>
+                    <SelectItem value="document">Documents</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="mt-4">
+                <DropZone
+                  onFileDrop={(file) => handleFileUpload(file, '')}
+                  acceptedFileTypes={['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'audio/mpeg']}
+                  currentFileUrl={null}
+                  isUploading={isUploading}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {mediaLoading ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : mediaError ? (
+                <div className="text-center py-10">
+                  <p className="text-red-500 mb-2">Failed to load media</p>
+                  <p className="text-muted-foreground">
+                    {mediaError instanceof Error ? mediaError.message : "Unknown error"}
+                  </p>
+                </div>
+              ) : !mediaItems || mediaItems.length === 0 ? (
+                <div className="text-center py-10">
+                  <Files className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="mb-2">No media files found</p>
+                  <p className="text-muted-foreground">Upload files to begin building your media library</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {mediaItems
+                    .filter(item => {
+                      // Filter by search term
+                      if (mediaSearchTerm && !item.fileName.toLowerCase().includes(mediaSearchTerm.toLowerCase())) {
+                        return false;
+                      }
+                      // Filter by type
+                      if (selectedMediaType && !item.fileType.includes(selectedMediaType)) {
+                        return false;
+                      }
+                      return true;
+                    })
+                    .map(item => (
+                      <Card key={item.id} className="overflow-hidden">
+                        <div className="aspect-square bg-gray-100 relative">
+                          {item.fileType.includes('image') ? (
+                            <img 
+                              src={item.fileUrl} 
+                              alt={item.fileName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : item.fileType.includes('video') ? (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Video className="h-12 w-12 text-muted-foreground" />
+                            </div>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Files className="h-12 w-12 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                            <Button 
+                              variant="secondary" 
+                              size="sm"
+                              onClick={() => handleSelectMedia(item.fileUrl)}
+                            >
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copy URL
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleDeleteMedia(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                        <CardFooter className="p-2">
+                          <div className="w-full overflow-hidden">
+                            <p className="text-sm font-medium truncate" title={item.fileName}>
+                              {item.fileName}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(item.uploadDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </CardFooter>
+                      </Card>
+                    ))
+                  }
+                </div>
               )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
