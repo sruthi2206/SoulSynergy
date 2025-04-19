@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, Heart, Users, Share2, Bell, BellOff, Filter, MessageSquareHeart } from "lucide-react";
-import { useContext } from "react";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 
 interface Post {
@@ -155,7 +154,7 @@ export default function Community() {
   const [activeTab, setActiveTab] = useState("feed");
   const [posts, setPosts] = useState<Post[]>(mockPosts);
   const [events, setEvents] = useState<Event[]>(mockEvents);
-  const { user } = useContext(UserContext);
+  const { user } = useAuth();
   
   // Handle liking a post
   const handleLikePost = (postId: number) => {

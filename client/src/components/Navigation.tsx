@@ -1,14 +1,14 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { UserContext } from "@/App";
-import { Menu, X, ChevronDown, LayoutDashboard, BookOpen, MessageSquare, Sparkles, LogOut, Users, CreditCard } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { Menu, X, ChevronDown, LayoutDashboard, BookOpen, MessageSquare, Sparkles, LogOut, Users, CreditCard, ShieldCheck } from "lucide-react";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
-  const { user, setUser } = useContext(UserContext);
+  const { user, logoutMutation } = useAuth();
   
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -19,14 +19,25 @@ export default function Navigation() {
   };
   
   const handleLogout = () => {
-    setUser(null);
+    logoutMutation.mutate();
   };
   
   const isActive = (path: string) => {
     return location === path;
   };
   
-  const navItems = [
+  // Define a type for navigation items
+  interface NavItem {
+    name: string;
+    path: string;
+    icon: JSX.Element;
+    dropdownItems?: Array<{
+      name: string;
+      path: string;
+    }>;
+  }
+
+  const navItems: NavItem[] = [
     {
       name: "Dashboard",
       path: "/dashboard",
@@ -125,7 +136,7 @@ export default function Navigation() {
             <div className="hidden md:block">
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <div className="text-sm font-medium">Hi, {user.name}</div>
+                  <div className="text-sm font-medium">Hi, {user.username}</div>
                   <Button variant="outline" size="sm" onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-1" />
                     Sign Out
@@ -207,7 +218,7 @@ export default function Navigation() {
                 <div className="pt-4 border-t border-neutral-200 mt-4">
                   {user ? (
                     <div className="space-y-3">
-                      <div className="px-3 py-2 text-neutral-700">Signed in as: <span className="font-medium">{user.name}</span></div>
+                      <div className="px-3 py-2 text-neutral-700">Signed in as: <span className="font-medium">{user.username}</span></div>
                       <Button 
                         variant="outline" 
                         className="w-full justify-start"

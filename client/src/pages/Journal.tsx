@@ -1,9 +1,9 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Calendar, CalendarIcon, BookOpen, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function Journal() {
-  const { user } = useContext(UserContext);
+  const { user } = useAuth();
   const [journalContent, setJournalContent] = useState("");
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const queryClient = useQueryClient();

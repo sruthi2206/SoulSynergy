@@ -8,7 +8,12 @@ import {
   UserRecommendation, InsertUserRecommendation
 } from "@shared/schema";
 
+import session from "express-session";
+
 export interface IStorage {
+  // Session storage for authentication
+  sessionStore: session.Store;
+  
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -16,6 +21,7 @@ export interface IStorage {
 
   // Chakra profile operations
   getChakraProfile(userId: number): Promise<ChakraProfile | undefined>;
+  getChakraProfileById(id: number): Promise<ChakraProfile | undefined>;
   createChakraProfile(profile: InsertChakraProfile): Promise<ChakraProfile>;
   updateChakraProfile(id: number, profile: Partial<InsertChakraProfile>): Promise<ChakraProfile | undefined>;
 
@@ -39,6 +45,8 @@ export interface IStorage {
   getHealingRitual(id: number): Promise<HealingRitual | undefined>;
   getHealingRitualsByTarget(targetChakra?: string, targetEmotion?: string): Promise<HealingRitual[]>;
   createHealingRitual(ritual: InsertHealingRitual): Promise<HealingRitual>;
+  updateHealingRitual(id: number, ritual: InsertHealingRitual): Promise<HealingRitual | undefined>;
+  deleteHealingRitual(id: number): Promise<void>;
 
   // User recommendation operations
   getUserRecommendations(userId: number): Promise<UserRecommendation[]>;
@@ -62,6 +70,9 @@ export class MemStorage implements IStorage {
   private coachConversationIdCounter: number;
   private healingRitualIdCounter: number;
   private userRecommendationIdCounter: number;
+  
+  // Session store for authentication
+  sessionStore: session.Store;
 
   constructor() {
     this.users = new Map();
@@ -79,6 +90,12 @@ export class MemStorage implements IStorage {
     this.coachConversationIdCounter = 1;
     this.healingRitualIdCounter = 1;
     this.userRecommendationIdCounter = 1;
+    
+    // Create in-memory session store
+    const MemoryStore = require('memorystore')(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    });
     
     // Initialize with default healing rituals
     this.initializeHealingRituals();
@@ -101,6 +118,7 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id,
+      isAdmin: insertUser.isAdmin || false,
       createdAt: timestamp
     };
     this.users.set(id, user);
@@ -112,6 +130,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.chakraProfiles.values()).find(
       (profile) => profile.userId === userId
     );
+  }
+  
+  async getChakraProfileById(id: number): Promise<ChakraProfile | undefined> {
+    return this.chakraProfiles.get(id);
   }
 
   async createChakraProfile(insertProfile: InsertChakraProfile): Promise<ChakraProfile> {
@@ -262,6 +284,23 @@ export class MemStorage implements IStorage {
     this.healingRituals.set(id, ritual);
     return ritual;
   }
+  
+  async updateHealingRitual(id: number, ritualUpdate: InsertHealingRitual): Promise<HealingRitual | undefined> {
+    const ritual = this.healingRituals.get(id);
+    if (!ritual) return undefined;
+    
+    const updatedRitual: HealingRitual = {
+      ...ritual,
+      ...ritualUpdate
+    };
+    
+    this.healingRituals.set(id, updatedRitual);
+    return updatedRitual;
+  }
+  
+  async deleteHealingRitual(id: number): Promise<void> {
+    this.healingRituals.delete(id);
+  }
 
   // User recommendation operations
   async getUserRecommendations(userId: number): Promise<UserRecommendation[]> {
@@ -383,4 +422,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Import the database storage implementation
+import { DatabaseStorage } from './storage-db';
+
+// Use database storage for production use
+export const storage = new DatabaseStorage();

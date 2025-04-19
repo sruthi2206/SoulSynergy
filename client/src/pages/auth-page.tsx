@@ -1,10 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import {
   Form,
@@ -32,6 +32,10 @@ const registerSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -39,10 +43,16 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { setUser } = useContext(UserContext);
+  const { user, loginMutation, registerMutation } = useAuth();
+  
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      setLocation("/dashboard");
+    }
+  }, [user, setLocation]);
   
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -61,107 +71,46 @@ export default function AuthPage() {
       username: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
   
   // Handle login submit
-  const handleLoginSubmit = async (values: LoginFormValues) => {
-    setIsSubmitting(true);
-    
-    try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Invalid username or password");
-        } else {
-          throw new Error("Login failed. Please try again.");
+  const handleLoginSubmit = (values: LoginFormValues) => {
+    loginMutation.mutate(values, {
+      onSuccess: () => {
+        setLocation("/dashboard");
+      },
+      onError: (error) => {
+        if (error.message.includes("401")) {
+          loginForm.setError("password", { 
+            type: "manual", 
+            message: "Invalid username or password" 
+          });
         }
       }
-      
-      const userData = await response.json();
-      
-      // Update user context
-      setUser({
-        id: userData.id,
-        name: userData.name,
-      });
-      
-      toast({
-        title: "Login Successful",
-        description: `Welcome back, ${userData.name}!`,
-      });
-      
-      // Redirect to dashboard
-      setLocation("/dashboard");
-    } catch (error) {
-      toast({
-        title: "Login Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
   
   // Handle register submit
-  const handleRegisterSubmit = async (values: RegisterFormValues) => {
-    setIsSubmitting(true);
+  const handleRegisterSubmit = (values: RegisterFormValues) => {
+    // Note: we need to remove confirmPassword before sending to the API
+    // as it's not part of the user schema in the backend
+    const { confirmPassword, ...userData } = values;
     
-    try {
-      const userResponse = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      
-      if (!userResponse.ok) {
-        // Handle HTTP error responses
-        const errorData = await userResponse.json();
-        if (userResponse.status === 409) {
-          throw new Error(`Username "${values.username}" already exists. Please choose a different username.`);
-        } else {
-          throw new Error(errorData.message || "Failed to create account");
+    registerMutation.mutate(userData as any, {
+      onSuccess: () => {
+        setLocation("/onboarding");
+      },
+      onError: (error) => {
+        if (error.message.includes("409") || error.message.includes("already exists")) {
+          registerForm.setError("username", { 
+            type: "manual", 
+            message: "This username is already taken" 
+          });
         }
       }
-      
-      const userData = await userResponse.json();
-      
-      // Set user in context
-      setUser({
-        id: userData.id,
-        name: userData.name,
-      });
-      
-      toast({
-        title: "Registration Successful",
-        description: "Your account has been created. You will be redirected to complete your onboarding.",
-      });
-      
-      // Redirect to onboarding to complete chakra profile
-      setLocation("/onboarding");
-    } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
-      
-      // If it's a username conflict, set field error
-      if (error instanceof Error && error.message.includes("already exists")) {
-        registerForm.setError("username", { 
-          type: "manual", 
-          message: "This username is already taken" 
-        });
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
   
   return (
@@ -232,9 +181,9 @@ export default function AuthPage() {
                         <Button 
                           type="submit" 
                           className="w-full bg-[#483D8B] hover:bg-opacity-90"
-                          disabled={isSubmitting}
+                          disabled={loginMutation.isPending}
                         >
-                          {isSubmitting ? (
+                          {loginMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Logging in...
@@ -316,12 +265,26 @@ export default function AuthPage() {
                           )}
                         />
                         
+                        <FormField
+                          control={registerForm.control}
+                          name="confirmPassword"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Confirm Password</FormLabel>
+                              <FormControl>
+                                <Input type="password" placeholder="Confirm your password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
                         <Button 
                           type="submit" 
                           className="w-full bg-[#483D8B] hover:bg-opacity-90"
-                          disabled={isSubmitting}
+                          disabled={registerMutation.isPending}
                         >
-                          {isSubmitting ? (
+                          {registerMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Creating account...

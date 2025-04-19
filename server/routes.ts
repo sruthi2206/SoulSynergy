@@ -8,9 +8,11 @@ import {
   insertChakraProfileSchema,
   insertJournalEntrySchema,
   insertEmotionTrackingSchema,
-  insertCoachConversationSchema
+  insertCoachConversationSchema,
+  insertHealingRitualSchema
 } from "@shared/schema";
-import { analyzeJournalEntry, generateChatResponse } from "./openai";
+import { analyzeJournalEntry, generateChatResponse, getCoachSystemPrompt } from "./openai";
+import { setupAuth } from "./auth";
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -22,6 +24,9 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  setupAuth(app);
+  
   // API routes prefix
   const apiRouter = '/api';
 
@@ -86,14 +91,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
+  
+  // Update chakra profile
+  app.patch(`${apiRouter}/chakra-profiles/:id`, async (req, res) => {
+    try {
+      const profileId = parseInt(req.params.id);
+      
+      console.log("Updating chakra profile with ID:", profileId);
+      console.log("Request body:", req.body);
+      
+      // Try to find the profile by ID (which is equal to userId in this case)
+      let existingProfile = await storage.getChakraProfile(profileId);
+      
+      if (!existingProfile) {
+        console.log("Profile not found by userId:", profileId);
+        return res.status(404).json({ message: 'Chakra profile not found' });
+      }
+      
+      console.log("Found existing profile:", existingProfile);
+      
+      // Validate only the fields that are provided
+      const validatedData = insertChakraProfileSchema.partial().parse(req.body);
+      
+      console.log("Validated data:", validatedData);
+      
+      const updatedProfile = await storage.updateChakraProfile(existingProfile.id, validatedData);
+      
+      console.log("Updated profile:", updatedProfile);
+      
+      res.status(200).json(updatedProfile);
+    } catch (error) {
+      console.error("Error updating chakra profile:", error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid chakra profile data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to update chakra profile', error: (error as Error).message });
+      }
+    }
+  });
 
   app.get(`${apiRouter}/users/:userId/chakra-profile`, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
-      const profile = await storage.getChakraProfile(userId);
+      let profile = await storage.getChakraProfile(userId);
       
+      // If no profile exists, create a default one
       if (!profile) {
-        return res.status(404).json({ message: 'Chakra profile not found' });
+        // Create a default profile with balanced values (5)
+        const defaultProfileData = {
+          userId,
+          crownChakra: 5,
+          thirdEyeChakra: 5,
+          throatChakra: 5,
+          heartChakra: 5,
+          solarPlexusChakra: 5,
+          sacralChakra: 5,
+          rootChakra: 5
+        };
+        
+        try {
+          // Create the profile
+          profile = await storage.createChakraProfile(defaultProfileData);
+          console.log("Created default chakra profile for user:", userId);
+        } catch (createError) {
+          console.error("Error creating default chakra profile:", createError);
+          return res.status(500).json({ 
+            message: 'Failed to create default chakra profile', 
+            error: (createError as Error).message 
+          });
+        }
       }
       
       res.status(200).json(profile);
@@ -185,7 +251,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       let conversation;
-      let messages;
+      let currentMessages;
+      let conversationHistory = [];
       
       // If conversationId is provided, update existing conversation
       if (conversationId) {
@@ -195,35 +262,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: 'Conversation not found' });
         }
         
-        messages = conversation.messages;
-        messages.push({ role: 'user', content: message });
+        // Save the history (exclude system message for history context)
+        // Handle conversation.messages being unknown type
+        const messages = conversation.messages || [];
+        if (Array.isArray(messages)) {
+          conversationHistory = messages.filter((msg: any) => msg.role !== 'system');
+          
+          // Current session messages (including system message)
+          currentMessages = [...messages];
+        } else {
+          console.warn('Conversation messages is not an array:', typeof messages);
+          // Create default messages with system prompt if messages aren't available
+          currentMessages = [
+            { role: 'system', content: getCoachSystemMessage(coachType) }
+          ];
+        }
+        
+        // Add the new user message
+        currentMessages.push({ role: 'user', content: message });
       } else {
         // Start a new conversation
+        // Use the function from openai.ts
         const systemMessage = getCoachSystemMessage(coachType);
-        messages = [
+        currentMessages = [
           { role: 'system', content: systemMessage },
           { role: 'user', content: message }
         ];
         
+        // Get past conversations for context
+        const pastConversations = await storage.getCoachConversations(userId, coachType);
+        if (pastConversations && pastConversations.length > 0) {
+          // Get messages from most recent conversation (excluding this new one)
+          const recentConversation = pastConversations[0];
+          if (recentConversation && recentConversation.messages) {
+            // Handle messages being potentially any type
+            const messages = recentConversation.messages;
+            if (Array.isArray(messages)) {
+              // Use the previous conversation for context
+              conversationHistory = messages.filter((msg: any) => msg.role !== 'system');
+            } else {
+              console.warn('Recent conversation messages is not an array:', typeof messages);
+            }
+          }
+        }
+        
         const conversationData = {
           userId,
           coachType,
-          messages
+          messages: currentMessages
         };
         
         conversation = await storage.createCoachConversation(conversationData);
       }
       
-      // Generate AI response
-      const aiResponse = await generateChatResponse(messages, coachType);
+      // Generate AI response with conversation history context
+      const aiResponse = await generateChatResponse(currentMessages, coachType, conversationHistory);
       
-      // Add AI response to messages
-      messages.push({ role: 'assistant', content: aiResponse });
+      // Add AI response to current messages
+      currentMessages.push({ role: 'assistant', content: aiResponse });
       
       // Update conversation with new messages
       const updatedConversation = await storage.updateCoachConversation(
         conversation.id,
-        messages
+        currentMessages
       );
       
       res.status(200).json({
@@ -246,6 +347,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to get coach conversations', error: (error as Error).message });
     }
   });
+
+  // Middleware to check if user is admin
+  const isAdmin = (req: Request, res: Response, next: any) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    
+    const user = req.user as { isAdmin?: boolean };
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    
+    next();
+  };
 
   // Healing ritual routes
   app.get(`${apiRouter}/healing-rituals`, async (req, res) => {
@@ -272,6 +387,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(ritual);
     } catch (error) {
       res.status(500).json({ message: 'Failed to get healing ritual', error: (error as Error).message });
+    }
+  });
+  
+  // Admin-only routes for healing rituals management
+  app.post(`${apiRouter}/healing-rituals`, isAdmin, async (req, res) => {
+    try {
+      const validatedData = insertHealingRitualSchema.parse(req.body);
+      const newRitual = await storage.createHealingRitual(validatedData);
+      res.status(201).json(newRitual);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid ritual data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to create ritual', error: (error as Error).message });
+      }
+    }
+  });
+  
+  app.put(`${apiRouter}/healing-rituals/:id`, isAdmin, async (req, res) => {
+    try {
+      const ritualId = parseInt(req.params.id);
+      const existingRitual = await storage.getHealingRitual(ritualId);
+      
+      if (!existingRitual) {
+        return res.status(404).json({ message: 'Healing ritual not found' });
+      }
+      
+      const validatedData = insertHealingRitualSchema.parse(req.body);
+      // Add updateHealingRitual to storage interface later
+      const updatedRitual = await storage.updateHealingRitual(ritualId, validatedData);
+      
+      res.status(200).json(updatedRitual);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid ritual data', errors: error.errors });
+      } else {
+        res.status(500).json({ message: 'Failed to update ritual', error: (error as Error).message });
+      }
+    }
+  });
+  
+  app.delete(`${apiRouter}/healing-rituals/:id`, isAdmin, async (req, res) => {
+    try {
+      const ritualId = parseInt(req.params.id);
+      const existingRitual = await storage.getHealingRitual(ritualId);
+      
+      if (!existingRitual) {
+        return res.status(404).json({ message: 'Healing ritual not found' });
+      }
+      
+      // Add deleteHealingRitual to storage interface later
+      await storage.deleteHealingRitual(ritualId);
+      
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete ritual', error: (error as Error).message });
     }
   });
 

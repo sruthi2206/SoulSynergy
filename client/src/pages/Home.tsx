@@ -2,11 +2,10 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import ChakraWheel from "@/components/ChakraWheel";
-import { useContext } from "react";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Home() {
-  const { user } = useContext(UserContext);
+  const { user } = useAuth();
   
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900 font-body">
