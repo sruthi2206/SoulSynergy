@@ -33,22 +33,22 @@ export default function ChakraWheel({ size = 300, animated = false, values }: Ch
 
   return (
     <div 
-      className="relative rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden"
+      className="relative rounded-full bg-white shadow-lg flex items-center justify-center"
       style={{ width: `${size}px`, height: `${size}px` }}
     >
       <motion.div 
-        className="w-[95%] h-[95%] rounded-full relative"
+        className="w-full h-full rounded-full relative"
         animate={animated ? { rotate: rotation } : {}}
         transition={{ duration: 0.05, ease: "linear" }}
       >
-        {/* Chakra layers */}
+        {/* Chakra layers - with a full circle disc appearance */}
         {chakras.map((chakra, index) => (
           <div 
             key={chakra.key}
-            className="absolute w-full h-full"
+            className="absolute w-full h-full rounded-full"
             style={{ 
               opacity: getChakraOpacity(chakra.key),
-              background: `conic-gradient(from ${index * 45}deg, transparent 0%, ${chakra.color} 5%, transparent 15%)`
+              background: `conic-gradient(from ${index * 51.4}deg, ${chakra.color} 0deg, ${chakra.color} 51.4deg, transparent 51.41deg, transparent 360deg)`
             }}
           />
         ))}
