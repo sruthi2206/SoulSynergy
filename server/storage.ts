@@ -210,16 +210,28 @@ export class MemStorage implements IStorage {
 
   // Coach conversation operations
   async getCoachConversations(userId: number, coachType?: string): Promise<CoachConversation[]> {
-    let conversations = Array.from(this.coachConversations.values())
-      .filter(convo => convo.userId === userId);
-    
-    if (coachType) {
-      conversations = conversations.filter(convo => convo.coachType === coachType);
+    try {
+      // First filter by userId
+      let conversations = Array.from(this.coachConversations.values())
+        .filter(convo => convo.userId === userId);
+      
+      // Then strictly filter by coachType if specified
+      if (coachType) {
+        conversations = conversations.filter(convo => 
+          convo.coachType === coachType
+        );
+      }
+      
+      // Sort by most recent
+      return conversations.sort((a, b) => {
+        const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return timeB - timeA; // Descending order
+      });
+    } catch (error) {
+      console.error("Error fetching coach conversations:", error);
+      return [];
     }
-    
-    return conversations.sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    });
   }
 
   async getCoachConversation(id: number): Promise<CoachConversation | undefined> {
