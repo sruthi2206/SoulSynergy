@@ -130,7 +130,11 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       // Get the most recent conversation
       const latestConversation = conversations[0];
       setConversationId(latestConversation.id);
-      setMessages(latestConversation.messages);
+      // Filter out system messages from displaying
+      const filteredMessages = Array.isArray(latestConversation.messages) 
+        ? latestConversation.messages.filter((msg: any) => msg.role !== "system")
+        : [];
+      setMessages(filteredMessages);
     } else if (!isLoadingConversations) {
       // If no conversation exists, add greeting message
       setMessages([
@@ -316,7 +320,7 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       <CardContent className="flex-grow overflow-y-auto pb-0">
         <div className="space-y-4">
           <AnimatePresence initial={false}>
-            {messages.map((msg, index) => (
+            {messages.filter(msg => msg.role !== "system").map((msg, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
