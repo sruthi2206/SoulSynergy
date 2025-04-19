@@ -159,7 +159,9 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       });
       
       if (!response.ok) {
-        throw new Error("Failed to send message");
+        // Get the error message from the response if available
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to send message");
       }
       
       return response.json();
@@ -187,11 +189,21 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       // Keep the UI clean by removing the failed user message
       setMessages(prev => prev.slice(0, prev.length - 1));
       
+      // Check if the error is related to coach type mismatch
+      const isMismatchError = error.message.includes('coach type mismatch');
+      
       toast({
-        title: "Connection Error",
-        description: `Unable to connect with your coach: ${error.message}`,
+        title: isMismatchError ? "Coach Type Mismatch" : "Connection Error",
+        description: isMismatchError 
+          ? "The conversation you tried to continue belongs to a different coach. Starting a new conversation."
+          : `Unable to connect with your coach: ${error.message}`,
         variant: "destructive",
       });
+      
+      // If it's a coach type mismatch, automatically start a new conversation
+      if (isMismatchError) {
+        startNewConversation();
+      }
     }
   });
   
