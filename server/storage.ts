@@ -39,6 +39,7 @@ export interface IStorage {
   getCoachConversation(id: number): Promise<CoachConversation | undefined>;
   createCoachConversation(conversation: InsertCoachConversation): Promise<CoachConversation>;
   updateCoachConversation(id: number, messages: any): Promise<CoachConversation | undefined>;
+  deleteCoachConversation(id: number): Promise<void>;
 
   // Healing ritual operations
   getHealingRituals(): Promise<HealingRitual[]>;
@@ -250,6 +251,10 @@ export class MemStorage implements IStorage {
     
     this.coachConversations.set(id, updatedConversation);
     return updatedConversation;
+  }
+  
+  async deleteCoachConversation(id: number): Promise<void> {
+    this.coachConversations.delete(id);
   }
 
   // Healing ritual operations
