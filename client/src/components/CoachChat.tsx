@@ -52,7 +52,7 @@ const coachConfig: Record<string, {
     avatar: "🌗",
     color: "#191970",
     iconColor: "text-[#191970]",
-    greeting: "Welcome. I'm your Shadow Self Coach. I'm here to help you identify and integrate the aspects of yourself you may have rejected or hidden. What patterns have you been noticing lately?"
+    greeting: "Hello love, I'm your Shadow Healing Companion. Together, we'll gently uncover the hidden parts of your subconscious that may still carry pain, fear, or limiting beliefs — and release them with compassion. Are you ready to begin?"
   },
   higher_self: {
     name: "Higher Self Coach",
