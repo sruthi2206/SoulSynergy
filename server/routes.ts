@@ -11,7 +11,7 @@ import {
   insertCoachConversationSchema,
   insertHealingRitualSchema
 } from "@shared/schema";
-import { analyzeJournalEntry, generateChatResponse } from "./openai";
+import { analyzeJournalEntry, generateChatResponse, getCoachSystemPrompt } from "./openai";
 import { setupAuth } from "./auth";
 
 // Initialize Stripe
@@ -257,7 +257,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       let conversation;
-      let messages;
+      let currentMessages;
+      let conversationHistory = [];
       
       // If conversationId is provided, update existing conversation
       if (conversationId) {
@@ -267,35 +268,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: 'Conversation not found' });
         }
         
-        messages = conversation.messages;
-        messages.push({ role: 'user', content: message });
+        // Save the history (exclude system message for history context)
+        conversationHistory = conversation.messages.filter(msg => msg.role !== 'system');
+        
+        // Current session messages (including system message)
+        currentMessages = [...conversation.messages];
+        currentMessages.push({ role: 'user', content: message });
       } else {
         // Start a new conversation
+        // Use the function from openai.ts
         const systemMessage = getCoachSystemMessage(coachType);
-        messages = [
+        currentMessages = [
           { role: 'system', content: systemMessage },
           { role: 'user', content: message }
         ];
         
+        // Get past conversations for context
+        const pastConversations = await storage.getCoachConversations(userId, coachType);
+        if (pastConversations && pastConversations.length > 0) {
+          // Get messages from most recent conversation (excluding this new one)
+          const recentConversation = pastConversations[0];
+          if (recentConversation && recentConversation.messages) {
+            // Use the previous conversation for context
+            conversationHistory = recentConversation.messages.filter(msg => msg.role !== 'system');
+          }
+        }
+        
         const conversationData = {
           userId,
           coachType,
-          messages
+          messages: currentMessages
         };
         
         conversation = await storage.createCoachConversation(conversationData);
       }
       
-      // Generate AI response
-      const aiResponse = await generateChatResponse(messages, coachType);
+      // Generate AI response with conversation history context
+      const aiResponse = await generateChatResponse(currentMessages, coachType, conversationHistory);
       
-      // Add AI response to messages
-      messages.push({ role: 'assistant', content: aiResponse });
+      // Add AI response to current messages
+      currentMessages.push({ role: 'assistant', content: aiResponse });
       
       // Update conversation with new messages
       const updatedConversation = await storage.updateCoachConversation(
         conversation.id,
-        messages
+        currentMessages
       );
       
       res.status(200).json({
