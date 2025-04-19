@@ -74,13 +74,26 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
   // Get coach config
   const coach = coachConfig[coachType] || coachConfig.integration;
   
-  // Fetch previous conversation
-  const { data: conversations, isLoading: isLoadingConversations } = useQuery({
+  // Fetch previous conversations
+  const { data: conversations, isLoading: isLoadingConversations, refetch: refetchConversations } = useQuery({
     queryKey: [`/api/users/${userId}/coach-conversations`, { coachType }],
     queryFn: async ({ queryKey }) => {
-      const [url, params] = queryKey;
-      const fullUrl = `${url}?coachType=${params.coachType}`;
-      return fetch(fullUrl, { credentials: "include" }).then(res => res.json());
+      // Type assertion to help TypeScript understand the structure
+      const baseUrl = queryKey[0] as string;
+      const params = queryKey[1] as { coachType: string };
+      const fullUrl = `${baseUrl}?coachType=${params.coachType}`;
+      const response = await fetch(fullUrl, { credentials: "include" });
+      if (!response.ok) {
+        throw new Error("Failed to fetch conversations");
+      }
+      return response.json();
+    },
+    // Sort conversations by creation date to ensure newest is first
+    select: (data) => {
+      if (!Array.isArray(data)) return [];
+      return [...data].sort((a, b) => {
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      });
     }
   });
   
@@ -117,11 +130,16 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
         message: content,
         conversationId
       });
+      
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+      
       return response.json();
     },
     onSuccess: (data) => {
       // Update conversation ID if it's a new conversation
-      if (!conversationId && data.conversation.id) {
+      if (!conversationId && data.conversation?.id) {
         setConversationId(data.conversation.id);
       }
       
@@ -134,11 +152,17 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
           timestamp: new Date()
         }
       ]);
+      
+      // Refresh the conversations list to keep it up to date
+      refetchConversations();
     },
-    onError: () => {
+    onError: (error) => {
+      // Keep the UI clean by removing the failed user message
+      setMessages(prev => prev.slice(0, prev.length - 1));
+      
       toast({
         title: "Connection Error",
-        description: "Unable to connect with your coach. Please try again.",
+        description: `Unable to connect with your coach: ${error.message}`,
         variant: "destructive",
       });
     }
