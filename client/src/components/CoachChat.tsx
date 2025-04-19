@@ -91,17 +91,35 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       const baseUrl = queryKey[0] as string;
       const params = queryKey[1] as { coachType: string };
       const fullUrl = `${baseUrl}?coachType=${params.coachType}`;
-      const response = await fetch(fullUrl, { credentials: "include" });
-      if (!response.ok) {
-        throw new Error("Failed to fetch conversations");
+      
+      try {
+        const response = await fetch(fullUrl, { credentials: "include" });
+        if (!response.ok) {
+          console.error(`Error fetching conversations: ${response.status}`);
+          if (response.status === 400) {
+            return []; // Return empty array if coachType parameter is missing
+          }
+          throw new Error(`Failed to fetch conversations: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error in conversation fetch:", error);
+        throw error;
       }
-      return response.json();
     },
     // Sort conversations by creation date to ensure newest is first
     select: (data) => {
       if (!Array.isArray(data)) return [];
-      return [...data].sort((a, b) => {
-        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      
+      // Double-check that we're only getting conversations for this coach type
+      const filteredData = data.filter(conversation => 
+        conversation.coachType === coachType
+      );
+      
+      return [...filteredData].sort((a, b) => {
+        return new Date(b.updatedAt || b.createdAt || 0).getTime() - 
+               new Date(a.updatedAt || a.createdAt || 0).getTime();
       });
     }
   });

@@ -262,6 +262,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: 'Conversation not found' });
         }
         
+        // Verify the conversation belongs to the correct coach type
+        if (conversation.coachType !== coachType) {
+          return res.status(400).json({ 
+            message: 'Coach type mismatch. The conversation belongs to a different coach type.' 
+          });
+        }
+        
         // Save the history (exclude system message for history context)
         // Handle conversation.messages being unknown type
         const messages = conversation.messages || [];

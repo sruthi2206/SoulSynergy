@@ -103,13 +103,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCoachConversations(userId: number, coachType?: string): Promise<CoachConversation[]> {
-    let query = db.select().from(coachConversations).where(eq(coachConversations.userId, userId));
-    
-    if (coachType) {
-      query = query.where(eq(coachConversations.coachType, coachType));
+    try {
+      // First filter by userId
+      let conversations = await db
+        .select()
+        .from(coachConversations)
+        .where(eq(coachConversations.userId, userId));
+      
+      // Then filter by coachType if specified
+      if (coachType) {
+        conversations = conversations.filter(conversation => 
+          conversation.coachType === coachType
+        );
+      }
+      
+      // Sort by updatedAt
+      return conversations.sort((a, b) => {
+        const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return timeB - timeA; // Descending order
+      });
+    } catch (error) {
+      console.error("Error getting coach conversations:", error);
+      return [];
     }
-    
-    return await query.orderBy(desc(coachConversations.updatedAt));
   }
 
   async getCoachConversation(id: number): Promise<CoachConversation | undefined> {
