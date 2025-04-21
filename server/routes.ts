@@ -522,7 +522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get(`${apiRouter}/healing-rituals/:id`, requireAuth, async (req, res) => {
+  app.get(`${apiRouter}/healing-rituals/:id`, async (req, res) => {
     try {
       const ritualId = parseInt(req.params.id);
       const ritual = await storage.getHealingRitual(ritualId);

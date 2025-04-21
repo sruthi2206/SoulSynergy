@@ -27,15 +27,21 @@ export default function RitualCoursePage() {
     queryKey: ['/api/healing-rituals', courseId],
     queryFn: async () => {
       try {
+        // Use a regular fetch since we've removed auth requirement on this endpoint
         const res = await fetch(`/api/healing-rituals/${courseId}`);
-        if (!res.ok) throw new Error('Failed to fetch ritual details');
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Failed to fetch ritual details: ${errorText}`);
+        }
+        
         return await res.json();
       } catch (error) {
         console.error('Error fetching ritual details:', error);
         return null;
       }
     },
-    enabled: !!courseId,
+    enabled: !!courseId, // Only need the courseId now
   });
 
   // Loading state
@@ -120,12 +126,35 @@ export default function RitualCoursePage() {
                 </div>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Button size="lg" className="bg-white text-purple-700 hover:bg-white/90">
+                  <Button 
+                    size="lg" 
+                    className="bg-white text-purple-700 hover:bg-white/90"
+                    onClick={() => {
+                      if (ritual.videoUrl) {
+                        // If we have a video URL, open it in a new tab
+                        window.open(ritual.videoUrl, '_blank');
+                      } else if (ritual.courseUrl) {
+                        // If we have a course URL but no video, navigate to it
+                        window.open(ritual.courseUrl, '_blank');
+                      } else {
+                        // Show an alert if neither is available
+                        alert('This practice is coming soon. Please check back later!');
+                      }
+                    }}
+                  >
                     <PlayCircle className="mr-2 h-5 w-5" />
                     Start Practice
                   </Button>
                   
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-white text-white hover:bg-white/10"
+                    onClick={() => {
+                      // This could be linked to a downloadable PDF guide in the future
+                      alert('Practice guide coming soon!');
+                    }}
+                  >
                     <BookOpen className="mr-2 h-5 w-5" />
                     Download Guide
                   </Button>
@@ -242,7 +271,22 @@ export default function RitualCoursePage() {
                     </Card>
                     
                     <div className="mt-6">
-                      <Button className="w-full" size="lg">
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={() => {
+                          if (ritual.videoUrl) {
+                            // If we have a video URL, open it in a new tab
+                            window.open(ritual.videoUrl, '_blank');
+                          } else if (ritual.courseUrl) {
+                            // If we have a course URL but no video, navigate to it
+                            window.open(ritual.courseUrl, '_blank');
+                          } else {
+                            // Show an alert if neither is available
+                            alert('This practice is coming soon. Please check back later!');
+                          }
+                        }}
+                      >
                         <PlayCircle className="mr-2 h-5 w-5" />
                         Start Practice Now
                       </Button>
