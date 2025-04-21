@@ -1329,14 +1329,14 @@ function RitualDialog({
                       <Label htmlFor="targetChakra">Target Chakra</Label>
                       <Select 
                         name="targetChakra" 
-                        value={form.targetChakra} 
+                        value={form.targetChakra || "none"} 
                         onValueChange={(value) => setForm(prev => ({ ...prev, targetChakra: value }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select a chakra" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           <SelectItem value="root">Root Chakra</SelectItem>
                           <SelectItem value="sacral">Sacral Chakra</SelectItem>
                           <SelectItem value="solar_plexus">Solar Plexus Chakra</SelectItem>
@@ -1352,14 +1352,14 @@ function RitualDialog({
                       <Label htmlFor="targetEmotion">Target Emotion</Label>
                       <Select 
                         name="targetEmotion" 
-                        value={form.targetEmotion} 
+                        value={form.targetEmotion || "none"} 
                         onValueChange={(value) => setForm(prev => ({ ...prev, targetEmotion: value }))}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select an emotion" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           <SelectItem value="anxiety">Anxiety</SelectItem>
                           <SelectItem value="depression">Depression</SelectItem>
                           <SelectItem value="anger">Anger</SelectItem>
@@ -1529,7 +1529,7 @@ function RitualDialog({
                         <div>
                           <Label htmlFor="lesson1Duration">Duration</Label>
                           <Select
-                            value={form.lesson1Duration}
+                            value={form.lesson1Duration || "10min"}
                             onValueChange={(value) => setForm(prev => ({ ...prev, lesson1Duration: value }))}
                           >
                             <SelectTrigger>
@@ -1576,7 +1576,7 @@ function RitualDialog({
                         <div>
                           <Label htmlFor="lesson2Duration">Duration</Label>
                           <Select
-                            value={form.lesson2Duration}
+                            value={form.lesson2Duration || "15min"}
                             onValueChange={(value) => setForm(prev => ({ ...prev, lesson2Duration: value }))}
                           >
                             <SelectTrigger>
@@ -1623,7 +1623,7 @@ function RitualDialog({
                         <div>
                           <Label htmlFor="lesson3Duration">Duration</Label>
                           <Select
-                            value={form.lesson3Duration}
+                            value={form.lesson3Duration || "5min"}
                             onValueChange={(value) => setForm(prev => ({ ...prev, lesson3Duration: value }))}
                           >
                             <SelectTrigger>
