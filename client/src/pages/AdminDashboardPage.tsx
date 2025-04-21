@@ -489,20 +489,7 @@ function MediaLibrary() {
     });
   };
   
-  // Convert YouTube URL to embed format
-  const convertYouTubeUrl = (url: string): string | null => {
-  // We're using the imported convertYouTubeUrl function from @/lib/youtube-utils
-    // Match different YouTube URL formats
-    const ytRegExp = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/(?:watch\?v=)?([^&]+)/;
-    const match = url.match(ytRegExp);
-    
-    if (match && match[4]) {
-      const videoId = match[4];
-      return `https://www.youtube.com/embed/${videoId}`;
-    }
-    
-    return null;
-  };
+  // Using the imported convertYouTubeUrl function from @/lib/youtube-utils
 
   return (
     <div>
@@ -1204,19 +1191,7 @@ function RitualDialog({
     refetchMedia();
   };
   
-  // Convert YouTube URL to embed format
-  const convertYouTubeUrl = (url: string): string | null => {
-    // Match different YouTube URL formats
-    const ytRegExp = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/(?:watch\?v=)?([^&]+)/;
-    const match = url.match(ytRegExp);
-    
-    if (match && match[4]) {
-      const videoId = match[4];
-      return `https://www.youtube.com/embed/${videoId}`;
-    }
-    
-    return null;
-  };
+  // Using the imported convertYouTubeUrl function from @/lib/youtube-utils
 
   // Filter only images
   const imageMedia = mediaItems.filter((item: any) => 
