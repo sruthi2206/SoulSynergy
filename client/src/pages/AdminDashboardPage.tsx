@@ -1125,19 +1125,19 @@ function RitualDialog({
         thumbnailUrl: ritual.thumbnailUrl || '',
         courseUrl: ritual.courseUrl || '',
         videoUrl: ritual.videoUrl || '',
-        duration: ritual.duration || '',
+        duration: ritual.duration || '30min',
         // Lesson 1 fields
         lesson1Title: ritual.lesson1Title || '',
         lesson1Description: ritual.lesson1Description || '',
-        lesson1Duration: ritual.lesson1Duration || '',
+        lesson1Duration: ritual.lesson1Duration || '10min',
         // Lesson 2 fields
         lesson2Title: ritual.lesson2Title || '',
         lesson2Description: ritual.lesson2Description || '',
-        lesson2Duration: ritual.lesson2Duration || '',
+        lesson2Duration: ritual.lesson2Duration || '15min',
         // Lesson 3 fields
         lesson3Title: ritual.lesson3Title || '',
         lesson3Description: ritual.lesson3Description || '',
-        lesson3Duration: ritual.lesson3Duration || '',
+        lesson3Duration: ritual.lesson3Duration || '5min',
       });
       setSelectedMainImage(ritual.mainImageUrl || null);
       setSelectedThumbnail(ritual.thumbnailUrl || null);
