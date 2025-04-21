@@ -13,6 +13,8 @@ import Coach from "@/pages/Coach";
 import Community from "@/pages/Community";
 import Membership from "@/pages/Membership";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminDashboardPage from "@/pages/AdminDashboardPage";
+import AdminLoginPage from "@/pages/AdminLoginPage";
 import ChakraAssessment from "@/pages/ChakraAssessment";
 import ChakraReport from "@/pages/ChakraReport";
 import HealingRitualsPage from "@/pages/HealingRitualsPage";
@@ -24,24 +26,36 @@ import { ProtectedRoute } from "@/lib/protected-route";
 function Router() {
   const [location] = useLocation();
   const isHome = location === "/";
+  const isAdmin = location.startsWith("/admin") && location !== "/admin";
   
   return (
     <>
-      {!isHome && <Navigation />}
+      {!isHome && !isAdmin && <Navigation />}
       <AnimatePresence mode="wait">
         <Switch>
+          {/* Public routes */}
           <Route path="/" component={Home} />
+          <Route path="/auth" component={AuthPage} />
+          
+          {/* Admin routes */}
+          <Route path="/admin" component={AdminLoginPage} />
+          <ProtectedRoute path="/admin/dashboard" component={AdminDashboardPage} />
+          
+          {/* Protected user routes */}
           <ProtectedRoute path="/dashboard" component={Dashboard} />
           <ProtectedRoute path="/onboarding" component={Onboarding} />
           <ProtectedRoute path="/journal" component={Journal} />
           <ProtectedRoute path="/coach/:type" component={Coach} />
           <ProtectedRoute path="/community" component={Community} />
           <ProtectedRoute path="/membership" component={Membership} />
-          <ProtectedRoute path="/admin" component={AdminDashboard} />
           <ProtectedRoute path="/chakra-assessment" component={ChakraAssessment} />
           <ProtectedRoute path="/chakra-report" component={ChakraReport} />
           <ProtectedRoute path="/healing-rituals" component={HealingRitualsPage} />
-          <Route path="/auth" component={AuthPage} />
+          
+          {/* Legacy admin route - can be removed later */}
+          <ProtectedRoute path="/admin-old" component={AdminDashboard} />
+          
+          {/* 404 page */}
           <Route component={NotFound} />
         </Switch>
       </AnimatePresence>

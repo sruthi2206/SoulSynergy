@@ -457,7 +457,7 @@ export default function HealingRitualsPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <div className="space-y-8 max-w-5xl mx-auto">
                     {recommendations.map((recommendation) => {
                       const ritual = recommendation.ritual;
                       if (!ritual) return null;
@@ -491,7 +491,7 @@ export default function HealingRitualsPage() {
               {/* All Available Rituals */}
               <TabsContent value="all" className="mt-0">
                 <h2 className="text-xl font-semibold mb-4">Explore All Rituals</h2>
-                <div className="space-y-6">
+                <div className="space-y-8 max-w-5xl mx-auto">
                   {healingRituals.length > 0 ? (
                     healingRituals.map((ritual: any) => {
                       const recommendation = getRecommendation(ritual.id);
