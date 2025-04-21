@@ -1,11 +1,12 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface HealingRitualCardProps {
   title: string;
   description: string;
-  chakraTags?: string[];
-  emotionTags?: string[];
+  chakraType?: string;
+  authorName?: string;
+  imageUrl?: string;
+  thumbnailUrl?: string;
   isCompleted?: boolean;
   onDetails?: () => void;
   onAdd?: () => void;
@@ -15,89 +16,65 @@ interface HealingRitualCardProps {
 export function HealingRitualCard({
   title,
   description,
-  chakraTags = [],
-  emotionTags = [],
+  chakraType = "",
+  authorName = "",
+  imageUrl = "/images/crown_chakra.jpg",
+  thumbnailUrl = "/images/root_chakra.jpg",
   isCompleted = false,
   onDetails,
-  onAdd,
-  onComplete
+  onAdd
 }: HealingRitualCardProps) {
-  // Get chakra icon emoji based on chakra name
-  const getChakraEmoji = (chakraName: string) => {
-    const chakraName_lower = chakraName.toLowerCase();
-    if (chakraName_lower.includes('crown')) return '👑';
-    if (chakraName_lower.includes('third eye')) return '👁️';
-    if (chakraName_lower.includes('throat')) return '🗣️';
-    if (chakraName_lower.includes('heart')) return '💚';
-    if (chakraName_lower.includes('solar plexus')) return '☀️';
-    if (chakraName_lower.includes('sacral')) return '🧡';
-    if (chakraName_lower.includes('root')) return '🔴';
-    return '✨';
+  // Truncate description if too long
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
   };
 
-  // Get first chakra tag if available
-  const primaryChakra = chakraTags.length > 0 ? chakraTags[0] : '';
-  const chakraEmoji = getChakraEmoji(primaryChakra);
-
   return (
-    <div className="border border-gray-200 rounded-lg mb-4 bg-white overflow-hidden">
-      <div className="p-4">
-        <div className="flex items-center mb-2">
-          <span className="text-xl mr-2">{chakraEmoji}</span>
-          <h3 className="font-medium text-lg">{title}</h3>
-          
-          {isCompleted && (
-            <span className="ml-auto bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-              Completed
-            </span>
-          )}
-        </div>
+    <div className="w-full bg-white rounded-xl shadow-sm mb-6 overflow-hidden">
+      <div className="p-6 pb-4">
+        <h3 className="text-xl font-medium text-gray-900 mb-1">{title}</h3>
+        {authorName && (
+          <p className="text-sm text-gray-500 mb-3">{authorName}</p>
+        )}
         
-        <div className="flex flex-wrap gap-1 mb-2">
-          {chakraTags.map((tag) => (
-            <Badge 
-              key={tag} 
-              variant="outline" 
-              className="bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100"
-            >
-              {tag}
-            </Badge>
-          ))}
-          
-          {emotionTags.map((tag) => (
-            <Badge 
-              key={tag} 
-              variant="outline" 
-              className="bg-amber-50 text-amber-600 border-amber-100 hover:bg-amber-100"
-            >
-              {tag}
-            </Badge>
-          ))}
-          
-          <Badge 
+        <p className="text-gray-700 mb-4 line-clamp-3">
+          {truncateText(description, 180)}
+        </p>
+        
+        <div className="flex justify-between items-center mt-2">
+          <Button 
             variant="outline" 
-            className="bg-gray-50 text-gray-600 border-gray-100 hover:bg-gray-100"
+            className="rounded-full px-6" 
+            onClick={onDetails}
           >
-            {primaryChakra.includes('crown') || primaryChakra.includes('third eye') ? 'meditation' : 'visualization'}
-          </Badge>
-        </div>
-        
-        <p className="text-gray-600 mb-4">{description}</p>
-        
-        <div className="flex justify-between pt-2">
-          <Button variant="ghost" size="sm" onClick={onDetails}>
-            View Details
+            Learn More
           </Button>
           
           {isCompleted ? (
-            <Button variant="outline" size="sm" onClick={onComplete}>
-              Mark Complete
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" onClick={onAdd}>
-              Add to Practices
-            </Button>
-          )}
+            <span className="text-green-600 text-sm font-medium">
+              Completed
+            </span>
+          ) : null}
+        </div>
+      </div>
+      
+      <div className="flex mt-1 pr-6 pb-6 justify-end">
+        <div className="flex space-x-2">
+          <div className="w-24 h-32 rounded-md overflow-hidden shadow-sm">
+            <img 
+              src={thumbnailUrl} 
+              alt="Instructor" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="w-60 h-32 rounded-md overflow-hidden shadow-sm">
+            <img 
+              src={imageUrl} 
+              alt={title} 
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
       </div>
     </div>

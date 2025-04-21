@@ -66,6 +66,22 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
     });
   };
   
+  // Map chakra name to image path
+  const getChakraImagePath = (chakraName: string) => {
+    if (!chakraName) return "/images/crown_chakra.jpg";
+    
+    const chakraName_lower = chakraName.toLowerCase();
+    if (chakraName_lower.includes('crown')) return "/images/crown_chakra.jpg";
+    if (chakraName_lower.includes('third eye')) return "/images/third_eye.jpg";
+    if (chakraName_lower.includes('throat')) return "/images/throat_chakra.jpg";
+    if (chakraName_lower.includes('heart')) return "/images/heart_chakra.jpg";
+    if (chakraName_lower.includes('solar plexus')) return "/images/solar_plexus.jpg";
+    if (chakraName_lower.includes('sacral')) return "/images/sacral_chakra.jpg";
+    if (chakraName_lower.includes('root')) return "/images/root_chakra.jpg";
+    
+    return "/images/chakra_balance.jpg";
+  };
+  
   // Mark recommendation as completed
   const completeRecommendationMutation = useMutation({
     mutationFn: async (recommendationId: number) => {
@@ -138,10 +154,10 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Explore Healing Rituals</h2>
-        <p className="text-neutral-600 max-w-xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Explore Healing Rituals</h1>
+        <p className="text-gray-600 max-w-3xl">
           Personalized practices to balance your chakras and support your emotional well-being.
         </p>
       </div>
@@ -173,8 +189,9 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                     key={recommendation.id}
                     title={ritual.name}
                     description={ritual.description}
-                    chakraTags={ritual.targetChakra ? [ritual.targetChakra] : []}
-                    emotionTags={ritual.targetEmotion ? [ritual.targetEmotion] : []}
+                    imageUrl={getChakraImagePath(ritual.targetChakra)}
+                    thumbnailUrl={ritual.thumbnailUrl || "/images/journaling.jpg"}
+                    chakraType={ritual.targetChakra}
                     isCompleted={recommendation.completed}
                     onDetails={() => {}}
                     onAdd={() => handleCompleteRitual(recommendation.id)}
@@ -195,7 +212,6 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
             {chakraProfile ? (
               getWeakestChakraRituals().length > 0 ? (
                 getWeakestChakraRituals().map((ritual: any) => {
-                  const isRecommended = recommendations.some((rec: any) => rec.ritualId === ritual.id);
                   const recommendation = recommendations.find((rec: any) => rec.ritualId === ritual.id);
                   
                   return (
@@ -203,8 +219,9 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                       key={ritual.id}
                       title={ritual.name}
                       description={ritual.description}
-                      chakraTags={ritual.targetChakra ? [ritual.targetChakra] : []}
-                      emotionTags={ritual.targetEmotion ? [ritual.targetEmotion] : []}
+                      imageUrl={getChakraImagePath(ritual.targetChakra)}
+                      thumbnailUrl={ritual.thumbnailUrl || "/images/joy.jpg"}
+                      chakraType={ritual.targetChakra}
                       isCompleted={recommendation?.completed}
                       onDetails={() => {}}
                       onAdd={() => handleAddRitual(ritual.id)}
@@ -229,7 +246,6 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
           <div className="space-y-4">
             {Array.isArray(allRituals) && allRituals.length > 0 ? (
               allRituals.map((ritual: any) => {
-                const isRecommended = recommendations.some((rec: any) => rec.ritualId === ritual.id);
                 const recommendation = recommendations.find((rec: any) => rec.ritualId === ritual.id);
                 
                 return (
@@ -237,8 +253,9 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                     key={ritual.id}
                     title={ritual.name}
                     description={ritual.description}
-                    chakraTags={ritual.targetChakra ? [ritual.targetChakra] : []}
-                    emotionTags={ritual.targetEmotion ? [ritual.targetEmotion] : []}
+                    imageUrl={getChakraImagePath(ritual.targetChakra)}
+                    thumbnailUrl={ritual.thumbnailUrl || "/images/journaling.jpg"}
+                    chakraType={ritual.targetChakra}
                     isCompleted={recommendation?.completed}
                     onDetails={() => {}}
                     onAdd={() => handleAddRitual(ritual.id)}
