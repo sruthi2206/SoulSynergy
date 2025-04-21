@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Search, Edit, Trash2, Image, X, Grid3X3, List, Plus } from "lucide-react";
+import { Loader2, Upload, Search, Edit, Trash2, Image, X, Grid3X3, List, Plus, Video as VideoIcon } from "lucide-react";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -320,11 +320,11 @@ import {
   Settings,
   Info,
   FileText,
-  CheckCircle2,
   XCircle,
   Filter,
   Clipboard,
-  LayoutGrid
+  LayoutGrid,
+  CheckCircle2
 } from "lucide-react";
 
 // Media Library Component
@@ -1438,6 +1438,53 @@ function RitualDialog({
                         )}
                       </div>
                     ))}
+                  </div>
+                </div>
+                
+                <div className="border-t pt-4">
+                  <h3 className="font-medium mb-2">Video URL</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Enter a YouTube or other video URL to be displayed on the ritual page.
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="videoUrl">YouTube or Video URL</Label>
+                      <Input
+                        id="videoUrl"
+                        name="videoUrl"
+                        value={form.videoUrl}
+                        onChange={handleChange}
+                        placeholder="e.g., https://www.youtube.com/embed/abc123"
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        For YouTube videos, use format: https://www.youtube.com/embed/VIDEO_ID
+                      </p>
+                    </div>
+                    
+                    {form.videoUrl && (
+                      <div className="mt-3 border rounded-md p-3">
+                        <p className="font-medium mb-2">Video Preview</p>
+                        <div className="aspect-video bg-muted flex items-center justify-center rounded-md">
+                          {form.videoUrl.includes('youtube.com/embed') ? (
+                            <iframe
+                              src={form.videoUrl}
+                              className="w-full h-full rounded-md"
+                              title="Video preview"
+                              allowFullScreen
+                            ></iframe>
+                          ) : (
+                            <div className="text-center p-4">
+                              <VideoIcon className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">
+                                Video URL set: {form.videoUrl}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
