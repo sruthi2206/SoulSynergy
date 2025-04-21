@@ -4,8 +4,9 @@ import { useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Search, Edit, Trash2, Image, X, Grid3X3, List, Plus, Video as VideoIcon } from "lucide-react";
+import { Loader2, Upload, Search, Edit, Trash2, Image, X, Grid3X3, List, Plus, Video as VideoIcon, Check, ExternalLink, Youtube, Filter, FilterX } from "lucide-react";
 import MediaUploadDialog from "@/components/MediaUploadDialog";
+import { convertYouTubeUrl, isYouTubeUrl } from "@/lib/youtube-utils";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -323,11 +324,8 @@ import {
   Info,
   FileText,
   XCircle,
-  Filter,
   Clipboard,
-  LayoutGrid,
-  Check,
-  Youtube
+  LayoutGrid
 } from "lucide-react";
 
 // Media Library Component
