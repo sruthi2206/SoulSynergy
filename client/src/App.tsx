@@ -18,6 +18,7 @@ import AdminLoginPage from "@/pages/AdminLoginPage";
 import ChakraAssessment from "@/pages/ChakraAssessment";
 import ChakraReport from "@/pages/ChakraReport";
 import HealingRitualsPage from "@/pages/HealingRitualsPage";
+import RitualCoursePage from "@/pages/RitualCoursePage";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -51,6 +52,7 @@ function Router() {
           <ProtectedRoute path="/chakra-assessment" component={ChakraAssessment} />
           <ProtectedRoute path="/chakra-report" component={ChakraReport} />
           <ProtectedRoute path="/healing-rituals" component={HealingRitualsPage} />
+          <ProtectedRoute path="/courses/:courseId" component={RitualCoursePage} />
           
           {/* Legacy admin route - can be removed later */}
           <ProtectedRoute path="/admin-old" component={AdminDashboard} />

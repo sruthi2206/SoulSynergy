@@ -79,6 +79,10 @@ type HealingRitual = {
   targetChakra: string | null;
   targetEmotion: string | null;
   thumbnailUrl?: string;
+  mainImageUrl?: string;
+  courseUrl?: string;
+  videoUrl?: string;
+  duration?: string;
 };
 
 type UserRecommendation = {
@@ -228,7 +232,13 @@ export default function HealingRitualsPage() {
 
   // Handle opening ritual details
   const handleOpenRitual = (ritual: HealingRitual) => {
-    setSelectedRitual(ritual);
+    if (ritual.courseUrl) {
+      // If the ritual has a course URL, redirect to the course page
+      setLocation(ritual.courseUrl.startsWith('/') ? ritual.courseUrl : `/courses/${ritual.id}`);
+    } else {
+      // Otherwise, show the details dialog
+      setSelectedRitual(ritual);
+    }
   };
 
   // Handle clearing filters
