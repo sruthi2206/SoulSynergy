@@ -514,7 +514,7 @@ export default function HealingRitualsPage() {
                             description={ritual.description}
                             chakraType={ritual.targetChakra}
                             isCompleted={recommendation?.completed}
-                            mainImageUrl={getChakraImagePath(ritual.targetChakra)}
+                            mainImageUrl={ritual.mainImageUrl || getChakraImagePath(ritual.targetChakra)}
                             thumbnailUrl={ritual.thumbnailUrl || "/images/journaling.jpg"}
                             onDetails={() => handleOpenRitual(ritual)}
                             onAction={() => handleAddToPractices(ritual)}
