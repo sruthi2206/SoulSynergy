@@ -24,9 +24,20 @@ if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('Missing Stripe secret key - payment features will not work');
 }
 
-const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" }) 
-  : null;
+// Initialize Stripe with proper error handling
+let stripe: Stripe | null = null;
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { 
+      apiVersion: "2023-10-16"
+    });
+    console.log('Stripe initialized successfully');
+  } else {
+    console.warn('No Stripe secret key found in environment variables');
+  }
+} catch (error) {
+  console.error('Error initializing Stripe:', error);
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -810,6 +821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(`${apiRouter}/create-payment-intent`, async (req, res) => {
     try {
       if (!stripe) {
+        console.error('Stripe not configured - create-payment-intent endpoint called but Stripe is null');
         return res.status(500).json({ message: 'Stripe is not configured' });
       }
 
@@ -819,21 +831,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Missing amount field' });
       }
 
-      // Create a payment intent
+      console.log(`Creating payment intent for amount: ${amount}, interval: ${interval || 'one-time'}`);
+
+      // Create a payment intent with support for multiple payment methods
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: 'usd',
-        payment_method_types: ['card'],
+        // Support multiple payment methods
+        payment_method_types: ['card', 'us_bank_account', 'cashapp'],
+        automatic_payment_methods: {
+          enabled: true,
+        },
         metadata: {
           plan: interval || 'one-time'
         }
       });
+      
+      console.log('Payment intent created successfully:', paymentIntent.id);
       
       res.status(200).json({
         clientSecret: paymentIntent.client_secret
       });
     } catch (error) {
       console.error('Stripe error:', error);
+      
+      // More detailed error logging
+      if (error instanceof Error) {
+        const stripeError = error as any;
+        if (stripeError.type) {
+          console.error('Stripe error type:', stripeError.type);
+        }
+        if (stripeError.raw) {
+          console.error('Stripe raw error:', stripeError.raw);
+        }
+      }
+      
       res.status(500).json({ 
         message: 'Failed to create payment intent', 
         error: (error as Error).message 
