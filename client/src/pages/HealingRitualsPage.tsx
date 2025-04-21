@@ -77,6 +77,7 @@ type HealingRitual = {
   instructions: string;
   targetChakra: string | null;
   targetEmotion: string | null;
+  thumbnailUrl?: string;
 };
 
 type UserRecommendation = {
@@ -243,6 +244,22 @@ export default function HealingRitualsPage() {
   // Get recommendation for a ritual if it exists
   const getRecommendation = (ritualId: number) => {
     return recommendations.find(rec => rec.ritualId === ritualId);
+  };
+  
+  // Map chakra name to image path
+  const getChakraImagePath = (chakraName: string | null) => {
+    if (!chakraName) return "/images/chakra_balance.jpg";
+    
+    const chakraName_lower = chakraName.toLowerCase();
+    if (chakraName_lower.includes('crown')) return "/images/crown_chakra.jpg";
+    if (chakraName_lower.includes('third eye')) return "/images/third_eye.jpg";
+    if (chakraName_lower.includes('throat')) return "/images/throat_chakra.jpg";
+    if (chakraName_lower.includes('heart')) return "/images/heart_chakra.jpg";
+    if (chakraName_lower.includes('solar plexus')) return "/images/solar_plexus.jpg";
+    if (chakraName_lower.includes('sacral')) return "/images/sacral_chakra.jpg";
+    if (chakraName_lower.includes('root')) return "/images/root_chakra.jpg";
+    
+    return "/images/chakra_balance.jpg";
   };
 
   // Loading state
@@ -439,122 +456,94 @@ export default function HealingRitualsPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recommendations.map((recommendation) => (
-                      <motion.div
-                        key={recommendation.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Card className={`h-full overflow-hidden transition-all ${recommendation.completed ? 'bg-neutral-50' : 'hover:shadow-md'}`}>
-                          <CardHeader className="p-4 pb-0">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center gap-2">
-                                {recommendation.ritual?.targetChakra && (
-                                  <Avatar className="h-8 w-8">
-                                    <AvatarFallback
-                                      style={{
-                                        backgroundColor: chakraColors[recommendation.ritual.targetChakra]?.bg || '#f5f5f5',
-                                        color: chakraColors[recommendation.ritual.targetChakra]?.color || '#999'
-                                      }}
-                                    >
-                                      {chakraColors[recommendation.ritual.targetChakra]?.icon}
-                                    </AvatarFallback>
-                                  </Avatar>
+                  <div className="space-y-6">
+                    {recommendations.map((recommendation) => {
+                      const ritual = recommendation.ritual;
+                      if (!ritual) return null;
+                      
+                      return (
+                        <motion.div
+                          key={recommendation.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden"
+                        >
+                          {/* Left column with text content - takes 60% on larger screens */}
+                          <div className="p-8 md:w-3/5 flex flex-col justify-between">
+                            <div>
+                              <h2 className="text-2xl font-bold mb-3 text-gray-900">{ritual.name}</h2>
+                              <p className="text-gray-700 mb-6">
+                                {ritual.description}
+                              </p>
+                            </div>
+                            
+                            <div className="mt-auto">
+                              <div className="flex items-center gap-4">
+                                <Button
+                                  onClick={() => handleOpenRitual(ritual)}
+                                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-2"
+                                >
+                                  Learn More
+                                </Button>
+                                
+                                <Button
+                                  variant="outline"
+                                  onClick={() => handleCompletePractice(recommendation)}
+                                  className="border-indigo-300 text-indigo-600 hover:bg-indigo-50 rounded-full"
+                                >
+                                  {recommendation.completed ? "Completed" : "Mark Complete"}
+                                </Button>
+                                
+                                {recommendation.completed && (
+                                  <span className="text-green-600 font-medium flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    Completed
+                                  </span>
                                 )}
-                                <CardTitle className="text-base">{recommendation.ritual?.name}</CardTitle>
                               </div>
-                              <Button
-                                variant={recommendation.completed ? "outline" : "ghost"}
-                                size="icon"
-                                className={`h-7 w-7 rounded-full ${
-                                  recommendation.completed ? 'border-green-500 bg-green-50 text-green-500' : 'text-muted-foreground'
-                                }`}
-                                onClick={() => handleCompletePractice(recommendation)}
-                              >
-                                <Check className="h-4 w-4" />
-                                <span className="sr-only">
-                                  {recommendation.completed ? 'Mark as incomplete' : 'Mark as complete'}
-                                </span>
-                              </Button>
                             </div>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {recommendation.ritual?.targetChakra && (
-                                <Badge 
-                                  variant="outline"
-                                  style={{
-                                    borderColor: chakraColors[recommendation.ritual.targetChakra]?.color + '50',
-                                    backgroundColor: chakraColors[recommendation.ritual.targetChakra]?.bg,
-                                    color: chakraColors[recommendation.ritual.targetChakra]?.color
-                                  }}
-                                  className="font-normal text-xs"
-                                >
-                                  {recommendation.ritual.targetChakra.replace('_', ' ')} chakra
-                                </Badge>
-                              )}
-                              {recommendation.ritual?.targetEmotion && (
-                                <Badge 
-                                  variant="outline"
-                                  style={{
-                                    borderColor: emotionColors[recommendation.ritual.targetEmotion]?.color + '50',
-                                    backgroundColor: emotionColors[recommendation.ritual.targetEmotion]?.bg,
-                                    color: emotionColors[recommendation.ritual.targetEmotion]?.color
-                                  }}
-                                  className="font-normal text-xs"
-                                >
-                                  {recommendation.ritual.targetEmotion}
-                                </Badge>
-                              )}
-                              <Badge variant="outline" className="font-normal text-xs">
-                                {recommendation.ritual?.type.replace('_', ' ')}
-                              </Badge>
+                          </div>
+                          
+                          {/* Right column with images - takes 40% on larger screens */}
+                          <div className="md:w-2/5 flex p-4 md:p-6 items-center justify-center">
+                            <div className="relative">
+                              {/* Main image - larger and in the back */}
+                              <div className="w-60 h-40 md:w-80 md:h-60 rounded-lg overflow-hidden shadow-md z-10">
+                                <img 
+                                  src={getChakraImagePath(ritual.targetChakra)} 
+                                  alt={ritual.name} 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              
+                              {/* Smaller image - in front, absolutely positioned */}
+                              <div className="absolute -bottom-4 -left-4 w-24 h-32 rounded-lg overflow-hidden shadow-lg border-2 border-white">
+                                <img 
+                                  src={ritual.thumbnailUrl || "/images/journaling.jpg"} 
+                                  alt="Ritual" 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
                             </div>
-                          </CardHeader>
-                          <CardContent className="p-4 pt-2">
-                            <CardDescription className="line-clamp-2">
-                              {recommendation.ritual?.description}
-                            </CardDescription>
-                          </CardContent>
-                          <CardFooter className="p-4 pt-0 flex justify-between">
-                            <Button 
-                              variant="secondary" 
-                              size="sm"
-                              onClick={() => recommendation.ritual && handleOpenRitual(recommendation.ritual)}
-                            >
-                              View Details
-                            </Button>
-                            {recommendation.completed && (
-                              <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-                                Completed
-                              </Badge>
-                            )}
-                          </CardFooter>
-                        </Card>
-                      </motion.div>
-                    ))}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>
               
-              {/* All Rituals Tab */}
+              {/* All Available Rituals */}
               <TabsContent value="all" className="mt-0">
-                <h2 className="text-xl font-semibold mb-4">Explore Healing Rituals</h2>
-                {healingRituals.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-neutral-200 p-8 text-center">
-                    <h3 className="font-medium mb-2">No rituals found</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Try adjusting your filters or check back later
-                    </p>
-                    <Button onClick={handleClearFilters} variant="outline">
-                      Clear Filters
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {healingRituals.map((ritual) => {
+                <h2 className="text-xl font-semibold mb-4">Explore All Rituals</h2>
+                <div className="space-y-6">
+                  {healingRituals.length > 0 ? (
+                    healingRituals.map((ritual: any) => {
                       const recommendation = getRecommendation(ritual.id);
-                      const isAdded = !!recommendation;
+                      const isRecommended = !!recommendation;
                       
                       return (
                         <motion.div
@@ -562,205 +551,166 @@ export default function HealingRitualsPage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.3 }}
+                          className="w-full flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden"
                         >
-                          <Card className="h-full overflow-hidden transition-all hover:shadow-md">
-                            <CardHeader className="p-4 pb-0">
-                              <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-2">
-                                  {ritual.targetChakra && (
-                                    <Avatar className="h-8 w-8">
-                                      <AvatarFallback
-                                        style={{
-                                          backgroundColor: chakraColors[ritual.targetChakra]?.bg || '#f5f5f5',
-                                          color: chakraColors[ritual.targetChakra]?.color || '#999'
-                                        }}
-                                      >
-                                        {chakraColors[ritual.targetChakra]?.icon}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                  )}
-                                  <CardTitle className="text-base">{ritual.name}</CardTitle>
-                                </div>
-                                {isAdded && recommendation?.completed && (
-                                  <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-                                    Completed
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {ritual.targetChakra && (
-                                  <Badge 
-                                    variant="outline"
-                                    style={{
-                                      borderColor: chakraColors[ritual.targetChakra]?.color + '50',
-                                      backgroundColor: chakraColors[ritual.targetChakra]?.bg,
-                                      color: chakraColors[ritual.targetChakra]?.color
-                                    }}
-                                    className="font-normal text-xs"
-                                  >
-                                    {ritual.targetChakra.replace('_', ' ')} chakra
-                                  </Badge>
-                                )}
-                                {ritual.targetEmotion && (
-                                  <Badge 
-                                    variant="outline"
-                                    style={{
-                                      borderColor: emotionColors[ritual.targetEmotion]?.color + '50',
-                                      backgroundColor: emotionColors[ritual.targetEmotion]?.bg,
-                                      color: emotionColors[ritual.targetEmotion]?.color
-                                    }}
-                                    className="font-normal text-xs"
-                                  >
-                                    {ritual.targetEmotion}
-                                  </Badge>
-                                )}
-                                <Badge variant="outline" className="font-normal text-xs">
-                                  {ritual.type.replace('_', ' ')}
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="p-4 pt-2">
-                              <CardDescription className="line-clamp-2">
+                          {/* Left column with text content - takes 60% on larger screens */}
+                          <div className="p-8 md:w-3/5 flex flex-col justify-between">
+                            <div>
+                              <h2 className="text-2xl font-bold mb-3 text-gray-900">{ritual.name}</h2>
+                              <p className="text-gray-700 mb-6">
                                 {ritual.description}
-                              </CardDescription>
-                            </CardContent>
-                            <CardFooter className="p-4 pt-0 flex justify-between">
-                              <Button 
-                                variant="secondary" 
-                                size="sm"
-                                onClick={() => handleOpenRitual(ritual)}
-                              >
-                                View Details
-                              </Button>
-                              {isAdded ? (
+                              </p>
+                            </div>
+                            
+                            <div className="mt-auto">
+                              <div className="flex items-center gap-4">
                                 <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => recommendation && handleCompletePractice(recommendation)}
-                                  className={`${recommendation?.completed ? 'border-green-500 bg-green-50 text-green-500 hover:bg-green-100' : ''}`}
+                                  onClick={() => handleOpenRitual(ritual)}
+                                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-2"
                                 >
-                                  {recommendation?.completed ? 'Completed' : 'Mark Complete'}
+                                  Learn More
                                 </Button>
-                              ) : (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleAddToPractices(ritual)}
-                                  disabled={createRecommendationMutation.isPending}
-                                >
-                                  Add to Practices
-                                </Button>
-                              )}
-                            </CardFooter>
-                          </Card>
+                                
+                                {!isRecommended && (
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleAddToPractices(ritual)}
+                                    className="border-indigo-300 text-indigo-600 hover:bg-indigo-50 rounded-full"
+                                  >
+                                    Add to Practice
+                                  </Button>
+                                )}
+                                
+                                {isRecommended && recommendation?.completed && (
+                                  <span className="text-green-600 font-medium flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                    Completed
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Right column with images - takes 40% on larger screens */}
+                          <div className="md:w-2/5 flex p-4 md:p-6 items-center justify-center">
+                            <div className="relative">
+                              {/* Main image - larger and in the back */}
+                              <div className="w-60 h-40 md:w-80 md:h-60 rounded-lg overflow-hidden shadow-md z-10">
+                                <img 
+                                  src={getChakraImagePath(ritual.targetChakra)} 
+                                  alt={ritual.name} 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              
+                              {/* Smaller image - in front, absolutely positioned */}
+                              <div className="absolute -bottom-4 -left-4 w-24 h-32 rounded-lg overflow-hidden shadow-lg border-2 border-white">
+                                <img 
+                                  src={ritual.thumbnailUrl || "/images/journaling.jpg"} 
+                                  alt="Ritual" 
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </motion.div>
                       );
-                    })}
-                  </div>
-                )}
+                    })
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-neutral-200 p-8 text-center">
+                      <h3 className="font-medium mb-2">No rituals found</h3>
+                      <p className="text-muted-foreground">
+                        {filterChakra || filterEmotion
+                          ? "Try adjusting your filters to see more rituals."
+                          : "There are no healing rituals available at the moment."}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </>
           )}
         </Tabs>
-
-        {/* Ritual Details Dialog */}
+      </div>
+      
+      {/* Ritual Details Dialog */}
+      {selectedRitual && (
         <Dialog open={!!selectedRitual} onOpenChange={(open) => !open && setSelectedRitual(null)}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                {selectedRitual?.targetChakra && (
-                  <span
-                    className="inline-block h-4 w-4 rounded-full"
+              <DialogTitle className="text-2xl">{selectedRitual.name}</DialogTitle>
+              <DialogDescription className="flex flex-wrap gap-2 mt-2">
+                {selectedRitual.targetChakra && (
+                  <Badge 
+                    variant="outline"
                     style={{
-                      backgroundColor: chakraColors[selectedRitual.targetChakra]?.color || '#ccc'
+                      borderColor: chakraColors[selectedRitual.targetChakra]?.color + '50',
+                      backgroundColor: chakraColors[selectedRitual.targetChakra]?.bg,
+                      color: chakraColors[selectedRitual.targetChakra]?.color
                     }}
-                  />
+                  >
+                    {selectedRitual.targetChakra}
+                  </Badge>
                 )}
-                {selectedRitual?.name}
-              </DialogTitle>
-              <DialogDescription>
-                {selectedRitual?.description}
+                {selectedRitual.targetEmotion && (
+                  <Badge 
+                    variant="outline"
+                    style={{
+                      borderColor: emotionColors[selectedRitual.targetEmotion]?.color + '50',
+                      backgroundColor: emotionColors[selectedRitual.targetEmotion]?.bg,
+                      color: emotionColors[selectedRitual.targetEmotion]?.color
+                    }}
+                  >
+                    {selectedRitual.targetEmotion}
+                  </Badge>
+                )}
               </DialogDescription>
             </DialogHeader>
             
-            <div className="flex flex-wrap gap-2 mb-4">
-              {selectedRitual?.targetChakra && (
-                <Badge 
-                  variant="outline"
-                  style={{
-                    borderColor: chakraColors[selectedRitual.targetChakra]?.color + '50',
-                    backgroundColor: chakraColors[selectedRitual.targetChakra]?.bg,
-                    color: chakraColors[selectedRitual.targetChakra]?.color
-                  }}
-                >
-                  {selectedRitual.targetChakra.replace('_', ' ')} chakra
-                </Badge>
-              )}
-              {selectedRitual?.targetEmotion && (
-                <Badge 
-                  variant="outline"
-                  style={{
-                    borderColor: emotionColors[selectedRitual.targetEmotion]?.color + '50',
-                    backgroundColor: emotionColors[selectedRitual.targetEmotion]?.bg,
-                    color: emotionColors[selectedRitual.targetEmotion]?.color
-                  }}
-                >
-                  {selectedRitual.targetEmotion} support
-                </Badge>
-              )}
-              <Badge variant="outline">
-                {selectedRitual?.type.replace('_', ' ')}
-              </Badge>
+            <div className="space-y-4 my-4">
+              <div>
+                <h3 className="font-medium text-lg mb-2">Description</h3>
+                <p className="text-gray-700">{selectedRitual.description}</p>
+              </div>
+              
+              <div>
+                <h3 className="font-medium text-lg mb-2">Instructions</h3>
+                <div className="text-gray-700 whitespace-pre-line">
+                  {selectedRitual.instructions}
+                </div>
+              </div>
             </div>
             
-            <div className="rounded-lg bg-neutral-50 p-4 text-sm">
-              <h3 className="font-semibold mb-2">Instructions</h3>
-              <p className="whitespace-pre-wrap">{selectedRitual?.instructions}</p>
-            </div>
-            
-            <DialogFooter className="sm:justify-between">
+            <DialogFooter className="gap-2 sm:gap-0">
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => setSelectedRitual(null)}
               >
                 Close
               </Button>
               
-              {selectedRitual && (
-                <>
-                  {isInRecommendations(selectedRitual.id) ? (
-                    <Button
-                      variant="default"
-                      onClick={() => {
-                        const recommendation = getRecommendation(selectedRitual.id);
-                        if (recommendation) {
-                          handleCompletePractice(recommendation);
-                        }
-                        setSelectedRitual(null);
-                      }}
-                    >
-                      {getRecommendation(selectedRitual.id)?.completed 
-                        ? 'Mark as Incomplete' 
-                        : 'Mark as Complete'}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="default"
-                      onClick={() => {
-                        handleAddToPractices(selectedRitual);
-                        setSelectedRitual(null);
-                      }}
-                      disabled={createRecommendationMutation.isPending}
-                    >
-                      Add to Your Practices
-                    </Button>
-                  )}
-                </>
+              {!isInRecommendations(selectedRitual.id) ? (
+                <Button onClick={() => {
+                  handleAddToPractices(selectedRitual);
+                  setSelectedRitual(null);
+                }}>
+                  Add to My Practices
+                </Button>
+              ) : (
+                <Button 
+                  variant="default" 
+                  className="bg-green-600 hover:bg-green-700" 
+                  disabled
+                >
+                  Already in Your Practices
+                </Button>
               )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      )}
     </div>
   );
 }
