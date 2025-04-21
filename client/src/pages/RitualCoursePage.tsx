@@ -130,16 +130,14 @@ export default function RitualCoursePage() {
                     size="lg" 
                     className="bg-white text-purple-700 hover:bg-white/90"
                     onClick={() => {
-                      if (ritual.videoUrl) {
-                        // If we have a video URL, open it in a new tab
-                        window.open(ritual.videoUrl, '_blank');
-                      } else if (ritual.courseUrl) {
-                        // If we have a course URL but no video, navigate to it
-                        window.open(ritual.courseUrl, '_blank');
-                      } else {
-                        // Show an alert if neither is available
-                        alert('This practice is coming soon. Please check back later!');
-                      }
+                      // Smooth scroll to the video section in the overview tab
+                      setActiveTab("overview");
+                      setTimeout(() => {
+                        const videoSection = document.getElementById("practice-video-section");
+                        if (videoSection) {
+                          videoSection.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }, 100);
                     }}
                   >
                     <PlayCircle className="mr-2 h-5 w-5" />
@@ -270,26 +268,33 @@ export default function RitualCoursePage() {
                       </CardContent>
                     </Card>
                     
-                    <div className="mt-6">
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        onClick={() => {
-                          if (ritual.videoUrl) {
-                            // If we have a video URL, open it in a new tab
-                            window.open(ritual.videoUrl, '_blank');
-                          } else if (ritual.courseUrl) {
-                            // If we have a course URL but no video, navigate to it
-                            window.open(ritual.courseUrl, '_blank');
-                          } else {
-                            // Show an alert if neither is available
-                            alert('This practice is coming soon. Please check back later!');
-                          }
-                        }}
-                      >
-                        <PlayCircle className="mr-2 h-5 w-5" />
-                        Start Practice Now
-                      </Button>
+                    <div id="practice-video-section" className="mt-6 space-y-4">
+                      {ritual.videoUrl ? (
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            src={ritual.videoUrl}
+                            className="w-full h-full"
+                            title={`${ritual.name} Video`}
+                            allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          ></iframe>
+                        </div>
+                      ) : (
+                        <Button 
+                          className="w-full" 
+                          size="lg"
+                          onClick={() => {
+                            if (ritual.courseUrl) {
+                              window.open(ritual.courseUrl, '_blank');
+                            } else {
+                              alert('This practice is coming soon. Please check back later!');
+                            }
+                          }}
+                        >
+                          <PlayCircle className="mr-2 h-5 w-5" />
+                          Start Practice Now
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

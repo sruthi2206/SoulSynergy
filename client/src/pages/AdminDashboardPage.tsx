@@ -1402,7 +1402,7 @@ function RitualDialog({
                         />
                         {selectedMainImage === media.url && (
                           <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
-                            <CheckCircle2 className="h-4 w-4" />
+                            <Check className="h-4 w-4" />
                           </div>
                         )}
                       </div>
@@ -1433,7 +1433,7 @@ function RitualDialog({
                         />
                         {selectedThumbnail === media.url && (
                           <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
-                            <CheckCircle2 className="h-4 w-4" />
+                            <Check className="h-4 w-4" />
                           </div>
                         )}
                       </div>
