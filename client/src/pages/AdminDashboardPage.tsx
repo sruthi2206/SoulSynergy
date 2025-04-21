@@ -491,6 +491,7 @@ function MediaLibrary() {
   
   // Convert YouTube URL to embed format
   const convertYouTubeUrl = (url: string): string | null => {
+  // We're using the imported convertYouTubeUrl function from @/lib/youtube-utils
     // Match different YouTube URL formats
     const ytRegExp = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/(?:watch\?v=)?([^&]+)/;
     const match = url.match(ytRegExp);
