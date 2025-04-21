@@ -1070,19 +1070,19 @@ function RitualDialog({
     thumbnailUrl: '',
     courseUrl: '',
     videoUrl: '',
-    duration: '',
+    duration: '30min',
     // Lesson 1 fields
     lesson1Title: '',
     lesson1Description: '',
-    lesson1Duration: '',
+    lesson1Duration: '10min',
     // Lesson 2 fields
     lesson2Title: '',
     lesson2Description: '',
-    lesson2Duration: '',
+    lesson2Duration: '15min',
     // Lesson 3 fields
     lesson3Title: '',
     lesson3Description: '',
-    lesson3Duration: '',
+    lesson3Duration: '5min',
   });
   const [step, setStep] = useState<'details' | 'media' | 'course'>('details');
   const [selectedMainImage, setSelectedMainImage] = useState<string | null>(null);
@@ -1152,19 +1152,19 @@ function RitualDialog({
         thumbnailUrl: '',
         courseUrl: '',
         videoUrl: '',
-        duration: '',
+        duration: '30min',
         // Lesson 1 fields
         lesson1Title: '',
         lesson1Description: '',
-        lesson1Duration: '',
+        lesson1Duration: '10min',
         // Lesson 2 fields
         lesson2Title: '',
         lesson2Description: '',
-        lesson2Duration: '',
+        lesson2Duration: '15min',
         // Lesson 3 fields
         lesson3Title: '',
         lesson3Description: '',
-        lesson3Duration: '',
+        lesson3Duration: '5min',
       });
       setSelectedMainImage(null);
       setSelectedThumbnail(null);
@@ -1529,7 +1529,7 @@ function RitualDialog({
                         <div>
                           <Label htmlFor="lesson1Duration">Duration</Label>
                           <Select
-                            value={form.lesson1Duration || ""}
+                            value={form.lesson1Duration}
                             onValueChange={(value) => setForm(prev => ({ ...prev, lesson1Duration: value }))}
                           >
                             <SelectTrigger>
@@ -1576,7 +1576,7 @@ function RitualDialog({
                         <div>
                           <Label htmlFor="lesson2Duration">Duration</Label>
                           <Select
-                            value={form.lesson2Duration || ""}
+                            value={form.lesson2Duration}
                             onValueChange={(value) => setForm(prev => ({ ...prev, lesson2Duration: value }))}
                           >
                             <SelectTrigger>
@@ -1623,7 +1623,7 @@ function RitualDialog({
                         <div>
                           <Label htmlFor="lesson3Duration">Duration</Label>
                           <Select
-                            value={form.lesson3Duration || ""}
+                            value={form.lesson3Duration}
                             onValueChange={(value) => setForm(prev => ({ ...prev, lesson3Duration: value }))}
                           >
                             <SelectTrigger>
