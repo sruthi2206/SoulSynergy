@@ -1071,6 +1071,18 @@ function RitualDialog({
     courseUrl: '',
     videoUrl: '',
     duration: '',
+    // Lesson 1 fields
+    lesson1Title: '',
+    lesson1Description: '',
+    lesson1Duration: '',
+    // Lesson 2 fields
+    lesson2Title: '',
+    lesson2Description: '',
+    lesson2Duration: '',
+    // Lesson 3 fields
+    lesson3Title: '',
+    lesson3Description: '',
+    lesson3Duration: '',
   });
   const [step, setStep] = useState<'details' | 'media' | 'course'>('details');
   const [selectedMainImage, setSelectedMainImage] = useState<string | null>(null);
@@ -1114,6 +1126,18 @@ function RitualDialog({
         courseUrl: ritual.courseUrl || '',
         videoUrl: ritual.videoUrl || '',
         duration: ritual.duration || '',
+        // Lesson 1 fields
+        lesson1Title: ritual.lesson1Title || '',
+        lesson1Description: ritual.lesson1Description || '',
+        lesson1Duration: ritual.lesson1Duration || '',
+        // Lesson 2 fields
+        lesson2Title: ritual.lesson2Title || '',
+        lesson2Description: ritual.lesson2Description || '',
+        lesson2Duration: ritual.lesson2Duration || '',
+        // Lesson 3 fields
+        lesson3Title: ritual.lesson3Title || '',
+        lesson3Description: ritual.lesson3Description || '',
+        lesson3Duration: ritual.lesson3Duration || '',
       });
       setSelectedMainImage(ritual.mainImageUrl || null);
       setSelectedThumbnail(ritual.thumbnailUrl || null);
@@ -1129,6 +1153,18 @@ function RitualDialog({
         courseUrl: '',
         videoUrl: '',
         duration: '',
+        // Lesson 1 fields
+        lesson1Title: '',
+        lesson1Description: '',
+        lesson1Duration: '',
+        // Lesson 2 fields
+        lesson2Title: '',
+        lesson2Description: '',
+        lesson2Duration: '',
+        // Lesson 3 fields
+        lesson3Title: '',
+        lesson3Description: '',
+        lesson3Duration: '',
       });
       setSelectedMainImage(null);
       setSelectedThumbnail(null);
@@ -1441,19 +1477,167 @@ function RitualDialog({
                 </div>
                 
                 <div>
-                  <Label htmlFor="duration">Duration</Label>
+                  <Label htmlFor="duration">Course Duration</Label>
                   <Input
                     id="duration"
                     name="duration"
                     value={form.duration}
                     onChange={handleChange}
-                    placeholder="e.g., 15 minutes"
+                    placeholder="e.g., 15 minutes, 1 hour"
                     className="mt-1"
                   />
                   <p className="text-sm text-muted-foreground mt-1">
-                    Approximate time to complete this ritual
+                    Expected time to complete the practice or course
                   </p>
                 </div>
+                
+                <Separator className="my-4" />
+                
+                <div>
+                  <h3 className="font-medium mb-3">Curriculum Sections</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    The course curriculum will be displayed on the course page. You can add up to 3 lessons.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div className="border rounded-md p-4">
+                      <h4 className="font-medium mb-2">Lesson 1</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="lesson1Title">Title</Label>
+                          <Input
+                            id="lesson1Title"
+                            name="lesson1Title"
+                            value={form.lesson1Title}
+                            onChange={handleChange}
+                            placeholder="Introduction to the practice"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lesson1Description">Description</Label>
+                          <Textarea
+                            id="lesson1Description"
+                            name="lesson1Description"
+                            value={form.lesson1Description}
+                            onChange={handleChange}
+                            placeholder="Brief description of the lesson"
+                            className="mt-1"
+                            rows={2}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lesson1Duration">Duration</Label>
+                          <Select
+                            value={form.lesson1Duration || ""}
+                            onValueChange={(value) => setForm(prev => ({ ...prev, lesson1Duration: value }))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select duration" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5min">5 minutes</SelectItem>
+                              <SelectItem value="10min">10 minutes</SelectItem>
+                              <SelectItem value="15min">15 minutes</SelectItem>
+                              <SelectItem value="20min">20 minutes</SelectItem>
+                              <SelectItem value="30min">30 minutes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded-md p-4">
+                      <h4 className="font-medium mb-2">Lesson 2</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="lesson2Title">Title</Label>
+                          <Input
+                            id="lesson2Title"
+                            name="lesson2Title"
+                            value={form.lesson2Title}
+                            onChange={handleChange}
+                            placeholder="The Main Practice"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lesson2Description">Description</Label>
+                          <Textarea
+                            id="lesson2Description"
+                            name="lesson2Description"
+                            placeholder="Brief description of the lesson"
+                            className="mt-1"
+                            rows={2}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lesson2Duration">Duration</Label>
+                          <Select
+                            value={form.lesson2Duration || ""}
+                            onValueChange={(value) => setForm(prev => ({ ...prev, lesson2Duration: value }))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select duration" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5min">5 minutes</SelectItem>
+                              <SelectItem value="10min">10 minutes</SelectItem>
+                              <SelectItem value="15min">15 minutes</SelectItem>
+                              <SelectItem value="20min">20 minutes</SelectItem>
+                              <SelectItem value="30min">30 minutes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded-md p-4">
+                      <h4 className="font-medium mb-2">Lesson 3</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="lesson3Title">Title</Label>
+                          <Input
+                            id="lesson3Title"
+                            name="lesson3Title"
+                            placeholder="Integration & Daily Practice"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lesson3Description">Description</Label>
+                          <Textarea
+                            id="lesson3Description"
+                            name="lesson3Description"
+                            placeholder="Brief description of the lesson"
+                            className="mt-1"
+                            rows={2}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="lesson3Duration">Duration</Label>
+                          <Select
+                            value={form.lesson3Duration || ""}
+                            onValueChange={(value) => setForm(prev => ({ ...prev, lesson3Duration: value }))}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select duration" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5min">5 minutes</SelectItem>
+                              <SelectItem value="10min">10 minutes</SelectItem>
+                              <SelectItem value="15min">15 minutes</SelectItem>
+                              <SelectItem value="20min">20 minutes</SelectItem>
+                              <SelectItem value="30min">30 minutes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+
               </div>
             )}
           </form>
