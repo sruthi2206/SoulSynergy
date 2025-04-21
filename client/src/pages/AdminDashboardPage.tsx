@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Search, Edit, Trash2, Image, X, Grid3X3, List, Plus, Video as VideoIcon } from "lucide-react";
+import MediaUploadDialog from "@/components/MediaUploadDialog";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -1184,7 +1185,7 @@ function RitualDialog({
   const queryClient = useQueryClient();
 
   // Media library for selecting images
-  const { data: mediaItems = [] } = useQuery({
+  const { data: mediaItems = [], refetch: refetchMedia } = useQuery({
     queryKey: ['/api/media'],
     queryFn: async () => {
       try {
@@ -1199,9 +1200,28 @@ function RitualDialog({
     enabled: isOpen,
   });
 
+  // Function to load media items
+  const loadMediaItems = () => {
+    refetchMedia();
+  };
+  
+  // Convert YouTube URL to embed format
+  const convertYouTubeUrl = (url: string): string | null => {
+    // Match different YouTube URL formats
+    const ytRegExp = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/(?:watch\?v=)?([^&]+)/;
+    const match = url.match(ytRegExp);
+    
+    if (match && match[4]) {
+      const videoId = match[4];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    return null;
+  };
+
   // Filter only images
   const imageMedia = mediaItems.filter((item: any) => 
-    item.mimetype.startsWith('image/')
+    item.mimetype && item.mimetype.startsWith('image/')
   );
 
   // Reset form on dialog open/close
@@ -1316,9 +1336,19 @@ function RitualDialog({
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Check if videoUrl is a regular YouTube URL and convert it
+    let videoUrl = form.videoUrl;
+    if (videoUrl && !videoUrl.includes('youtube.com/embed') && videoUrl.includes('youtube.com')) {
+      const embeddedUrl = convertYouTubeUrl(videoUrl);
+      if (embeddedUrl) {
+        videoUrl = embeddedUrl;
+      }
+    }
+    
     // Prepare data for submission
     const data = {
       ...form,
+      videoUrl,
       mainImageUrl: selectedMainImage,
       thumbnailUrl: selectedThumbnail,
     };
@@ -1472,7 +1502,18 @@ function RitualDialog({
             {step === 'media' && (
               <div className="space-y-6 py-2">
                 <div>
-                  <h3 className="font-medium mb-2">Main Image</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-medium">Main Image</h3>
+                    <MediaUploadDialog 
+                      onUploadComplete={() => loadMediaItems()}
+                      buttonLabel="Upload New Image"
+                    >
+                      <Button variant="outline" size="sm" className="flex items-center">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload New Image
+                      </Button>
+                    </MediaUploadDialog>
+                  </div>
                   <p className="text-sm text-muted-foreground mb-4">
                     Select an image from your media library to use as the main image for this ritual.
                   </p>
@@ -1503,7 +1544,18 @@ function RitualDialog({
                 </div>
                 
                 <div>
-                  <h3 className="font-medium mb-2">Thumbnail Image</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-medium">Thumbnail Image</h3>
+                    <MediaUploadDialog 
+                      onUploadComplete={() => loadMediaItems()}
+                      buttonLabel="Upload New Image"
+                    >
+                      <Button variant="outline" size="sm" className="flex items-center">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload New Image
+                      </Button>
+                    </MediaUploadDialog>
+                  </div>
                   <p className="text-sm text-muted-foreground mb-4">
                     Select a thumbnail image to appear alongside the main image.
                   </p>
