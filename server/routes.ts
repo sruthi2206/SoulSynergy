@@ -35,6 +35,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API routes prefix
   const apiRouter = '/api';
   
+  // Authentication middlewares
+  const requireAuth = (req: Request, res: Response, next: any) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    next();
+  };
+  
   // Middleware to check if user is admin
   const isAdmin = (req: Request, res: Response, next: any) => {
     if (!req.isAuthenticated()) {
@@ -514,7 +522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get(`${apiRouter}/healing-rituals/:id`, async (req, res) => {
+  app.get(`${apiRouter}/healing-rituals/:id`, requireAuth, async (req, res) => {
     try {
       const ritualId = parseInt(req.params.id);
       const ritual = await storage.getHealingRitual(ritualId);
