@@ -19,6 +19,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -324,7 +325,8 @@ import {
   Filter,
   Clipboard,
   LayoutGrid,
-  CheckCircle2
+  Check,
+  Youtube
 } from "lucide-react";
 
 // Media Library Component
@@ -487,6 +489,20 @@ function MediaLibrary() {
       });
     });
   };
+  
+  // Convert YouTube URL to embed format
+  const convertYouTubeUrl = (url: string): string | null => {
+    // Match different YouTube URL formats
+    const ytRegExp = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/(?:watch\?v=)?([^&]+)/;
+    const match = url.match(ytRegExp);
+    
+    if (match && match[4]) {
+      const videoId = match[4];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    
+    return null;
+  };
 
   return (
     <div>
@@ -522,8 +538,8 @@ function MediaLibrary() {
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="relative">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search media files..."
@@ -531,6 +547,82 @@ function MediaLibrary() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+        </div>
+        <div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Youtube className="h-4 w-4 mr-2" />
+                Add YouTube URL
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Add YouTube Video</DialogTitle>
+                <DialogDescription>
+                  Enter a YouTube URL to add it to your ritual courses
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="youtube-url">YouTube URL</Label>
+                  <Input
+                    id="youtube-url"
+                    placeholder="https://www.youtube.com/watch?v=abcdefg"
+                    className="w-full"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Regular YouTube URLs will be automatically converted to embed format
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="youtube-title">Title (Optional)</Label>
+                  <Input
+                    id="youtube-title"
+                    placeholder="Meditation for Heart Chakra"
+                  />
+                </div>
+              </div>
+              
+              <DialogFooter className="sm:justify-between">
+                <Button
+                  variant="ghost"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    // Handle YouTube URL conversion and save
+                    const youtubeUrl = (document.getElementById('youtube-url') as HTMLInputElement).value;
+                    const youtubeTitle = (document.getElementById('youtube-title') as HTMLInputElement).value || 'YouTube Video';
+                    
+                    // Convert YouTube URL to embed format
+                    const embedUrl = convertYouTubeUrl(youtubeUrl);
+                    
+                    if (embedUrl) {
+                      toast({
+                        title: "YouTube URL Added",
+                        description: "The YouTube URL has been converted to embed format and copied to clipboard",
+                      });
+                      
+                      // Copy to clipboard
+                      navigator.clipboard.writeText(embedUrl);
+                    } else {
+                      toast({
+                        title: "Invalid YouTube URL",
+                        description: "Please enter a valid YouTube URL",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  Copy Embed URL
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
