@@ -40,6 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { RitualCard } from "@/components/RitualCard";
 
 // Chakra colors for visual association
 const chakraColors: Record<string, { color: string, bg: string, icon: string }> = {
