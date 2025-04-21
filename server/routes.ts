@@ -677,6 +677,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch media items', error: (error as Error).message });
     }
   });
+  
+  // Multiple file upload endpoint for media
+  app.post(`${apiRouter}/media/upload`, requireAuth, upload.array('files', 10), async (req, res) => {
+    try {
+      const files = req.files as Express.Multer.File[];
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ success: false, message: 'No files uploaded' });
+      }
+      
+      // Get authenticated user
+      const user = req.user;
+      
+      const uploadedMedia = [];
+      
+      // Process each uploaded file
+      for (const file of files) {
+        // Create relative URL for the uploaded file
+        const relativeFilePath = `/uploads/${file.filename}`;
+        
+        // Create a new media entry in the database
+        if (user) {
+          try {
+            const mediaData = {
+              fileName: file.originalname,
+              fileType: file.mimetype,
+              fileUrl: relativeFilePath,
+              fileSize: file.size,
+              altText: file.originalname,
+              uploadedById: user.id
+            };
+            
+            // Store the media in the database
+            const mediaItem = await storage.uploadMedia(mediaData);
+            
+            uploadedMedia.push({
+              id: mediaItem.id,
+              url: relativeFilePath,
+              filename: file.originalname,
+              mimetype: file.mimetype
+            });
+          } catch (error) {
+            console.error("Failed to save media to database:", error);
+            // Continue processing other files even if one fails
+          }
+        }
+      }
+      
+      res.status(201).json({
+        success: true,
+        message: `Successfully uploaded ${uploadedMedia.length} files`,
+        files: uploadedMedia
+      });
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to upload files',
+        error: (error as Error).message
+      });
+    }
+  });
 
   app.get(`${apiRouter}/media/:id`, async (req, res) => {
     try {
