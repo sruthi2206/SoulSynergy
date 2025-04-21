@@ -1566,6 +1566,8 @@ function RitualDialog({
                           <Textarea
                             id="lesson2Description"
                             name="lesson2Description"
+                            value={form.lesson2Description}
+                            onChange={handleChange}
                             placeholder="Brief description of the lesson"
                             className="mt-1"
                             rows={2}
@@ -1600,6 +1602,8 @@ function RitualDialog({
                           <Input
                             id="lesson3Title"
                             name="lesson3Title"
+                            value={form.lesson3Title}
+                            onChange={handleChange}
                             placeholder="Integration & Daily Practice"
                             className="mt-1"
                           />
@@ -1609,6 +1613,8 @@ function RitualDialog({
                           <Textarea
                             id="lesson3Description"
                             name="lesson3Description"
+                            value={form.lesson3Description}
+                            onChange={handleChange}
                             placeholder="Brief description of the lesson"
                             className="mt-1"
                             rows={2}
