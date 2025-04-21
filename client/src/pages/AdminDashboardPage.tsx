@@ -644,10 +644,10 @@ function MediaLibrary() {
                     onClick={() => handleMediaClick(item)}
                   >
                     <div className="aspect-square w-full overflow-hidden bg-muted">
-                      {item.mimetype.startsWith('image/') ? (
+                      {item.fileType && item.fileType.startsWith('image/') ? (
                         <img 
-                          src={item.url} 
-                          alt={item.filename} 
+                          src={item.fileUrl} 
+                          alt={item.fileName} 
                           className="h-full w-full object-cover transition-all group-hover:scale-105"
                         />
                       ) : (
@@ -684,7 +684,7 @@ function MediaLibrary() {
                         onClick={() => handleMediaClick(item)}
                       >
                         <TableCell>
-                          {item.mimetype.startsWith('image/') ? (
+                          {item.fileType && item.fileType.startsWith('image/') ? (
                             <Image className="h-4 w-4" />
                           ) : (
                             <FileText className="h-4 w-4" />
@@ -692,12 +692,12 @@ function MediaLibrary() {
                         </TableCell>
                         <TableCell className="font-medium">
                           <div className="flex items-center">
-                            {item.mimetype.startsWith('image/') && (
+                            {item.fileType && item.fileType.startsWith('image/') && (
                               <div className="h-8 w-8 mr-2 overflow-hidden rounded border">
-                                <img src={item.url} alt={item.filename} className="h-full w-full object-cover" />
+                                <img src={item.fileUrl} alt={item.fileName} className="h-full w-full object-cover" />
                               </div>
                             )}
-                            <span className="truncate max-w-[200px]">{item.filename}</span>
+                            <span className="truncate max-w-[200px]">{item.fileName}</span>
                           </div>
                         </TableCell>
                         <TableCell>{formatFileSize(item.size)}</TableCell>
@@ -738,10 +738,10 @@ function MediaLibrary() {
               </div>
               
               <div className="aspect-square w-full overflow-hidden rounded-md border bg-muted">
-                {selectedFile.mimetype.startsWith('image/') ? (
+                {selectedFile.fileType && selectedFile.fileType.startsWith('image/') ? (
                   <img 
-                    src={selectedFile.url} 
-                    alt={selectedFile.filename} 
+                    src={selectedFile.fileUrl} 
+                    alt={selectedFile.fileName} 
                     className="h-full w-full object-contain"
                   />
                 ) : (
@@ -754,32 +754,32 @@ function MediaLibrary() {
               <div className="space-y-2">
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">File name:</span>
-                  <p className="truncate">{selectedFile.filename}</p>
+                  <p className="truncate">{selectedFile.fileName}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">Type:</span>
-                  <p>{selectedFile.mimetype}</p>
+                  <p>{selectedFile.fileType}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">Size:</span>
-                  <p>{formatFileSize(selectedFile.size)}</p>
+                  <p>{formatFileSize(selectedFile.fileSize)}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">Uploaded:</span>
-                  <p>{new Date(selectedFile.uploadedAt).toLocaleDateString()}</p>
+                  <p>{new Date(selectedFile.uploadDate).toLocaleDateString()}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">URL:</span>
                   <div className="flex mt-1">
                     <Input 
-                      value={selectedFile.url} 
+                      value={selectedFile.fileUrl} 
                       readOnly 
                       className="text-xs"
                     />
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => copyToClipboard(selectedFile.url)}
+                      onClick={() => copyToClipboard(selectedFile.fileUrl)}
                       className="ml-2"
                     >
                       <Clipboard className="h-4 w-4" />
@@ -791,7 +791,7 @@ function MediaLibrary() {
               <div className="pt-4 flex justify-between space-x-2">
                 <Button
                   variant="outline"
-                  onClick={() => copyToClipboard(selectedFile.url)}
+                  onClick={() => copyToClipboard(selectedFile.fileUrl)}
                   className="flex-1"
                 >
                   Copy URL
@@ -1195,7 +1195,7 @@ function RitualDialog({
 
   // Filter only images
   const imageMedia = mediaItems.filter((item: any) => 
-    item.mimetype && item.mimetype.startsWith('image/')
+    item.fileType && item.fileType.startsWith('image/')
   );
 
   // Reset form on dialog open/close
@@ -1518,16 +1518,16 @@ function RitualDialog({
                         key={media.id}
                         className={`
                           relative aspect-square rounded-md overflow-hidden border-2 cursor-pointer
-                          ${selectedMainImage === media.url ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'}
+                          ${selectedMainImage === media.fileUrl ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'}
                         `}
-                        onClick={() => setSelectedMainImage(media.url)}
+                        onClick={() => setSelectedMainImage(media.fileUrl)}
                       >
                         <img 
-                          src={media.url} 
-                          alt={media.filename} 
+                          src={media.fileUrl} 
+                          alt={media.fileName} 
                           className="w-full h-full object-cover"
                         />
-                        {selectedMainImage === media.url && (
+                        {selectedMainImage === media.fileUrl && (
                           <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
                             <Check className="h-4 w-4" />
                           </div>
@@ -1560,16 +1560,16 @@ function RitualDialog({
                         key={`thumb-${media.id}`}
                         className={`
                           relative aspect-square rounded-md overflow-hidden border-2 cursor-pointer
-                          ${selectedThumbnail === media.url ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'}
+                          ${selectedThumbnail === media.fileUrl ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'}
                         `}
-                        onClick={() => setSelectedThumbnail(media.url)}
+                        onClick={() => setSelectedThumbnail(media.fileUrl)}
                       >
                         <img 
-                          src={media.url} 
-                          alt={media.filename} 
+                          src={media.fileUrl} 
+                          alt={media.fileName} 
                           className="w-full h-full object-cover"
                         />
-                        {selectedThumbnail === media.url && (
+                        {selectedThumbnail === media.fileUrl && (
                           <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
                             <Check className="h-4 w-4" />
                           </div>
