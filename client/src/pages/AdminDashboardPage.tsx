@@ -1291,7 +1291,27 @@ function RitualDialog({
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    
+    // If this is a videoUrl field and looks like a YouTube URL, convert it
+    if (name === 'videoUrl' && (value.includes('youtube.com') || value.includes('youtu.be'))) {
+      const embedUrl = convertYouTubeUrl(value);
+      if (embedUrl) {
+        setForm(prev => ({ ...prev, [name]: embedUrl }));
+        
+        // Show a toast notification if the URL was converted
+        if (embedUrl !== value) {
+          toast({
+            title: "YouTube URL Converted",
+            description: "URL automatically converted to embed format for compatibility",
+          });
+        }
+      } else {
+        setForm(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      // For all other fields or non-YouTube URLs
+      setForm(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Create/Update ritual mutation
