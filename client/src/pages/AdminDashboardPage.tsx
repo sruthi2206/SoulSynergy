@@ -848,25 +848,654 @@ function MediaLibrary() {
 
 // Rituals Manager Component
 function RitualsManager() {
-  // Component implementation
-  // Placeholder for now to avoid making this file too long
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedRitual, setSelectedRitual] = useState<any | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch all healing rituals
+  const { data: rituals = [], isLoading } = useQuery({
+    queryKey: ['/api/healing-rituals'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('/api/healing-rituals');
+        if (!res.ok) throw new Error('Failed to fetch healing rituals');
+        return await res.json();
+      } catch (error) {
+        console.error('Error fetching healing rituals:', error);
+        return [];
+      }
+    },
+  });
+
+  // Delete ritual mutation
+  const deleteRitualMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/healing-rituals/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to delete ritual');
+      }
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/healing-rituals'] });
+      toast({
+        title: "Ritual deleted",
+        description: "The ritual has been successfully deleted",
+      });
+      setIsDeleting(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      setIsDeleting(false);
+    },
+  });
+
+  // Filter rituals based on search term
+  const filteredRituals = rituals.filter((ritual: any) => 
+    ritual.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (ritual.description && ritual.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  // Handle ritual deletion
+  const handleDeleteRitual = (id: number) => {
+    setIsDeleting(true);
+    deleteRitualMutation.mutate(id);
+  };
+
+  // Handle editing a ritual
+  const handleEditRitual = (ritual: any) => {
+    setSelectedRitual(ritual);
+    setIsEditDialogOpen(true);
+  };
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h2 className="text-2xl font-bold">Healing Rituals</h2>
-        <Button id="add-ritual-button">
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Ritual
-        </Button>
+        
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search rituals..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <Button 
+            id="add-ritual-button"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Ritual
+          </Button>
+        </div>
       </div>
       
-      <div className="border rounded-md p-8 text-center">
-        <h3 className="text-lg font-semibold mb-2">Rituals Management</h3>
-        <p className="text-muted-foreground mb-4">
-          Here you'll be able to manage all healing rituals, add new ones, and edit existing ones.
-        </p>
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : filteredRituals.length === 0 ? (
+        <div className="text-center p-12 border border-dashed rounded-md">
+          <h3 className="text-lg font-semibold mb-2">No rituals found</h3>
+          <p className="text-muted-foreground mb-4">
+            {searchTerm 
+              ? "No results match your search query. Try something different."
+              : "There are no healing rituals available. Add one to get started."}
+          </p>
+          <Button onClick={() => setIsAddDialogOpen(true)}>Add New Ritual</Button>
+        </div>
+      ) : (
+        <div className="border rounded-md overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]">ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden md:table-cell">Type</TableHead>
+                <TableHead className="hidden md:table-cell">Target</TableHead>
+                <TableHead className="hidden md:table-cell">Course URL</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRituals.map((ritual: any) => (
+                <TableRow key={ritual.id}>
+                  <TableCell className="font-medium">{ritual.id}</TableCell>
+                  <TableCell>
+                    <div className="font-medium">{ritual.name}</div>
+                    <div className="text-sm text-muted-foreground md:hidden">
+                      {ritual.type || "General"} | {ritual.targetChakra || ritual.targetEmotion || "N/A"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">{ritual.type || "General"}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {ritual.targetChakra ? 
+                      <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                        {ritual.targetChakra}
+                      </Badge> 
+                      : null}
+                    {ritual.targetEmotion ? 
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 ml-1">
+                        {ritual.targetEmotion}
+                      </Badge> 
+                      : null}
+                    {!ritual.targetChakra && !ritual.targetEmotion && "N/A"}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {ritual.courseUrl ? (
+                      <span className="text-blue-600 hover:underline">{new URL(ritual.courseUrl).pathname}</span>
+                    ) : (
+                      <span className="text-muted-foreground">Not set</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditRitual(ritual)}
+                        title="Edit Ritual"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeleteRitual(ritual.id)}
+                        disabled={isDeleting}
+                        title="Delete Ritual"
+                      >
+                        {isDeleting && ritual.id === selectedRitual?.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {/* Ritual Add/Edit Dialog will be implemented here */}
+      <RitualDialog 
+        isOpen={isAddDialogOpen || isEditDialogOpen} 
+        onClose={() => {
+          setIsAddDialogOpen(false);
+          setIsEditDialogOpen(false);
+          setSelectedRitual(null);
+        }}
+        ritual={selectedRitual}
+        isEditing={isEditDialogOpen}
+      />
     </div>
+  );
+}
+
+// Ritual Dialog Component for Add/Edit
+function RitualDialog({ 
+  isOpen, 
+  onClose, 
+  ritual = null, 
+  isEditing = false 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  ritual?: any | null;
+  isEditing?: boolean;
+}) {
+  const [form, setForm] = useState({
+    name: '',
+    type: '',
+    description: '',
+    instructions: '',
+    targetChakra: '',
+    targetEmotion: '',
+    thumbnailUrl: '',
+    courseUrl: '',
+    videoUrl: '',
+    duration: '',
+  });
+  const [step, setStep] = useState<'details' | 'media' | 'course'>('details');
+  const [selectedMainImage, setSelectedMainImage] = useState<string | null>(null);
+  const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Media library for selecting images
+  const { data: mediaItems = [] } = useQuery({
+    queryKey: ['/api/media'],
+    queryFn: async () => {
+      try {
+        const res = await fetch('/api/media');
+        if (!res.ok) throw new Error('Failed to fetch media');
+        return await res.json();
+      } catch (error) {
+        console.error('Error fetching media:', error);
+        return [];
+      }
+    },
+    enabled: isOpen,
+  });
+
+  // Filter only images
+  const imageMedia = mediaItems.filter((item: any) => 
+    item.mimetype.startsWith('image/')
+  );
+
+  // Reset form on dialog open/close
+  useEffect(() => {
+    if (isOpen && isEditing && ritual) {
+      setForm({
+        name: ritual.name || '',
+        type: ritual.type || '',
+        description: ritual.description || '',
+        instructions: ritual.instructions || '',
+        targetChakra: ritual.targetChakra || '',
+        targetEmotion: ritual.targetEmotion || '',
+        thumbnailUrl: ritual.thumbnailUrl || '',
+        courseUrl: ritual.courseUrl || '',
+        videoUrl: ritual.videoUrl || '',
+        duration: ritual.duration || '',
+      });
+      setSelectedMainImage(ritual.mainImageUrl || null);
+      setSelectedThumbnail(ritual.thumbnailUrl || null);
+    } else if (isOpen && !isEditing) {
+      setForm({
+        name: '',
+        type: '',
+        description: '',
+        instructions: '',
+        targetChakra: '',
+        targetEmotion: '',
+        thumbnailUrl: '',
+        courseUrl: '',
+        videoUrl: '',
+        duration: '',
+      });
+      setSelectedMainImage(null);
+      setSelectedThumbnail(null);
+    }
+    
+    // Reset step when opening dialog
+    if (isOpen) {
+      setStep('details');
+    }
+  }, [isOpen, isEditing, ritual]);
+
+  // Handle form input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Create/Update ritual mutation
+  const saveRitualMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const url = isEditing 
+        ? `/api/healing-rituals/${ritual.id}` 
+        : '/api/healing-rituals';
+      
+      const method = isEditing ? "PATCH" : "POST";
+      
+      const response = await apiRequest(method, url, data);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to ${isEditing ? 'update' : 'create'} ritual`);
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/healing-rituals'] });
+      toast({
+        title: isEditing ? "Ritual updated" : "Ritual created",
+        description: `The ritual has been successfully ${isEditing ? 'updated' : 'created'}`,
+      });
+      setIsSubmitting(false);
+      onClose();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+    },
+  });
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Prepare data for submission
+    const data = {
+      ...form,
+      mainImageUrl: selectedMainImage,
+      thumbnailUrl: selectedThumbnail,
+    };
+    
+    saveRitualMutation.mutate(data);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle>
+            {isEditing ? 'Edit Healing Ritual' : 'Add New Healing Ritual'}
+          </DialogTitle>
+          <DialogDescription>
+            {isEditing 
+              ? 'Update the details of this healing ritual'
+              : 'Create a new healing ritual for users to practice'}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex border-b">
+          <div 
+            className={`px-4 py-2 cursor-pointer border-b-2 ${step === 'details' ? 'border-primary font-medium' : 'border-transparent'}`}
+            onClick={() => setStep('details')}
+          >
+            Details
+          </div>
+          <div 
+            className={`px-4 py-2 cursor-pointer border-b-2 ${step === 'media' ? 'border-primary font-medium' : 'border-transparent'}`}
+            onClick={() => setStep('media')}
+          >
+            Media
+          </div>
+          <div 
+            className={`px-4 py-2 cursor-pointer border-b-2 ${step === 'course' ? 'border-primary font-medium' : 'border-transparent'}`}
+            onClick={() => setStep('course')}
+          >
+            Course Content
+          </div>
+        </div>
+        
+        <div className="overflow-y-auto flex-1 p-1">
+          <form onSubmit={handleSubmit}>
+            {/* Details Tab */}
+            {step === 'details' && (
+              <div className="space-y-4 py-2">
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <Label htmlFor="name">Ritual Name</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter ritual name"
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="type">Type</Label>
+                    <Input
+                      id="type"
+                      name="type"
+                      value={form.type}
+                      onChange={handleChange}
+                      placeholder="Meditation, Breathwork, etc."
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      value={form.description}
+                      onChange={handleChange}
+                      placeholder="Enter a detailed description"
+                      className="mt-1 min-h-[120px]"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="instructions">Instructions</Label>
+                    <Textarea
+                      id="instructions"
+                      name="instructions"
+                      value={form.instructions}
+                      onChange={handleChange}
+                      placeholder="Step-by-step instructions for the ritual"
+                      className="mt-1 min-h-[150px]"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="targetChakra">Target Chakra</Label>
+                      <Select 
+                        name="targetChakra" 
+                        value={form.targetChakra} 
+                        onValueChange={(value) => setForm(prev => ({ ...prev, targetChakra: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a chakra" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="root">Root Chakra</SelectItem>
+                          <SelectItem value="sacral">Sacral Chakra</SelectItem>
+                          <SelectItem value="solar_plexus">Solar Plexus Chakra</SelectItem>
+                          <SelectItem value="heart">Heart Chakra</SelectItem>
+                          <SelectItem value="throat">Throat Chakra</SelectItem>
+                          <SelectItem value="third_eye">Third Eye Chakra</SelectItem>
+                          <SelectItem value="crown">Crown Chakra</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="targetEmotion">Target Emotion</Label>
+                      <Select 
+                        name="targetEmotion" 
+                        value={form.targetEmotion} 
+                        onValueChange={(value) => setForm(prev => ({ ...prev, targetEmotion: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an emotion" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="anxiety">Anxiety</SelectItem>
+                          <SelectItem value="depression">Depression</SelectItem>
+                          <SelectItem value="anger">Anger</SelectItem>
+                          <SelectItem value="fear">Fear</SelectItem>
+                          <SelectItem value="grief">Grief</SelectItem>
+                          <SelectItem value="shame">Shame</SelectItem>
+                          <SelectItem value="guilt">Guilt</SelectItem>
+                          <SelectItem value="joy">Joy</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Media Tab */}
+            {step === 'media' && (
+              <div className="space-y-6 py-2">
+                <div>
+                  <h3 className="font-medium mb-2">Main Image</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Select an image from your media library to use as the main image for this ritual.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[200px] overflow-y-auto p-1">
+                    {imageMedia.map((media: any) => (
+                      <div 
+                        key={media.id}
+                        className={`
+                          relative aspect-square rounded-md overflow-hidden border-2 cursor-pointer
+                          ${selectedMainImage === media.url ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'}
+                        `}
+                        onClick={() => setSelectedMainImage(media.url)}
+                      >
+                        <img 
+                          src={media.url} 
+                          alt={media.filename} 
+                          className="w-full h-full object-cover"
+                        />
+                        {selectedMainImage === media.url && (
+                          <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
+                            <CheckCircle2 className="h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium mb-2">Thumbnail Image</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Select a thumbnail image to appear alongside the main image.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[200px] overflow-y-auto p-1">
+                    {imageMedia.map((media: any) => (
+                      <div 
+                        key={`thumb-${media.id}`}
+                        className={`
+                          relative aspect-square rounded-md overflow-hidden border-2 cursor-pointer
+                          ${selectedThumbnail === media.url ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'}
+                        `}
+                        onClick={() => setSelectedThumbnail(media.url)}
+                      >
+                        <img 
+                          src={media.url} 
+                          alt={media.filename} 
+                          className="w-full h-full object-cover"
+                        />
+                        {selectedThumbnail === media.url && (
+                          <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
+                            <CheckCircle2 className="h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Course Content Tab */}
+            {step === 'course' && (
+              <div className="space-y-4 py-2">
+                <div>
+                  <Label htmlFor="courseUrl">Course URL</Label>
+                  <Input
+                    id="courseUrl"
+                    name="courseUrl"
+                    value={form.courseUrl}
+                    onChange={handleChange}
+                    placeholder="e.g., /courses/meditation-mastery"
+                    className="mt-1"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    URL path for the detailed course page when users click "Learn More"
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="videoUrl">Video URL</Label>
+                  <Input
+                    id="videoUrl"
+                    name="videoUrl"
+                    value={form.videoUrl}
+                    onChange={handleChange}
+                    placeholder="e.g., https://www.youtube.com/embed/abc123"
+                    className="mt-1"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    URL for embedded video content in the course page
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    name="duration"
+                    value={form.duration}
+                    onChange={handleChange}
+                    placeholder="e.g., 15 minutes"
+                    className="mt-1"
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Approximate time to complete this ritual
+                  </p>
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
+        
+        <DialogFooter className="border-t p-4">
+          <div className="flex gap-2 justify-between w-full">
+            <div>
+              {step !== 'details' && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setStep(step === 'media' ? 'details' : 'media')}
+                >
+                  Previous
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              {step !== 'course' ? (
+                <Button onClick={() => setStep(step === 'details' ? 'media' : 'course')}>
+                  Next
+                </Button>
+              ) : (
+                <Button onClick={handleSubmit} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isEditing ? 'Updating...' : 'Creating...'}
+                    </>
+                  ) : (
+                    isEditing ? 'Update Ritual' : 'Create Ritual'
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
