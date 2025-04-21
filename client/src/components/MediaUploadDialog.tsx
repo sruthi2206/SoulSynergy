@@ -27,6 +27,7 @@ export function MediaUploadDialog({
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -61,38 +62,72 @@ export function MediaUploadDialog({
     if (uploadedFiles.length === 0) return;
     
     setIsUploading(true);
+    setUploadProgress(5); // Start with a small progress indicator
     
     try {
+      // Create a FormData object to send the files
       const formData = new FormData();
       uploadedFiles.forEach((file) => {
         formData.append('files', file);
       });
 
+      // Simulate upload progress with intervals
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          // Go up to 90% to give room for server processing
+          if (prev < 90) {
+            return prev + Math.floor(Math.random() * 5) + 1;
+          }
+          return prev;
+        });
+      }, 200);
+      
+      // Use fetch with credentials to ensure cookies are sent (for authentication)
       const response = await fetch('/api/media/upload', {
         method: 'POST',
         body: formData,
+        credentials: 'same-origin',
       });
+
+      // Clear the progress interval
+      clearInterval(progressInterval);
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Upload failed');
+        const responseData = await response.json();
+        throw new Error(responseData.message || 'Upload failed');
       }
 
+      const result = await response.json();
+      
+      // Complete the progress bar
+      setUploadProgress(100);
+      
+      // Invalidate the media query cache to refresh the media list
       queryClient.invalidateQueries({ queryKey: ['/api/media'] });
-      setUploadedFiles([]);
-      setIsOpen(false);
-      setIsUploading(false);
       
-      toast({
-        title: "Upload successful",
-        description: "Your files have been uploaded",
-      });
-      
-      if (onUploadComplete) {
-        onUploadComplete();
-      }
+      // Wait a moment to show the completed progress bar before closing
+      setTimeout(() => {
+        // Reset state
+        setUploadedFiles([]);
+        setIsOpen(false);
+        setIsUploading(false);
+        
+        // Show success message
+        toast({
+          title: "Upload successful",
+          description: `Successfully uploaded ${result.files?.length || 0} file(s)`,
+        });
+        
+        // Call the completion callback if provided
+        if (onUploadComplete) {
+          onUploadComplete();
+        }
+      }, 600);
     } catch (error) {
+      console.error("Upload error:", error);
       setIsUploading(false);
+      setUploadProgress(0);
+      
       toast({
         title: "Upload failed",
         description: error instanceof Error ? error.message : "An unknown error occurred",
@@ -120,32 +155,46 @@ export function MediaUploadDialog({
         </DialogHeader>
         
         <div className="space-y-4">
-          <div 
-            className={`
-              border-2 border-dashed rounded-md p-6 text-center cursor-pointer
-              ${uploadedFiles.length > 0 ? 'border-primary/50 bg-primary/5' : 'border-gray-300/50'}
-            `}
-            onClick={() => fileInputRef.current?.click()}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          >
-            <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-            <p className="text-sm font-medium mb-1">
-              {uploadedFiles.length > 0 
-                ? `${uploadedFiles.length} file(s) selected` 
-                : "Click or drag and drop to upload"
-              }
-            </p>
-            <p className="text-xs text-muted-foreground">Max file size: 10MB</p>
-            <input 
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </div>
+          {isUploading ? (
+            <div className="border rounded-md p-6 text-center bg-muted/10">
+              <Loader2 className="h-8 w-8 mx-auto text-primary animate-spin mb-4" />
+              <p className="text-sm font-medium mb-1">Uploading files...</p>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div 
+                  className="bg-primary h-2.5 rounded-full transition-all duration-300" 
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-xs text-muted-foreground">This may take a moment</p>
+            </div>
+          ) : (
+            <div 
+              className={`
+                border-2 border-dashed rounded-md p-6 text-center cursor-pointer
+                ${uploadedFiles.length > 0 ? 'border-primary/50 bg-primary/5' : 'border-gray-300/50'}
+              `}
+              onClick={() => fileInputRef.current?.click()}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+              <p className="text-sm font-medium mb-1">
+                {uploadedFiles.length > 0 
+                  ? `${uploadedFiles.length} file(s) selected` 
+                  : "Click or drag and drop to upload"
+                }
+              </p>
+              <p className="text-xs text-muted-foreground">Max file size: 10MB</p>
+              <input 
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+          )}
           
           {uploadedFiles.length > 0 && (
             <div className="space-y-2">
