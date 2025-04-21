@@ -249,12 +249,12 @@ export default function HealingRitualsPage() {
 
   // Determine if ritual is already in user's recommendations
   const isInRecommendations = (ritualId: number) => {
-    return recommendations.some(rec => rec.ritualId === ritualId);
+    return recommendations.some((rec: UserRecommendation) => rec.ritualId === ritualId);
   };
 
   // Get recommendation for a ritual if it exists
   const getRecommendation = (ritualId: number) => {
-    return recommendations.find(rec => rec.ritualId === ritualId);
+    return recommendations.find((rec: UserRecommendation) => rec.ritualId === ritualId);
   };
   
   // Map chakra name to image path
@@ -468,7 +468,7 @@ export default function HealingRitualsPage() {
                   </div>
                 ) : (
                   <div className="space-y-8 max-w-5xl mx-auto">
-                    {recommendations.map((recommendation) => {
+                    {recommendations.map((recommendation: UserRecommendation) => {
                       const ritual = recommendation.ritual;
                       if (!ritual) return null;
                       
