@@ -18,7 +18,7 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
   const queryClient = useQueryClient();
   
   // Fetch all healing rituals
-  const { data: allRituals = [], isLoading } = useQuery({
+  const { data: allRituals = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/healing-rituals"],
   });
   
@@ -56,7 +56,7 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
   // Get rituals for weakest chakra
   const getWeakestChakraRituals = () => {
     const weakestChakra = findWeakestChakra();
-    if (!weakestChakra) return [];
+    if (!weakestChakra || !Array.isArray(allRituals)) return [];
     
     const chakraKey = weakestChakra.key;
     const chakraInfo = chakras.find(c => c.key === chakraKey);
@@ -189,7 +189,7 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                     key={recommendation.id}
                     title={ritual.name}
                     description={ritual.description}
-                    imageUrl={getChakraImagePath(ritual.targetChakra)}
+                    imageUrl={ritual.mainImageUrl || getChakraImagePath(ritual.targetChakra)}
                     thumbnailUrl={ritual.thumbnailUrl || "/images/journaling.jpg"}
                     chakraType={ritual.targetChakra}
                     isCompleted={recommendation.completed}
@@ -219,7 +219,7 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                       key={ritual.id}
                       title={ritual.name}
                       description={ritual.description}
-                      imageUrl={getChakraImagePath(ritual.targetChakra)}
+                      imageUrl={ritual.mainImageUrl || getChakraImagePath(ritual.targetChakra)}
                       thumbnailUrl={ritual.thumbnailUrl || "/images/joy.jpg"}
                       chakraType={ritual.targetChakra}
                       isCompleted={recommendation?.completed}
@@ -253,7 +253,7 @@ export default function HealingRituals({ recommendations = [], chakraProfile, us
                     key={ritual.id}
                     title={ritual.name}
                     description={ritual.description}
-                    imageUrl={getChakraImagePath(ritual.targetChakra)}
+                    imageUrl={ritual.mainImageUrl || getChakraImagePath(ritual.targetChakra)}
                     thumbnailUrl={ritual.thumbnailUrl || "/images/journaling.jpg"}
                     chakraType={ritual.targetChakra}
                     isCompleted={recommendation?.completed}
