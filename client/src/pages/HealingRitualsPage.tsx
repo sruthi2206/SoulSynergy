@@ -232,13 +232,8 @@ export default function HealingRitualsPage() {
 
   // Handle opening ritual details
   const handleOpenRitual = (ritual: HealingRitual) => {
-    if (ritual.courseUrl) {
-      // If the ritual has a course URL, redirect to the course page
-      setLocation(ritual.courseUrl.startsWith('/') ? ritual.courseUrl : `/courses/${ritual.id}`);
-    } else {
-      // Otherwise, show the details dialog
-      setSelectedRitual(ritual);
-    }
+    // Always direct to the course page format, even if courseUrl is not set
+    setLocation(`/courses/${ritual.id}`);
   };
 
   // Handle clearing filters
