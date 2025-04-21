@@ -57,7 +57,8 @@ const pricingPlans: PricingPlan[] = [
       "VIP access to premium workshops",
       "Extended support for your journey"
     ],
-    popular: true
+    popular: true,
+    savings: 180
   }
 ];
 
