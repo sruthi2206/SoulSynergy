@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ interface PricingPlan {
   interval: "month" | "year";
   features: string[];
   popular?: boolean;
+  savings?: number;
 }
 
 // Pricing plans
@@ -376,73 +377,121 @@ export default function Membership() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-heading font-bold mb-4">Choose Your Membership Plan</h2>
+                <h2 className="text-2xl font-heading font-bold mb-4">Transform with SoulSync</h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  Select the plan that best fits your healing journey and unlock the full potential of SoulSync
+                  Join our supportive community and unlock your true potential
                 </p>
-                
-                <div className="flex justify-center mt-6">
-                  <Tabs 
-                    defaultValue="year" 
-                    value={billingInterval}
-                    onValueChange={(value) => setBillingInterval(value as "month" | "year")}
-                    className="w-full max-w-xs"
-                  >
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="month">Monthly</TabsTrigger>
-                      <TabsTrigger value="year">Yearly</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
+              </div>
+              
+              {/* Mindvalley-style pricing card */}
+              <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                <div className="bg-indigo-900 text-white py-10 px-8">
+                  <div className="flex flex-col md:flex-row justify-between items-center">
+                    <div>
+                      <h2 className="text-3xl font-bold mb-4">Transform Your Journey with SoulSync</h2>
+                      <div className="space-y-3">
+                        <div className="flex items-center">
+                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <span>100+ Healing Rituals from Spiritual Experts</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <span>Advanced AI Coaching for Personal Growth</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <span>Exclusive Network: Connect with Like-minded Souls</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <span>Premium Chakra Analysis & Balancing Tools</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <span>100% Risk-Free: 14-day Money-back Guarantee</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                {pricingPlans
-                  .filter(plan => plan.interval === billingInterval)
-                  .map((plan) => (
-                    <Card 
-                      key={plan.id}
-                      className={`border-2 ${plan.popular ? "border-[#483D8B]" : "border-neutral-200"} relative`}
+                
+                <div className="p-6">
+                  <div className="flex justify-center mb-8">
+                    <Tabs 
+                      defaultValue="year" 
+                      value={billingInterval}
+                      onValueChange={(value) => setBillingInterval(value as "month" | "year")}
+                      className="w-full max-w-md"
                     >
-                      {plan.popular && (
-                        <div className="absolute top-0 right-0 bg-[#483D8B] text-white py-1 px-3 text-xs uppercase font-bold rounded-bl-lg">
-                          Best Value
+                      <TabsList className="grid w-full grid-cols-2 p-1 bg-gray-100">
+                        <TabsTrigger value="month" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">Monthly</TabsTrigger>
+                        <TabsTrigger value="year" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                          <div className="flex flex-col items-center">
+                            <span>Yearly</span>
+                            {billingInterval === "year" && <span className="text-xs text-green-600 font-medium">Save $180/year</span>}
+                          </div>
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
+                  
+                  {pricingPlans
+                    .filter(plan => plan.interval === billingInterval)
+                    .map((plan) => (
+                      <div key={plan.id} className="max-w-md mx-auto bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                        <div className="text-center mb-6">
+                          <div className="text-5xl font-bold flex justify-center items-baseline">
+                            <span className="text-2xl mr-1">$</span>{plan.price}
+                            <span className="text-gray-500 text-lg font-normal ml-1">/{plan.interval}</span>
+                          </div>
+                          {plan.interval === "year" && (
+                            <div className="text-sm text-gray-500 mt-1">Billed annually, cancel anytime</div>
+                          )}
                         </div>
-                      )}
-                      <CardHeader>
-                        <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                        <CardDescription>
-                          {plan.interval === "month" ? "Flexible monthly subscription" : "Save $180 with annual billing"}
-                        </CardDescription>
-                        <div className="mt-4">
-                          <span className="text-4xl font-bold">${plan.price}</span>
-                          <span className="text-neutral-500">/{plan.interval}</span>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-3">
-                          {plan.features.map((feature, idx) => (
-                            <li key={idx} className="flex items-start">
-                              <Check className="h-5 w-5 text-green-500 mr-2 shrink-0 mt-0.5" />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                      <CardFooter>
-                        <Button 
-                          className={`w-full ${plan.popular ? "bg-[#483D8B] hover:bg-opacity-90" : "bg-neutral-800 hover:bg-neutral-700"}`}
+                        
+                        <Button
                           onClick={() => handleSelectPlan(plan)}
+                          className="w-full py-6 text-lg bg-[#FF5757] hover:bg-[#FF4040] rounded-xl mb-4"
                         >
-                          {user ? "Subscribe Now" : "Sign Up"}
+                          Join SoulSync Membership
                         </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-              </div>
-              
-              <div className="text-center mt-6 text-neutral-500 text-sm">
-                All plans include our 14-day money-back guarantee
+                        
+                        <div className="mt-4 flex justify-center space-x-3">
+                          <svg className="h-8" viewBox="0 0 40 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="40" height="25" rx="4" fill="white"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M16.4822 7.92135H23.5194V17.1072H16.4822V7.92135Z" fill="#FF5F00"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M17.1803 12.5143C17.1791 10.9462 17.8769 9.45 19.0641 8.39241C17.3767 7.0324 15.0874 6.73354 13.1035 7.62489C11.1196 8.51625 9.89904 10.4514 9.90078 12.5799C9.90253 14.7084 11.1261 16.6416 13.1117 17.5299C15.0972 18.4181 17.3865 18.1157 19.0719 16.7539C17.8842 15.6957 17.1865 14.1983 17.1889 12.6299L17.1803 12.5143Z" fill="#EB001B"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M30.0996 12.5143C30.1014 14.6428 28.8808 16.578 26.8969 17.4693C24.913 18.3607 22.6237 18.0618 20.9363 16.7018C22.1234 15.6444 22.8213 14.1483 22.82 12.5803C22.8188 11.0123 22.1188 9.51658 20.9302 8.46063C22.6162 7.09925 24.9051 6.7992 26.8896 7.68966C28.8741 8.58012 30.0962 10.5153 30.0996 12.6443V12.5143Z" fill="#F79E1B"/>
+                          </svg>
+                          <svg className="h-8" viewBox="0 0 40 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="40" height="25" rx="4" fill="white"/>
+                            <path d="M6 16.4262L7.88524 8.57377H10.9836L9.09836 16.4262H6Z" fill="#006FCF"/>
+                            <path d="M18.6885 8.73771C18.0328 8.49181 17.0492 8.24591 15.9016 8.24591C13.0328 8.24591 11 9.80328 11 12.0984C11 13.8033 12.4262 14.7869 13.5246 15.3934C14.6721 16 15.0984 16.3934 15.0984 16.9508C15.0984 17.7541 14.1639 18.1311 13.2787 18.1311C12.0656 18.1311 11.3606 17.9344 10.2623 17.3934L9.88524 17.2295L9.5 19.7541C10.2787 20.082 11.689 20.3607 13.1475 20.3607C16.2131 20.3607 18.1967 18.8525 18.1967 16.3934C18.1967 15.0164 17.3443 13.9508 15.5738 13.0984C14.5 12.5738 13.8934 12.2131 13.8934 11.6557C13.8934 11.1639 14.4754 10.6721 15.6066 10.6721C16.5574 10.6393 17.2623 10.9016 17.8033 11.1639L18.0656 11.2951L18.6885 8.73771Z" fill="#006FCF"/>
+                            <path d="M22.5246 8.57377H24.9508L27.9836 16.4262H25.1803L24.6885 14.9508H21.3607L20.9016 16.4262H18L22.5246 8.57377ZM23.9344 10.8688L22.5246 13.3934H24.1967L23.9344 10.8688Z" fill="#006FCF"/>
+                            <path d="M29.4262 8.57377L32.2295 13.5574L33.0328 10.8032C33.0328 10.8032 33.2787 9.80328 33.3115 9.6721H36L32.8852 16.4262H30.0984L25.9508 8.57377H29.4262Z" fill="#006FCF"/>
+                          </svg>
+                          <svg className="h-8" viewBox="0 0 40 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="40" height="25" rx="4" fill="white"/>
+                            <path d="M20 7C15.0294 7 11 10.8579 11 15.625C11 20.3921 15.0294 24.25 20 24.25C24.9706 24.25 29 20.3921 29 15.625C29 10.8579 24.9706 7 20 7Z" fill="#5F6368"/>
+                            <path d="M20 18.2917C21.5062 18.2917 22.7245 17.118 22.7245 15.6667C22.7245 14.2153 21.5062 13.0417 20 13.0417C18.4938 13.0417 17.2755 14.2153 17.2755 15.6667C17.2755 17.118 18.4938 18.2917 20 18.2917Z" fill="white"/>
+                          </svg>
+                        </div>
+                        
+                        <div className="mt-3 text-xs text-center text-gray-500">
+                          Powered by <span className="font-medium">stripe</span>
+                        </div>
+                        
+                        <div className="mt-4 text-xs text-center text-gray-500">
+                          VAT charges might apply as per your billing address
+                        </div>
+                        
+                        <div className="mt-2 text-xs text-center text-gray-500 flex justify-center items-center">
+                          <Shield className="h-3 w-3 inline-block mr-1" />
+                          All transactions are secured with 256-bit encryption
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
             </motion.div>
             
@@ -503,7 +552,7 @@ export default function Membership() {
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-start">
                         <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Advanced chakra visualization</span>
+                        <span>Advanced chakra analysis</span>
                       </li>
                       <li className="flex items-start">
                         <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
@@ -511,7 +560,7 @@ export default function Membership() {
                       </li>
                       <li className="flex items-start">
                         <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Custom meditation guides</span>
+                        <span>Priority AI coach guidance</span>
                       </li>
                     </ul>
                   </CardContent>
@@ -520,26 +569,26 @@ export default function Membership() {
                 <Card>
                   <CardHeader>
                     <div className="w-12 h-12 rounded-full bg-[#483D8B]/10 flex items-center justify-center mb-4">
-                      <Infinity className="h-6 w-6 text-[#483D8B]" />
+                      <BookOpen className="h-6 w-6 text-[#483D8B]" />
                     </div>
-                    <CardTitle>Unlimited Access</CardTitle>
+                    <CardTitle>Curated Learning Resources</CardTitle>
                     <CardDescription>
-                      No limits to the tools and resources you can use
+                      Expand your knowledge with exclusive content
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-start">
                         <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Unlimited AI coaching conversations</span>
+                        <span>Member-only courses</span>
                       </li>
                       <li className="flex items-start">
                         <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Full healing ritual library</span>
+                        <span>Expert video workshops</span>
                       </li>
                       <li className="flex items-start">
                         <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Unrestricted progress tracking</span>
+                        <span>Guided meditation library</span>
                       </li>
                     </ul>
                   </CardContent>
@@ -547,7 +596,7 @@ export default function Membership() {
               </div>
             </motion.div>
             
-            {/* Compare Plans */}
+            {/* Compare Plans Table */}
             <motion.div
               className="mb-20"
               initial={{ opacity: 0, y: 20 }}
@@ -555,46 +604,48 @@ export default function Membership() {
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <div className="text-center mb-10">
-                <h2 className="text-2xl font-heading font-bold mb-4">Compare Membership Tiers</h2>
+                <h2 className="text-2xl font-heading font-bold mb-4">Compare Plans</h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  See the difference between our free features and premium membership benefits
+                  See which features are available in the free and premium plans
                 </p>
               </div>
               
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse">
+              <div className="max-w-5xl mx-auto overflow-x-auto">
+                <table className="w-full border-separate border-spacing-0">
                   <thead>
-                    <tr className="bg-neutral-100">
-                      <th className="px-6 py-4 text-left text-sm font-medium text-neutral-600">Features</th>
-                      <th className="px-6 py-4 text-center text-sm font-medium text-neutral-600">Free</th>
-                      <th className="px-6 py-4 text-center text-sm font-medium text-[#483D8B]">Premium</th>
+                    <tr>
+                      <th className="bg-neutral-50 text-left py-4 px-6 font-medium text-neutral-500 rounded-tl-lg">Features</th>
+                      <th className="bg-neutral-50 text-center py-4 px-6 font-medium text-neutral-500">Free</th>
+                      <th className="bg-neutral-50 text-center py-4 px-6 font-medium text-neutral-500 rounded-tr-lg">Premium</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-200">
-                    {comparePlansData.categories.map((category, idx) => (
-                      <React.Fragment key={idx}>
-                        <tr className="bg-neutral-50">
-                          <td colSpan={3} className="px-6 py-3 text-sm font-semibold text-neutral-700">{category}</td>
+                  <tbody>
+                    {comparePlansData.categories.map((category, categoryIndex) => (
+                      <React.Fragment key={categoryIndex}>
+                        <tr>
+                          <td colSpan={3} className="py-3 px-6 font-medium text-[#483D8B]">
+                            {category}
+                          </td>
                         </tr>
                         {comparePlansData.features
-                          .filter((_, featureIdx) => Math.floor(featureIdx / 4) === idx)
-                          .map((feature, featureIdx) => (
-                            <tr key={`${idx}-${featureIdx}`} className="hover:bg-neutral-50">
-                              <td className="px-6 py-3 text-sm text-neutral-800">{feature.name}</td>
-                              <td className="px-6 py-3 text-center text-sm">
+                          .filter((_, idx) => Math.floor(idx / 4) === categoryIndex)
+                          .map((feature, idx) => (
+                            <tr key={idx} className="border-b border-neutral-100 last:border-0">
+                              <td className="py-3 px-6">{feature.name}</td>
+                              <td className="py-3 px-6 text-center">
                                 {feature.free === true ? (
                                   <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
                                 ) : feature.free === false ? (
-                                  <span className="text-neutral-400">—</span>
+                                  <span className="text-neutral-300">—</span>
                                 ) : (
-                                  <span className="text-neutral-500 text-xs px-2 py-1 bg-neutral-100 rounded-full">{feature.free}</span>
+                                  <span className="text-sm text-neutral-500">{feature.free}</span>
                                 )}
                               </td>
-                              <td className="px-6 py-3 text-center text-sm">
+                              <td className="py-3 px-6 text-center">
                                 {feature.paid === true ? (
-                                  <CheckCircle2 className="h-5 w-5 text-[#483D8B] mx-auto" />
+                                  <CheckCircle2 className="h-5 w-5 text-green-500 mx-auto" />
                                 ) : (
-                                  <span className="text-[#483D8B] text-xs px-2 py-1 bg-[#483D8B]/10 rounded-full">{feature.paid}</span>
+                                  <span className="text-sm text-neutral-500">{feature.paid}</span>
                                 )}
                               </td>
                             </tr>
@@ -614,47 +665,33 @@ export default function Membership() {
               transition={{ duration: 0.5, delay: 0.4 }}
             >
               <div className="text-center mb-10">
-                <h2 className="text-2xl font-heading font-bold mb-4">What Our Members Say</h2>
+                <h2 className="text-2xl font-heading font-bold mb-4">Member Testimonials</h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  Hear from people who have transformed their spiritual practice with SoulSync premium
+                  Hear from our community about their transformative experiences
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 {testimonials.map((testimonial) => (
-                  <Card key={testimonial.id}>
+                  <Card key={testimonial.id} className="bg-white border border-neutral-100">
                     <CardContent className="pt-6">
-                      <div className="mb-4 flex justify-center">
-                        <div className="w-12 h-12 rounded-full bg-[#483D8B]/10 flex items-center justify-center">
-                          {testimonial.avatar ? (
-                            <img 
-                              src={testimonial.avatar} 
-                              alt={testimonial.name} 
-                              className="w-full h-full rounded-full" 
-                            />
-                          ) : (
-                            <span className="text-[#483D8B] font-semibold text-lg">
-                              {testimonial.name.charAt(0)}
-                            </span>
-                          )}
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 rounded-full bg-[#483D8B]/10 flex items-center justify-center text-[#483D8B] font-medium mr-3">
+                          {testimonial.name.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="font-medium">{testimonial.name}</div>
+                          <div className="text-xs text-neutral-500">Member</div>
                         </div>
                       </div>
-                      <div className="flex justify-center mb-4">
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-[#483D8B] text-[#483D8B]" />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-neutral-700 text-center mb-4 italic">"{testimonial.content}"</p>
-                      <p className="text-neutral-500 text-sm text-center font-medium">{testimonial.name}</p>
+                      <p className="text-neutral-600 text-sm">"{testimonial.content}"</p>
                     </CardContent>
                   </Card>
                 ))}
               </div>
             </motion.div>
             
-            {/* FAQs */}
+            {/* FAQ Section */}
             <motion.div
               className="mb-20"
               initial={{ opacity: 0, y: 20 }}
@@ -664,13 +701,13 @@ export default function Membership() {
               <div className="text-center mb-10">
                 <h2 className="text-2xl font-heading font-bold mb-4">Frequently Asked Questions</h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  Find answers to common questions about our membership plans
+                  Find answers to common questions about SoulSync membership
                 </p>
               </div>
               
               <div className="max-w-3xl mx-auto">
-                {faqData.map((faq, idx) => (
-                  <Card key={idx} className="mb-4">
+                {faqData.map((faq, index) => (
+                  <Card key={index} className="mb-4 border border-neutral-100">
                     <CardHeader>
                       <CardTitle className="text-lg">{faq.question}</CardTitle>
                     </CardHeader>
@@ -682,25 +719,27 @@ export default function Membership() {
               </div>
             </motion.div>
             
-            {/* CTA */}
+            {/* CTA Section */}
             <motion.div
-              className="text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
+              className="text-center max-w-3xl mx-auto bg-gradient-to-r from-[#483D8B]/10 to-[#008080]/10 p-10 rounded-2xl"
             >
-              <div className="bg-gradient-to-r from-[#483D8B]/10 to-[#008080]/10 p-10 rounded-lg max-w-4xl mx-auto">
-                <h2 className="text-3xl font-heading font-bold mb-4">Ready to Transform Your Healing Journey?</h2>
-                <p className="text-neutral-600 max-w-2xl mx-auto mb-8">
-                  Join thousands of seekers who have elevated their practice with SoulSync premium membership
-                </p>
-                <Button 
-                  size="lg"
-                  className="bg-[#483D8B] hover:bg-opacity-90 px-8"
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                >
-                  Choose Your Plan
-                </Button>
+              <h2 className="text-3xl font-heading font-bold mb-4">
+                Ready to Transform Your Journey?
+              </h2>
+              <p className="text-neutral-600 mb-8 max-w-xl mx-auto">
+                Join our community today and unlock your full spiritual potential with personalized guidance and premium tools.
+              </p>
+              <Button
+                className="bg-[#483D8B] hover:bg-opacity-90 text-lg px-8 py-6 h-auto"
+                onClick={() => handleSelectPlan(pricingPlans[1])}
+              >
+                Start Your Membership
+              </Button>
+              <div className="text-sm text-neutral-500 mt-4">
+                14-day money-back guarantee, cancel anytime
               </div>
             </motion.div>
           </>
