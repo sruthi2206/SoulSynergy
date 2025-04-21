@@ -575,6 +575,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Add PATCH endpoint to support partial updates from AdminDashboardPage
+  app.patch(`${apiRouter}/healing-rituals/:id`, isAdmin, async (req, res) => {
+    try {
+      const ritualId = parseInt(req.params.id);
+      const existingRitual = await storage.getHealingRitual(ritualId);
+      
+      if (!existingRitual) {
+        return res.status(404).json({ message: 'Healing ritual not found' });
+      }
+      
+      // For PATCH we'll skip validation to allow partial updates
+      const updatedRitual = await storage.updateHealingRitual(ritualId, req.body);
+      
+      res.status(200).json(updatedRitual);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update ritual', error: (error as Error).message });
+    }
+  });
+  
   app.delete(`${apiRouter}/healing-rituals/:id`, isAdmin, async (req, res) => {
     try {
       const ritualId = parseInt(req.params.id);
