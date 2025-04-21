@@ -88,12 +88,12 @@ export default function RitualCoursePage() {
                 <div className="flex items-center space-x-2 mb-4">
                   {ritual.targetChakra && (
                     <Badge className="bg-white text-purple-700">
-                      {ritual.targetChakra.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Chakra
+                      {ritual.targetChakra.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} Chakra
                     </Badge>
                   )}
                   {ritual.targetEmotion && (
                     <Badge className="bg-white text-purple-700">
-                      {ritual.targetEmotion.replace(/\b\w/g, l => l.toUpperCase())}
+                      {ritual.targetEmotion.replace(/\b\w/g, (l: string) => l.toUpperCase())}
                     </Badge>
                   )}
                   <Badge className="bg-white/10">
