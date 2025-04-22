@@ -232,19 +232,41 @@ const CheckoutContainer = ({ plan }: { plan: PricingPlan }) => {
   
   const createPaymentIntentMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/create-payment-intent", { 
-        amount: plan.price,
-        interval: plan.interval
-      });
-      return response.json();
+      try {
+        const response = await apiRequest("POST", "/api/create-payment-intent", { 
+          amount: plan.price,
+          interval: plan.interval
+        });
+        
+        // Check if response is ok
+        if (!response.ok) {
+          const errorData = await response.json();
+          // If the server indicates we should use fallback UI
+          if (errorData.useFallback) {
+            return { useFallback: true };
+          }
+          throw new Error(errorData.message || "Failed to create payment intent");
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.error("Payment intent creation error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
-      setClientSecret(data.clientSecret);
+      // Only set client secret if it exists
+      if (data.clientSecret) {
+        setClientSecret(data.clientSecret);
+      } else {
+        console.warn("No client secret in payment intent response");
+      }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Payment mutation error:", error);
       toast({
-        title: "Error",
-        description: "Failed to initialize payment. Please try again.",
+        title: "Payment System Unavailable",
+        description: "We're experiencing issues with our payment system. Please try again later.",
         variant: "destructive",
       });
     }
@@ -263,13 +285,13 @@ const CheckoutContainer = ({ plan }: { plan: PricingPlan }) => {
     );
   }
 
-  if (!clientSecret && createPaymentIntentMutation.isError) {
-    return (
-      <div className="text-center p-8">
-        <p className="text-red-500 mb-4">Failed to initialize payment</p>
-        <Button onClick={() => createPaymentIntentMutation.mutate()}>Try Again</Button>
-      </div>
-    );
+  // If there's an error or the API indicates to use fallback
+  if ((!clientSecret && createPaymentIntentMutation.isError) || 
+      (createPaymentIntentMutation.error && 
+       typeof createPaymentIntentMutation.error === 'object' && 
+       'useFallback' in (createPaymentIntentMutation.error as any))) {
+    // Show the PaymentUnavailableMessage component instead
+    return <PaymentUnavailableMessage />;
   }
   
   return (
