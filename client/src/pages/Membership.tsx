@@ -1,10 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Star, CheckCircle2, Calendar, Users, Shield, BookOpen, Video, Infinity, ArrowRight, AlertTriangle, Loader2 } from "lucide-react";
+import { Check, Star, CheckCircle2, Calendar, Users, Shield, BookOpen, Video, Infinity, ArrowRight, AlertTriangle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -802,16 +802,44 @@ export default function Membership() {
               </div>
               
               <div className="max-w-3xl mx-auto">
-                {faqData.map((faq, index) => (
-                  <Card key={index} className="mb-4 border border-neutral-100">
-                    <CardHeader>
-                      <CardTitle className="text-lg">{faq.question}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-neutral-600">{faq.answer}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+                {faqData.map((faq, index) => {
+                  // Create a state variable for each FAQ item
+                  const [isOpen, setIsOpen] = useState(index === 0); // First one open by default
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="mb-4 overflow-hidden bg-white rounded-xl shadow-sm border border-neutral-100 transition-all duration-300 hover:shadow-md"
+                    >
+                      <div 
+                        className={`px-6 py-4 flex justify-between items-center cursor-pointer ${isOpen ? 'bg-gradient-to-r from-purple-50 to-indigo-50' : ''}`} 
+                        onClick={() => setIsOpen(!isOpen)}
+                      >
+                        <h3 className={`font-medium text-lg ${isOpen ? 'text-indigo-700' : 'text-neutral-700'}`}>
+                          {faq.question}
+                        </h3>
+                        <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+                          <ChevronDown className={`h-5 w-5 ${isOpen ? 'text-indigo-500' : 'text-neutral-400'}`} />
+                        </div>
+                      </div>
+                      
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <div className="px-6 py-4 border-t border-neutral-100 bg-white">
+                              <p className="text-neutral-600">{faq.answer}</p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
             
@@ -820,22 +848,77 @@ export default function Membership() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="text-center max-w-3xl mx-auto bg-gradient-to-r from-[#483D8B]/10 to-[#008080]/10 p-10 rounded-2xl"
+              className="relative max-w-4xl mx-auto overflow-hidden"
             >
-              <h2 className="text-3xl font-heading font-bold mb-4">
-                Ready to Transform Your Journey?
-              </h2>
-              <p className="text-neutral-600 mb-8 max-w-xl mx-auto">
-                Join our community today and unlock your full spiritual potential with personalized guidance and premium tools.
-              </p>
-              <Button
-                className="bg-[#483D8B] hover:bg-opacity-90 text-lg px-8 py-6 h-auto"
-                onClick={() => handleSelectPlan(pricingPlans[1])}
-              >
-                Start Your Membership
-              </Button>
-              <div className="text-sm text-neutral-500 mt-4">
-                14-day money-back guarantee, cancel anytime
+              {/* Background decorations */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-300/20 rounded-full blur-3xl"></div>
+              <div className="absolute top-1/4 left-1/3 w-20 h-20 bg-emerald-300/20 rounded-full blur-xl"></div>
+              
+              <div className="relative bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-12 rounded-2xl shadow-xl border border-indigo-100/50">
+                {/* Northern lights inspired top border */}
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-500"></div>
+                
+                <div className="text-center">
+                  <div className="mb-2 inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold uppercase tracking-wider">
+                    Limited Time Offer
+                  </div>
+                  
+                  <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700">
+                    Begin Your Transformation Today
+                  </h2>
+                  
+                  <p className="text-neutral-700 mb-8 max-w-xl mx-auto">
+                    Join our vibrant community of spiritual seekers and unlock your full potential with personalized guidance, expert tools, and premium resources.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row justify-center gap-5 mb-8">
+                    <div className="flex items-center justify-center gap-2 text-green-700">
+                      <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                        <Check className="h-3 w-3 text-green-600" />
+                      </div>
+                      <span className="text-sm font-medium">14-day money-back guarantee</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-green-700">
+                      <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                        <Check className="h-3 w-3 text-green-600" />
+                      </div>
+                      <span className="text-sm font-medium">Cancel anytime, no questions asked</span>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-lg px-10 py-6 h-auto rounded-xl shadow-lg shadow-indigo-200/50 transition-transform hover:scale-105"
+                    onClick={() => handleSelectPlan(pricingPlans[1])}
+                  >
+                    Join SoulSync Membership
+                  </Button>
+                  
+                  <div className="flex justify-center mt-8 gap-5">
+                    <div className="flex">
+                      {/* Payment method icons */}
+                      <div className="flex space-x-2 opacity-70">
+                        <div className="w-8 h-8 bg-white rounded-md shadow-sm flex items-center justify-center">
+                          <svg className="h-5" viewBox="0 0 40 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M16.4822 7.92135H23.5194V17.1072H16.4822V7.92135Z" fill="#FF5F00"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M17.1803 12.5143C17.1791 10.9462 17.8769 9.45 19.0641 8.39241C17.3767 7.0324 15.0874 6.73354 13.1035 7.62489C11.1196 8.51625 9.89904 10.4514 9.90078 12.5799C9.90253 14.7084 11.1261 16.6416 13.1117 17.5299C15.0972 18.4181 17.3865 18.1157 19.0719 16.7539C17.8842 15.6957 17.1865 14.1983 17.1889 12.6299L17.1803 12.5143Z" fill="#EB001B"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M30.0996 12.5143C30.1014 14.6428 28.8808 16.578 26.8969 17.4693C24.913 18.3607 22.6237 18.0618 20.9363 16.7018C22.1234 15.6444 22.8213 14.1483 22.82 12.5803C22.8188 11.0123 22.1188 9.51658 20.9302 8.46063C22.6162 7.09925 24.9051 6.7992 26.8896 7.68966C28.8741 8.58012 30.0962 10.5153 30.0996 12.6443V12.5143Z" fill="#F79E1B"/>
+                          </svg>
+                        </div>
+                        <div className="w-8 h-8 bg-white rounded-md shadow-sm flex items-center justify-center">
+                          <svg className="h-5" viewBox="0 0 40 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 16.4262L7.88524 8.57377H10.9836L9.09836 16.4262H6Z" fill="#006FCF"/>
+                            <path d="M22.5246 8.57377H24.9508L27.9836 16.4262H25.1803L24.6885 14.9508H21.3607L20.9016 16.4262H18L22.5246 8.57377Z" fill="#006FCF"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center text-xs text-gray-500">
+                      <Shield className="h-3 w-3 mr-1 text-gray-400" />
+                      Secure Payment
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </>
