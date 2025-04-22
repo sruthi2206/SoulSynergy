@@ -28,8 +28,10 @@ if (!process.env.STRIPE_SECRET_KEY) {
 let stripe: Stripe | null = null;
 try {
   if (process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { 
-      apiVersion: "2023-10-16"
+    // Ensure the key is properly formatted without any extra whitespace
+    const cleanKey = process.env.STRIPE_SECRET_KEY.trim();
+    stripe = new Stripe(cleanKey, { 
+      apiVersion: "2025-03-31.basil" as any
     });
     console.log('Stripe initialized successfully');
   } else {
