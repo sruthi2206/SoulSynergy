@@ -278,26 +278,50 @@ const CheckoutContainer = ({ plan }: { plan: PricingPlan }) => {
 // Payment processing unavailable message
 const PaymentUnavailableMessage = () => {
   return (
-    <div className="p-8 text-center">
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-        <div className="flex justify-center mb-4">
-          <AlertTriangle className="h-12 w-12 text-yellow-500" />
+    <div className="p-8">
+      <div className="bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200 rounded-2xl p-8 mb-6 shadow-sm">
+        <div className="flex justify-center mb-6">
+          <div className="h-20 w-20 bg-amber-100 rounded-full flex items-center justify-center">
+            <AlertTriangle className="h-10 w-10 text-amber-500" />
+          </div>
         </div>
-        <h3 className="text-xl font-medium text-yellow-800 mb-3">Payment Processing Currently Unavailable</h3>
-        <p className="text-yellow-700 mb-4">
-          Our payment system is currently being updated. Please check back later to subscribe to our premium plans.
+        <h3 className="text-2xl font-medium text-center text-amber-800 mb-4">We're Enhancing Our Payment System</h3>
+        <p className="text-amber-700 text-center mb-4 max-w-md mx-auto">
+          Our payment processing is currently being upgraded to provide you with a more secure and seamless experience.
         </p>
-        <p className="text-sm text-yellow-600">
-          We apologize for the inconvenience and are working to restore payment functionality as soon as possible.
-        </p>
+        <div className="bg-white bg-opacity-50 p-4 rounded-xl mb-6">
+          <h4 className="font-medium text-amber-800 mb-2">Alternative Ways to Join:</h4>
+          <ul className="space-y-2">
+            <li className="flex items-start">
+              <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
+              <span>Contact us at <span className="font-medium">support@soulsync.com</span> to set up your membership</span>
+            </li>
+            <li className="flex items-start">
+              <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
+              <span>Join our free <span className="font-medium">Community Preview</span> for limited access</span>
+            </li>
+            <li className="flex items-start">
+              <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
+              <span>Leave your email below for a notification when payments are live</span>
+            </li>
+          </ul>
+        </div>
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.href = "/dashboard"}
+            className="border-amber-300 text-amber-700 hover:bg-amber-50"
+          >
+            Return to Dashboard
+          </Button>
+          <Button 
+            onClick={() => window.location.href = "/contact"}
+            className="bg-gradient-to-r from-amber-500 to-rose-500 hover:opacity-90 text-white"
+          >
+            Contact Support
+          </Button>
+        </div>
       </div>
-      <Button 
-        variant="outline" 
-        onClick={() => window.location.href = "/dashboard"}
-        className="mt-4"
-      >
-        Return to Dashboard
-      </Button>
     </div>
   );
 };
@@ -384,30 +408,48 @@ export default function Membership() {
               </div>
               
               {/* Mindvalley-style pricing card */}
-              <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                <div className="bg-indigo-900 text-white py-10 px-8">
+              <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 relative">
+                {/* Decorative elements */}
+                <div className="absolute -top-12 -right-12 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-8 -left-8 w-16 h-16 bg-blue-500/20 rounded-full blur-xl"></div>
+                
+                <div className="bg-gradient-to-r from-indigo-900 to-purple-900 text-white py-10 px-8 relative">
+                  {/* Northern lights inspired decorative element */}
+                  <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400"></div>
+                  
                   <div className="flex flex-col md:flex-row justify-between items-center">
                     <div>
+                      <div className="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-medium mb-4">Premium Experience</div>
                       <h2 className="text-3xl font-bold mb-4">Transform Your Journey with SoulSync</h2>
                       <div className="space-y-3">
                         <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <div className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-400/30 mr-3">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
                           <span>100+ Healing Rituals from Spiritual Experts</span>
                         </div>
                         <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <div className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-400/30 mr-3">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
                           <span>Advanced AI Coaching for Personal Growth</span>
                         </div>
                         <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <div className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-400/30 mr-3">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
                           <span>Exclusive Network: Connect with Like-minded Souls</span>
                         </div>
                         <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <div className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-400/30 mr-3">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
                           <span>Premium Chakra Analysis & Balancing Tools</span>
                         </div>
                         <div className="flex items-center">
-                          <Check className="h-5 w-5 text-green-400 mr-3" />
+                          <div className="flex items-center justify-center h-6 w-6 rounded-full bg-emerald-400/30 mr-3">
+                            <Check className="h-4 w-4 text-white" />
+                          </div>
                           <span>100% Risk-Free: 14-day Money-back Guarantee</span>
                         </div>
                       </div>
@@ -438,8 +480,24 @@ export default function Membership() {
                   {pricingPlans
                     .filter(plan => plan.interval === billingInterval)
                     .map((plan) => (
-                      <div key={plan.id} className="max-w-md mx-auto bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                      <div key={plan.id} className="max-w-md mx-auto bg-white rounded-xl border border-gray-100 p-8 shadow-md relative">
+                        {/* Popular badge */}
+                        {plan.popular && (
+                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xs font-bold py-1.5 px-4 rounded-full shadow-md">
+                              MOST POPULAR
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="text-center mb-6">
+                          {/* Savings callout - only for yearly plan */}
+                          {plan.interval === "year" && plan.savings && (
+                            <div className="mb-4 bg-green-50 py-1.5 px-3 rounded-lg inline-block">
+                              <span className="text-green-600 font-medium text-sm">Save ${plan.savings}/year</span>
+                            </div>
+                          )}
+                          
                           <div className="text-5xl font-bold flex justify-center items-baseline">
                             <span className="text-2xl mr-1">$</span>{plan.price}
                             <span className="text-gray-500 text-lg font-normal ml-1">/{plan.interval}</span>
@@ -451,7 +509,11 @@ export default function Membership() {
                         
                         <Button
                           onClick={() => handleSelectPlan(plan)}
-                          className="w-full py-6 text-lg bg-[#FF5757] hover:bg-[#FF4040] rounded-xl mb-4"
+                          className={`w-full py-6 text-lg rounded-xl mb-4 ${
+                            plan.popular 
+                              ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-200" 
+                              : "bg-[#FF5757] hover:bg-[#FF4040]"
+                          }`}
                         >
                           Join SoulSync Membership
                         </Button>
@@ -510,85 +572,106 @@ export default function Membership() {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card>
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-full bg-[#483D8B]/10 flex items-center justify-center mb-4">
-                      <Users className="h-6 w-6 text-[#483D8B]" />
+                <Card className="overflow-hidden border-none shadow-lg shadow-purple-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="h-2 bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+                  <CardHeader className="pt-8">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center mb-4 mx-auto">
+                      <Users className="h-8 w-8 text-indigo-600" />
                     </div>
-                    <CardTitle>Exclusive Community</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-center text-xl">Exclusive Community</CardTitle>
+                    <CardDescription className="text-center">
                       Connect with fellow seekers on the same path
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Private discussion groups</span>
+                    <ul className="space-y-3 mt-4 text-sm">
+                      <li className="flex items-start bg-purple-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-purple-500" />
+                        </div>
+                        <span>Private discussion groups with like-minded members</span>
                       </li>
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Direct messaging with members</span>
+                      <li className="flex items-start bg-indigo-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-indigo-500" />
+                        </div>
+                        <span>Direct messaging with members worldwide</span>
                       </li>
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Expert-led community events</span>
+                      <li className="flex items-start bg-purple-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-purple-500" />
+                        </div>
+                        <span>Expert-led community events and workshops</span>
                       </li>
                     </ul>
                   </CardContent>
                 </Card>
                 
-                <Card>
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-full bg-[#483D8B]/10 flex items-center justify-center mb-4">
-                      <Star className="h-6 w-6 text-[#483D8B]" />
+                <Card className="overflow-hidden border-none shadow-lg shadow-cyan-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="h-2 bg-gradient-to-r from-cyan-500 to-blue-500"></div>
+                  <CardHeader className="pt-8">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center mb-4 mx-auto">
+                      <Star className="h-8 w-8 text-cyan-600" />
                     </div>
-                    <CardTitle>Premium Healing Tools</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-center text-xl">Premium Healing Tools</CardTitle>
+                    <CardDescription className="text-center">
                       Access advanced healing practices and tools
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Advanced chakra analysis</span>
+                    <ul className="space-y-3 mt-4 text-sm">
+                      <li className="flex items-start bg-cyan-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-cyan-500" />
+                        </div>
+                        <span>Advanced chakra analysis with personalized insights</span>
                       </li>
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Personalized healing rituals</span>
+                      <li className="flex items-start bg-blue-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <span>Custom healing rituals tailored to your needs</span>
                       </li>
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Priority AI coach guidance</span>
+                      <li className="flex items-start bg-cyan-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-cyan-500" />
+                        </div>
+                        <span>Priority AI coach guidance for your journey</span>
                       </li>
                     </ul>
                   </CardContent>
                 </Card>
                 
-                <Card>
-                  <CardHeader>
-                    <div className="w-12 h-12 rounded-full bg-[#483D8B]/10 flex items-center justify-center mb-4">
-                      <BookOpen className="h-6 w-6 text-[#483D8B]" />
+                <Card className="overflow-hidden border-none shadow-lg shadow-emerald-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="h-2 bg-gradient-to-r from-emerald-500 to-green-500"></div>
+                  <CardHeader className="pt-8">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center mb-4 mx-auto">
+                      <BookOpen className="h-8 w-8 text-emerald-600" />
                     </div>
-                    <CardTitle>Curated Learning Resources</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-center text-xl">Curated Learning Resources</CardTitle>
+                    <CardDescription className="text-center">
                       Expand your knowledge with exclusive content
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Member-only courses</span>
+                    <ul className="space-y-3 mt-4 text-sm">
+                      <li className="flex items-start bg-emerald-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        </div>
+                        <span>Member-only courses from spiritual experts</span>
                       </li>
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Expert video workshops</span>
+                      <li className="flex items-start bg-green-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        </div>
+                        <span>Exclusive video workshops and masterclasses</span>
                       </li>
-                      <li className="flex items-start">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 shrink-0 mt-0.5" />
-                        <span>Guided meditation library</span>
+                      <li className="flex items-start bg-emerald-50 p-3 rounded-lg">
+                        <div className="bg-white rounded-full p-1 shadow-sm mr-3 flex-shrink-0">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        </div>
+                        <span>Extensive guided meditation and practice library</span>
                       </li>
                     </ul>
                   </CardContent>
@@ -673,18 +756,31 @@ export default function Membership() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 {testimonials.map((testimonial) => (
-                  <Card key={testimonial.id} className="bg-white border border-neutral-100">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-full bg-[#483D8B]/10 flex items-center justify-center text-[#483D8B] font-medium mr-3">
+                  <Card key={testimonial.id} className="bg-gradient-to-b from-white to-purple-50/30 border-none shadow-md hover:shadow-xl transition-all duration-300">
+                    <CardContent className="pt-8 pb-8 relative">
+                      {/* Quote mark decoration */}
+                      <div className="absolute -top-2 -left-2 text-6xl text-purple-200 opacity-40 font-serif">"</div>
+                      
+                      <div className="flex items-center mb-6">
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white font-medium mr-4 shadow-md">
                           {testimonial.name.charAt(0)}
                         </div>
                         <div>
-                          <div className="font-medium">{testimonial.name}</div>
-                          <div className="text-xs text-neutral-500">Member</div>
+                          <div className="font-medium text-lg">{testimonial.name}</div>
+                          <div className="text-xs font-medium uppercase tracking-wider text-purple-600">Member</div>
                         </div>
                       </div>
-                      <p className="text-neutral-600 text-sm">"{testimonial.content}"</p>
+                      
+                      <div className="flex mb-4">
+                        {Array(5).fill(0).map((_, i) => (
+                          <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
+                        ))}
+                      </div>
+                      
+                      <p className="text-neutral-700 relative z-10">"{testimonial.content}"</p>
+                      
+                      {/* Bottom decoration */}
+                      <div className="absolute -bottom-2 -right-2 text-6xl text-purple-200 opacity-40 rotate-180 font-serif">"</div>
                     </CardContent>
                   </Card>
                 ))}
