@@ -17,7 +17,15 @@ import { apiRequest } from "@/lib/queryClient";
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
-const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
+// Also trim the key to remove any extra whitespace
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey.trim()) : null;
+
+// Log Stripe initialization status (for debugging)
+if (stripePublicKey) {
+  console.log('Stripe public key available, Stripe initialized');
+} else {
+  console.warn('Stripe public key not available, payments will not work');
+}
 
 interface PricingPlan {
   id: string;
@@ -322,6 +330,42 @@ const PaymentUnavailableMessage = () => {
           </Button>
         </div>
       </div>
+    </div>
+  );
+};
+
+// FAQ Item Component
+const FAQItem = ({ faq, isDefaultOpen = false }: { faq: { question: string, answer: string }, isDefaultOpen?: boolean }) => {
+  const [isOpen, setIsOpen] = useState(isDefaultOpen);
+  
+  return (
+    <div className="mb-4 overflow-hidden bg-white rounded-xl shadow-sm border border-neutral-100 transition-all duration-300 hover:shadow-md">
+      <div 
+        className={`px-6 py-4 flex justify-between items-center cursor-pointer ${isOpen ? 'bg-gradient-to-r from-purple-50 to-indigo-50' : ''}`} 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <h3 className={`font-medium text-lg ${isOpen ? 'text-indigo-700' : 'text-neutral-700'}`}>
+          {faq.question}
+        </h3>
+        <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          <ChevronDown className={`h-5 w-5 ${isOpen ? 'text-indigo-500' : 'text-neutral-400'}`} />
+        </div>
+      </div>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="px-6 py-4 border-t border-neutral-100 bg-white">
+              <p className="text-neutral-600">{faq.answer}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -802,44 +846,9 @@ export default function Membership() {
               </div>
               
               <div className="max-w-3xl mx-auto">
-                {faqData.map((faq, index) => {
-                  // Create a state variable for each FAQ item
-                  const [isOpen, setIsOpen] = useState(index === 0); // First one open by default
-                  
-                  return (
-                    <div 
-                      key={index} 
-                      className="mb-4 overflow-hidden bg-white rounded-xl shadow-sm border border-neutral-100 transition-all duration-300 hover:shadow-md"
-                    >
-                      <div 
-                        className={`px-6 py-4 flex justify-between items-center cursor-pointer ${isOpen ? 'bg-gradient-to-r from-purple-50 to-indigo-50' : ''}`} 
-                        onClick={() => setIsOpen(!isOpen)}
-                      >
-                        <h3 className={`font-medium text-lg ${isOpen ? 'text-indigo-700' : 'text-neutral-700'}`}>
-                          {faq.question}
-                        </h3>
-                        <div className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-                          <ChevronDown className={`h-5 w-5 ${isOpen ? 'text-indigo-500' : 'text-neutral-400'}`} />
-                        </div>
-                      </div>
-                      
-                      <AnimatePresence>
-                        {isOpen && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <div className="px-6 py-4 border-t border-neutral-100 bg-white">
-                              <p className="text-neutral-600">{faq.answer}</p>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
+                {faqData.map((faq, index) => (
+                  <FAQItem key={index} faq={faq} isDefaultOpen={index === 0} />
+                ))}
               </div>
             </motion.div>
             
