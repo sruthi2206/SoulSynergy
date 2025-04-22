@@ -28,12 +28,18 @@ if (!process.env.STRIPE_SECRET_KEY) {
 let stripe: Stripe | null = null;
 try {
   if (process.env.STRIPE_SECRET_KEY) {
-    // Ensure the key is properly formatted without any extra whitespace
+    // Ensure the key is properly formatted without any extra whitespace or invalid characters
     const cleanKey = process.env.STRIPE_SECRET_KEY.trim();
-    stripe = new Stripe(cleanKey, { 
-      apiVersion: "2025-03-31.basil" as any
-    });
-    console.log('Stripe initialized successfully');
+    
+    // Check if the key starts with sk_ (Stripe secret key format)
+    if (!cleanKey.startsWith('sk_')) {
+      console.error('Invalid Stripe key format. Secret key should start with sk_');
+    } else {
+      stripe = new Stripe(cleanKey, { 
+        apiVersion: "2022-11-15" as any // Using an older, more compatible API version
+      });
+      console.log('Stripe initialized successfully');
+    }
   } else {
     console.warn('No Stripe secret key found in environment variables');
   }
@@ -835,25 +841,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Creating payment intent for amount: ${amount}, interval: ${interval || 'one-time'}`);
 
-      // Create a payment intent with support for multiple payment methods
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Convert to cents
-        currency: 'usd',
-        // Support multiple payment methods
-        payment_method_types: ['card', 'us_bank_account', 'cashapp'],
-        automatic_payment_methods: {
-          enabled: true,
-        },
-        metadata: {
-          plan: interval || 'one-time'
-        }
-      });
-      
-      console.log('Payment intent created successfully:', paymentIntent.id);
-      
-      res.status(200).json({
-        clientSecret: paymentIntent.client_secret
-      });
+      // Use a simpler, more compatible configuration
+      try {
+        // Create a payment intent with basic configuration
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100), // Convert to cents
+          currency: 'usd',
+          payment_method_types: ['card'], // Just card payment to start with
+          metadata: {
+            plan: interval || 'one-time'
+          }
+        });
+        
+        console.log('Payment intent created successfully:', paymentIntent.id);
+        
+        res.status(200).json({
+          clientSecret: paymentIntent.client_secret
+        });
+      } catch (stripeError) {
+        console.error('Error in Stripe payment intent creation:', stripeError);
+        
+        // Try a fallback config if the first attempt fails
+        console.log('Trying fallback payment intent configuration...');
+        
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100),
+          currency: 'usd',
+          // No additional configuration
+        });
+        
+        console.log('Payment intent created with fallback config:', paymentIntent.id);
+        
+        res.status(200).json({
+          clientSecret: paymentIntent.client_secret
+        });
+      }
     } catch (error) {
       console.error('Stripe error:', error);
       
@@ -866,11 +888,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (stripeError.raw) {
           console.error('Stripe raw error:', stripeError.raw);
         }
+        if (stripeError.headers) {
+          console.error('Stripe error headers:', stripeError.headers);
+        }
+        if (stripeError.statusCode) {
+          console.error('Stripe error status code:', stripeError.statusCode);
+        }
       }
       
+      // If we get here, both payment intent creation attempts failed
+      // Return fallback UI by notifying the client
       res.status(500).json({ 
         message: 'Failed to create payment intent', 
-        error: (error as Error).message 
+        error: (error as Error).message,
+        useFallback: true
       });
     }
   });
