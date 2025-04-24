@@ -316,23 +316,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Journal entry routes
   app.post(`${apiRouter}/journal-entries`, async (req, res) => {
     try {
-      const journalContent = req.body.content;
-      const userId = req.body.userId;
+      const {
+        content = "",
+        gratitude = [],
+        affirmation = "",
+        shortTermGoals = [],
+        longTermVision = "",
+        language = "english",
+        userId
+      } = req.body;
       
-      if (!journalContent || !userId) {
-        return res.status(400).json({ message: 'Missing content or userId' });
+      if (!userId) {
+        return res.status(400).json({ message: 'Missing userId' });
+      }
+      
+      // Need at least one section filled in
+      if (!content && gratitude.length === 0 && !affirmation && shortTermGoals.length === 0 && !longTermVision) {
+        return res.status(400).json({ message: 'At least one journal section must be filled' });
       }
       
       // Analyze the journal entry with OpenAI
-      const analysis = await analyzeJournalEntry(journalContent);
+      const analysis = await analyzeJournalEntry({
+        content,
+        gratitude,
+        affirmation,
+        shortTermGoals,
+        longTermVision,
+        language
+      });
       
       // Create journal entry with analysis data
       const journalData = {
-        userId: userId,
-        content: journalContent,
+        userId,
+        content,
+        gratitude,
+        affirmation,
+        shortTermGoals,
+        longTermVision,
+        language,
         sentimentScore: analysis.sentimentScore,
         emotionTags: analysis.emotions,
-        chakraTags: analysis.chakras
+        chakraTags: analysis.chakras,
+        aiInsights: analysis.aiInsights
       };
       
       const validatedData = insertJournalEntrySchema.parse(journalData);
@@ -340,7 +365,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json({
         ...newEntry,
-        analysis: analysis.summary
+        analysis: analysis.summary,
+        progressNotes: analysis.progressNotes
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
