@@ -314,3 +314,221 @@ function getCoachTemperature(coachType: string): number {
       return 0.7;
   }
 }
+
+/**
+ * Utility function to prepare chakra assessment data for inclusion in coaching prompts
+ * @param chakraValues Object containing chakra values
+ * @returns Formatted string of chakra context
+ */
+export function prepareChakraCoachingContext(chakraValues: Record<string, number>): string {
+  // Create a summary of chakra values
+  const chakraSummary = Object.entries(chakraValues)
+    .map(([key, value]) => {
+      const chakraName = 
+        key === 'crown' ? 'Crown' :
+        key === 'thirdEye' ? 'Third Eye' :
+        key === 'throat' ? 'Throat' :
+        key === 'heart' ? 'Heart' :
+        key === 'solarPlexus' ? 'Solar Plexus' :
+        key === 'sacral' ? 'Sacral' :
+        key === 'root' ? 'Root' : key;
+        
+      const status = value < 4 ? "underactive" : value > 6 ? "overactive" : "balanced";
+      return `${chakraName}: ${value}/10 (${status})`;
+    })
+    .join("\n");
+    
+  // Find the most imbalanced chakra
+  const imbalances = Object.entries(chakraValues).map(([key, value]) => {
+    const distanceFromBalance = Math.abs(value - 5);
+    const direction = value < 5 ? "underactive" : value > 5 ? "overactive" : "balanced";
+    return { key, value, distanceFromBalance, direction };
+  });
+  
+  // Sort by most imbalanced
+  const sortedImbalances = [...imbalances].sort((a, b) => b.distanceFromBalance - a.distanceFromBalance);
+  
+  // Get the most imbalanced chakra
+  const primaryFocus = sortedImbalances[0];
+  
+  // Get chakra name and description
+  const chakraName = 
+    primaryFocus.key === 'crown' ? 'Crown' :
+    primaryFocus.key === 'thirdEye' ? 'Third Eye' :
+    primaryFocus.key === 'throat' ? 'Throat' :
+    primaryFocus.key === 'heart' ? 'Heart' :
+    primaryFocus.key === 'solarPlexus' ? 'Solar Plexus' :
+    primaryFocus.key === 'sacral' ? 'Sacral' :
+    primaryFocus.key === 'root' ? 'Root' : primaryFocus.key;
+    
+  const chakraDescription = getChakraDescription(primaryFocus.key, primaryFocus.direction);
+  
+  // Get healing practices
+  const healingPractices = getChakraHealingPractices(primaryFocus.key);
+  
+  // Get coaching focus areas
+  const focusAreas = getChakraFocusAreas(primaryFocus.key);
+  
+  return `
+CHAKRA ASSESSMENT CONTEXT:
+Overall Profile:
+${chakraSummary}
+
+Primary Focus: ${chakraName} Chakra (${primaryFocus.value}/10, ${primaryFocus.direction})
+${chakraDescription}
+
+Recommended healing practices:
+${healingPractices.join("\n")}
+
+Coaching considerations:
+- This user would benefit from focusing on their ${chakraName} chakra.
+- The imbalance indicates possible issues with ${focusAreas}.
+`;
+}
+
+/**
+ * Helper function to get chakra descriptions
+ */
+function getChakraDescription(chakraKey: string, direction: string): string {
+  if (chakraKey === 'root') {
+    if (direction === 'underactive') {
+      return 'The Root chakra appears to be underactive. This may manifest as feelings of instability, anxiety about basic needs, disconnection from the body, or difficulty feeling grounded.';
+    } else if (direction === 'overactive') {
+      return 'The Root chakra appears to be overactive. This may manifest as rigidity, materialism, excessive focus on security, or resistance to change.';
+    }
+    return 'The Root chakra is well-balanced. This suggests a strong foundation of safety, security, and physical wellbeing.';
+  }
+  else if (chakraKey === 'sacral') {
+    if (direction === 'underactive') {
+      return 'The Sacral chakra appears to be underactive. This may manifest as emotional numbness, lack of creativity, diminished pleasure, or sexual difficulties.';
+    } else if (direction === 'overactive') {
+      return 'The Sacral chakra appears to be overactive. This may manifest as emotional volatility, obsessive attachments, addictive behaviors, or boundary issues in relationships.';
+    }
+    return 'The Sacral chakra is well-balanced. This suggests healthy emotional flow, creative expression, and comfort with pleasure and passion.';
+  }
+  else if (chakraKey === 'solarPlexus') {
+    if (direction === 'underactive') {
+      return 'The Solar Plexus chakra appears to be underactive. This may manifest as low self-esteem, lack of confidence, indecisiveness, or feeling powerless and victimized.';
+    } else if (direction === 'overactive') {
+      return 'The Solar Plexus chakra appears to be overactive. This may manifest as domineering behavior, excessive control, perfectionism, or anger management issues.';
+    }
+    return 'The Solar Plexus chakra is well-balanced. This suggests healthy self-confidence, personal power, and the ability to meet challenges effectively.';
+  }
+  else if (chakraKey === 'heart') {
+    if (direction === 'underactive') {
+      return 'The Heart chakra appears to be underactive. This may manifest as difficulty giving or receiving love, emotional isolation, resentment, or grief that hasn\'t been processed.';
+    } else if (direction === 'overactive') {
+      return 'The Heart chakra appears to be overactive. This may manifest as codependency, emotional overwhelm, poor boundaries in relationships, or possessiveness.';
+    }
+    return 'The Heart chakra is well-balanced. This suggests the capacity for compassion, healthy relationships, self-love, and emotional openness.';
+  }
+  else if (chakraKey === 'throat') {
+    if (direction === 'underactive') {
+      return 'The Throat chakra appears to be underactive. This may manifest as difficulty expressing oneself, fear of speaking up, withholding truth, or creative blocks.';
+    } else if (direction === 'overactive') {
+      return 'The Throat chakra appears to be overactive. This may manifest as excessive talking, interrupting others, inability to listen, or being domineering in communication.';
+    }
+    return 'The Throat chakra is well-balanced. This suggests clear communication, authentic self-expression, and the ability to listen as well as speak your truth.';
+  }
+  else if (chakraKey === 'thirdEye') {
+    if (direction === 'underactive') {
+      return 'The Third Eye chakra appears to be underactive. This may manifest as lack of clarity, poor intuition, difficulty visualizing, or rigid thinking.';
+    } else if (direction === 'overactive') {
+      return 'The Third Eye chakra appears to be overactive. This may manifest as overthinking, spiritual bypassing, detachment from reality, or confusion between intuition and imagination.';
+    }
+    return 'The Third Eye chakra is well-balanced. This suggests strong intuition, clear perception, imagination grounded in reality, and access to inner wisdom.';
+  }
+  else if (chakraKey === 'crown') {
+    if (direction === 'underactive') {
+      return 'The Crown chakra appears to be underactive. This may manifest as spiritual disconnection, lack of purpose or meaning, rigid belief systems, or cynicism.';
+    } else if (direction === 'overactive') {
+      return 'The Crown chakra appears to be overactive. This may manifest as spiritual addiction, escapism, disconnection from physical reality, or spiritual superiority.';
+    }
+    return 'The Crown chakra is well-balanced. This suggests spiritual connection, understanding of one\'s purpose, and the ability to live with awareness of both material and spiritual dimensions.';
+  }
+  
+  return 'This chakra needs attention and balancing.';
+}
+
+/**
+ * Helper function to get chakra healing practices
+ */
+function getChakraHealingPractices(chakraKey: string): string[] {
+  switch (chakraKey) {
+    case 'root':
+      return [
+        'Grounding exercises like walking barefoot in nature',
+        'Physical activities that engage the legs and feet',
+        'Working with crystals like red jasper, hematite, or smoky quartz',
+        'Consuming root vegetables and proteins'
+      ];
+    case 'sacral':
+      return [
+        'Creative activities like dance, painting, or music',
+        'Hip-opening yoga poses',
+        'Spending time near water',
+        'Working with orange stones like carnelian'
+      ];
+    case 'solarPlexus':
+      return [
+        'Core-strengthening exercises',
+        'Setting and achieving small goals to build confidence',
+        'Practicing positive affirmations',
+        'Working with yellow stones like citrine or amber'
+      ];
+    case 'heart':
+      return [
+        'Heart-opening yoga poses like backbends',
+        'Loving-kindness meditation',
+        'Self-forgiveness practices',
+        'Working with green and pink stones like rose quartz'
+      ];
+    case 'throat':
+      return [
+        'Singing, chanting, or humming',
+        'Journaling to express thoughts and emotions',
+        'Neck stretches and yoga poses',
+        'Working with blue stones like lapis lazuli or turquoise'
+      ];
+    case 'thirdEye':
+      return [
+        'Meditation and visualization practices',
+        'Dream journaling',
+        'Reducing screen time and digital stimulation',
+        'Working with indigo stones like amethyst or sodalite'
+      ];
+    case 'crown':
+      return [
+        'Silent meditation',
+        'Spiritual study and contemplation',
+        'Connecting with nature and universal energies',
+        'Working with purple or clear stones like amethyst or clear quartz'
+      ];
+    default:
+      return ['Balanced nutrition', 'Regular meditation', 'Physical exercise', 'Time in nature'];
+  }
+}
+
+/**
+ * Helper function to get chakra focus areas
+ */
+function getChakraFocusAreas(chakraKey: string): string {
+  switch (chakraKey) {
+    case 'root':
+      return 'security, stability, and groundedness';
+    case 'sacral':
+      return 'creativity, emotions, and pleasure';
+    case 'solarPlexus':
+      return 'personal power, confidence, and self-esteem';
+    case 'heart':
+      return 'love, compassion, and relationships';
+    case 'throat':
+      return 'communication, expression, and truth';
+    case 'thirdEye':
+      return 'intuition, insight, and perception';
+    case 'crown':
+      return 'spirituality, purpose, and connection';
+    default:
+      return 'overall energy balance and wellbeing';
+  }
+}
