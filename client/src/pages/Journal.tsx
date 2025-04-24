@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage, LANGUAGES, TRANSLATIONS } from "@/hooks/use-language";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,142 +36,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Indian languages supported in the journal
-const LANGUAGES = [
-  { name: "English", code: "english" },
-  { name: "Hindi", code: "hindi" },
-  { name: "Bengali", code: "bengali" },
-  { name: "Tamil", code: "tamil" },
-  { name: "Telugu", code: "telugu" },
-  { name: "Marathi", code: "marathi" },
-  { name: "Gujarati", code: "gujarati" },
-  { name: "Kannada", code: "kannada" },
-  { name: "Malayalam", code: "malayalam" },
-  { name: "Punjabi", code: "punjabi" },
-  { name: "Urdu", code: "urdu" }
-];
-
-// Define translations for UI elements in different languages
-const TRANSLATIONS: Record<string, Record<string, string>> = {
-  english: {
-    title: "Daily Alignment Journal",
-    subtitle: "Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey",
-    newEntry: "New Journal Entry",
-    newEntryDescription: "Express your thoughts, emotions, and aspirations in this structured journal",
-    general: "General",
-    gratitude: "Gratitude",
-    affirmation: "Affirmation",
-    shortTerm: "Short-Term",
-    longTerm: "Long-Term",
-    insightsTitle: "Journal Insights",
-    insightsDescription: "AI-generated insights from your journal entries",
-    generalTitle: "💭 General Reflections",
-    generalDescription: "Write freely about your thoughts, emotions, and experiences",
-    generalPlaceholder: "How are you feeling today? What's on your mind?",
-    gratitudeTitle: "✨ I am grateful for...",
-    gratitudeDescription: "List things that brought you joy, peace, or inspiration today",
-    gratitudePlaceholder: "Gratitude",
-    affirmationTitle: "🌟 Today's Affirmation",
-    affirmationDescription: "Write a positive I AM statement to align your energy",
-    affirmationPlaceholder: "I am...",
-    shortTermTitle: "🎯 Steps I will take today",
-    shortTermDescription: "What key actions will move you forward today?",
-    shortTermPlaceholder: "Step",
-    longTermTitle: "🚀 Steps toward my long-term goals",
-    longTermDescription: "What aligned actions or habits will move you toward your vision?",
-    longTermPlaceholder: "My long-term vision includes...",
-    saveButton: "Save Entry",
-    addAnother: "Add Another",
-    emotionPatterns: "Emotion Patterns",
-    chakraBalance: "Chakra Balance",
-    goalProgress: "Goal Progress",
-    personalizedWisdom: "Personalized Wisdom",
-    noEntries: "No journal entries yet",
-    startWriting: "Start writing to see your insights here"
-  },
-  hindi: {
-    title: "दैनिक संरेखण जर्नल",
-    subtitle: "अपने उपचार यात्रा को मार्गदर्शन करने के लिए AI-संचालित अंतर्दृष्टि के साथ अपने विचारों, भावनाओं और लक्ष्यों को रिकॉर्ड करें",
-    newEntry: "नई जर्नल एंट्री",
-    newEntryDescription: "इस संरचित जर्नल में अपने विचारों, भावनाओं और आकांक्षाओं को व्यक्त करें",
-    general: "सामान्य",
-    gratitude: "कृतज्ञता",
-    affirmation: "दृढ़ीकरण",
-    shortTerm: "अल्पकालिक",
-    longTerm: "दीर्घकालिक",
-    insightsTitle: "जर्नल अंतर्दृष्टि",
-    insightsDescription: "आपकी जर्नल प्रविष्टियों से AI-निर्मित अंतर्दृष्टि",
-    generalTitle: "💭 सामान्य चिंतन",
-    generalDescription: "अपने विचारों, भावनाओं और अनुभवों के बारे में स्वतंत्र रूप से लिखें",
-    generalPlaceholder: "आज आप कैसा महसूस कर रहे हैं? आपके मन में क्या है?",
-    gratitudeTitle: "✨ मैं इसके लिए आभारी हूँ...",
-    gratitudeDescription: "उन चीजों की सूची बनाएं जिन्होंने आपको आज खुशी, शांति या प्रेरणा दी",
-    gratitudePlaceholder: "कृतज्ञता",
-    affirmationTitle: "🌟 आज का दृढ़ीकरण",
-    affirmationDescription: "अपनी ऊर्जा को संरेखित करने के लिए एक सकारात्मक मैं हूँ कथन लिखें",
-    affirmationPlaceholder: "मैं हूँ...",
-    shortTermTitle: "🎯 आज मैं जो कदम उठाऊंगा",
-    shortTermDescription: "कौन से प्रमुख कार्य आपको आज आगे बढ़ाएंगे?",
-    shortTermPlaceholder: "कदम",
-    longTermTitle: "🚀 मेरे दीर्घकालिक लक्ष्यों की ओर कदम",
-    longTermDescription: "कौन से संरेखित कार्य या आदतें आपको अपनी दृष्टि की ओर ले जाएंगी?",
-    longTermPlaceholder: "मेरी दीर्घकालिक दृष्टि में शामिल है...",
-    saveButton: "प्रविष्टि सहेजें",
-    addAnother: "एक और जोड़ें",
-    emotionPatterns: "भावना पैटर्न",
-    chakraBalance: "चक्र संतुलन",
-    goalProgress: "लक्ष्य प्रगति",
-    personalizedWisdom: "व्यक्तिगत ज्ञान",
-    noEntries: "अभी तक कोई जर्नल प्रविष्टियाँ नहीं हैं",
-    startWriting: "अपनी अंतर्दृष्टि यहां देखने के लिए लिखना शुरू करें"
-  },
-  tamil: {
-    title: "தினசரி சீரமைப்பு பதிவேடு",
-    subtitle: "உங்கள் குணமாக்கல் பயணத்தை வழிநடத்த AI-உருவாக்கிய நுண்ணறிவுகளுடன் உங்கள் எண்ணங்கள், உணர்வுகள் மற்றும் இலக்குகளைப் பதிவு செய்யுங்கள்",
-    newEntry: "புதிய பதிவேடு உள்ளீடு",
-    newEntryDescription: "இந்த கட்டமைக்கப்பட்ட பதிவேட்டில் உங்கள் எண்ணங்கள், உணர்வுகள் மற்றும் விருப்பங்களை வெளிப்படுத்துங்கள்",
-    general: "பொது",
-    gratitude: "நன்றி",
-    affirmation: "உறுதிமொழி",
-    shortTerm: "குறுகிய கால",
-    longTerm: "நீண்ட கால",
-    insightsTitle: "பதிவேடு நுண்ணறிவுகள்",
-    insightsDescription: "உங்கள் பதிவுகளில் இருந்து AI உருவாக்கிய நுண்ணறிவுகள்",
-    generalTitle: "💭 பொது சிந்தனைகள்",
-    generalDescription: "உங்கள் எண்ணங்கள், உணர்வுகள் மற்றும் அனுபவங்களை சுதந்திரமாக எழுதுங்கள்",
-    generalPlaceholder: "இன்று நீங்கள் எப்படி உணர்கிறீர்கள்? உங்கள் மனதில் என்ன உள்ளது?",
-    gratitudeTitle: "✨ நான் இதற்கு நன்றியுள்ளவன்...",
-    gratitudeDescription: "இன்று உங்களுக்கு மகிழ்ச்சி, அமைதி அல்லது ஊக்கத்தை அளித்த விஷயங்களை பட்டியலிடுங்கள்",
-    gratitudePlaceholder: "நன்றி",
-    affirmationTitle: "🌟 இன்றைய உறுதிமொழி",
-    affirmationDescription: "உங்கள் சக்தியை சீரமைக்க ஒரு நேர்மறையான நான் இருக்கிறேன் அறிக்கையை எழுதுங்கள்",
-    affirmationPlaceholder: "நான் இருக்கிறேன்...",
-    shortTermTitle: "🎯 இன்று நான் எடுக்கும் நடவடிக்கைகள்",
-    shortTermDescription: "எந்த முக்கிய செயல்கள் உங்களை இன்று முன்னேற்றும்?",
-    shortTermPlaceholder: "படி",
-    longTermTitle: "🚀 என் நீண்ட கால இலக்குகளை நோக்கிய படிகள்",
-    longTermDescription: "எந்த சீரமைக்கப்பட்ட செயல்கள் அல்லது பழக்கங்கள் உங்களை உங்கள் தொலைநோக்கை நோக்கி நகர்த்தும்?",
-    longTermPlaceholder: "என் நீண்ட கால தொலைநோக்கில் உள்ளவை...",
-    saveButton: "பதிவை சேமி",
-    addAnother: "மற்றொன்றை சேர்",
-    emotionPatterns: "உணர்வு முறைகள்",
-    chakraBalance: "சக்கர சமநிலை",
-    goalProgress: "இலக்கு முன்னேற்றம்",
-    personalizedWisdom: "தனிப்பயனாக்கப்பட்ட அறிவு",
-    noEntries: "இதுவரை பதிவேடு உள்ளீடுகள் இல்லை",
-    startWriting: "உங்கள் நுண்ணறிவுகளை இங்கே பார்க்க எழுத தொடங்குங்கள்"
-  }
-};
+// Using language context imported from hooks/use-language.tsx
 
 export default function Journal() {
   const { user } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const [activeTab, setActiveTab] = useState("general");
   const [journalContent, setJournalContent] = useState("");
   const [gratitude, setGratitude] = useState<string[]>(["", "", ""]);
   const [affirmation, setAffirmation] = useState("");
   const [shortTermGoals, setShortTermGoals] = useState<string[]>(["", "", ""]);
   const [longTermVision, setLongTermVision] = useState("");
-  const [language, setLanguage] = useState("english");
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -317,10 +193,10 @@ export default function Journal() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#483D8B] to-[#008080]">
-            {TRANSLATIONS[language]?.title || "Daily Alignment Journal"}
+            {t('title') || "Daily Alignment Journal"}
           </h1>
           <p className="text-neutral-600 max-w-xl mx-auto">
-            {TRANSLATIONS[language]?.subtitle || "Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey"}
+            {t('subtitle') || "Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey"}
           </p>
           
           {/* Language Selection */}
@@ -355,9 +231,9 @@ export default function Journal() {
           >
             <Card className="shadow-md border-0">
               <CardHeader>
-                <CardTitle>{TRANSLATIONS[language]?.newEntry || "New Journal Entry"}</CardTitle>
+                <CardTitle>{t('newEntry') || "New Journal Entry"}</CardTitle>
                 <CardDescription>
-                  {TRANSLATIONS[language]?.newEntryDescription || "Express your thoughts, emotions, and aspirations in this structured journal"}
+                  {t('newEntryDescription') || "Express your thoughts, emotions, and aspirations in this structured journal"}
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
@@ -366,23 +242,23 @@ export default function Journal() {
                     <TabsList className="grid grid-cols-5 mb-6">
                       <TabsTrigger value="general" className="flex items-center">
                         <MessageSquareText className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.general || "General"}</span>
+                        <span className="hidden sm:inline">{t('general') || "General"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="gratitude" className="flex items-center">
                         <Star className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.gratitude || "Gratitude"}</span>
+                        <span className="hidden sm:inline">{t('gratitude') || "Gratitude"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="affirmation" className="flex items-center">
                         <Bookmark className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.affirmation || "Affirmation"}</span>
+                        <span className="hidden sm:inline">{t('affirmation') || "Affirmation"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="shortterm" className="flex items-center">
                         <ListTodo className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.shortTerm || "Short-Term"}</span>
+                        <span className="hidden sm:inline">{t('shortTerm') || "Short-Term"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="longterm" className="flex items-center">
                         <Rocket className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.longTerm || "Long-Term"}</span>
+                        <span className="hidden sm:inline">{t('longTerm') || "Long-Term"}</span>
                       </TabsTrigger>
                     </TabsList>
                     
