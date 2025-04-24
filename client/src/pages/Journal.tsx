@@ -418,7 +418,7 @@ export default function Journal() {
                     className="bg-gradient-to-r from-[#483D8B] to-[#008080] text-white hover:opacity-90"
                     disabled={createJournalMutation.isPending}
                   >
-                    {createJournalMutation.isPending ? "Saving..." : TRANSLATIONS[language]?.saveButton || "Save Entry"}
+                    {createJournalMutation.isPending ? "Saving..." : t('saveButton') || "Save Entry"}
                   </Button>
                 </CardFooter>
               </form>
@@ -434,9 +434,9 @@ export default function Journal() {
           >
             <Card className="shadow-md border-0">
               <CardHeader>
-                <CardTitle>{TRANSLATIONS[language]?.insightsTitle || "Journal Insights"}</CardTitle>
+                <CardTitle>{t('insightsTitle') || "Journal Insights"}</CardTitle>
                 <CardDescription>
-                  {TRANSLATIONS[language]?.insightsDescription || "AI-generated insights from your journal entries"}
+                  {t('insightsDescription') || "AI-generated insights from your journal entries"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -450,7 +450,7 @@ export default function Journal() {
                     <div className="bg-rose-50 p-4 rounded-lg border border-rose-100">
                       <div className="flex items-center mb-3">
                         <Sparkles className="h-5 w-5 mr-2 text-rose-600" />
-                        <span className="font-medium text-rose-800">{TRANSLATIONS[language]?.emotionPatterns || "Emotion Patterns"}</span>
+                        <span className="font-medium text-rose-800">{t('emotionPatterns') || "Emotion Patterns"}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-2">
                         <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
@@ -478,7 +478,7 @@ export default function Journal() {
                     <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
                       <div className="flex items-center mb-3">
                         <Sparkles className="h-5 w-5 mr-2 text-indigo-600" />
-                        <span className="font-medium text-indigo-800">{TRANSLATIONS[language]?.chakraBalance || "Chakra Balance"}</span>
+                        <span className="font-medium text-indigo-800">{t('chakraBalance') || "Chakra Balance"}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-2">
                         <Badge variant="secondary" className="bg-[#483D8B]/10 text-[#483D8B] hover:bg-[#483D8B]/20">
@@ -503,7 +503,7 @@ export default function Journal() {
                     <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
                       <div className="flex items-center mb-3">
                         <Target className="h-5 w-5 mr-2 text-emerald-600" />
-                        <span className="font-medium text-emerald-800">{TRANSLATIONS[language]?.goalProgress || "Goal Progress"}</span>
+                        <span className="font-medium text-emerald-800">{t('goalProgress') || "Goal Progress"}</span>
                       </div>
                       <ul className="space-y-2 text-sm text-emerald-700">
                         <li className="flex items-start">
@@ -537,7 +537,7 @@ export default function Journal() {
                     <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
                       <div className="flex items-center mb-3">
                         <Sparkles className="h-5 w-5 mr-2 text-amber-600" />
-                        <span className="font-medium text-amber-800">{TRANSLATIONS[language]?.personalizedWisdom || "Personalized Wisdom"}</span>
+                        <span className="font-medium text-amber-800">{t('personalizedWisdom') || "Personalized Wisdom"}</span>
                       </div>
                       <p className="text-sm text-amber-700 mb-2 italic">
                         {language === "english" 
