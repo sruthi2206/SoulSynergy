@@ -198,27 +198,6 @@ export default function Journal() {
           <p className="text-neutral-600 max-w-xl mx-auto">
             {t('subtitle') || "Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey"}
           </p>
-          
-          {/* Language Selection */}
-          <div className="mt-4 flex justify-center">
-            <div className="max-w-xs w-full">
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {LANGUAGES.map((lang: { code: string, name: string }) => (
-                    <SelectItem key={lang.code} value={lang.code}>
-                      <div className="flex items-center">
-                        <Languages className="h-4 w-4 mr-2" />
-                        {lang.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </motion.div>
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
