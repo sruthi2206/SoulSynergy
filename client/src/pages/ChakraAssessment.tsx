@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ChakraWheel from "@/components/ChakraWheel";
 import OnboardingQuiz from "@/components/OnboardingQuiz";
+import EnhancedChakraQuiz from "@/components/EnhancedChakraQuiz";
 import ChakraIntroduction from "@/components/ChakraIntroduction";
 
 export default function ChakraAssessment() {
@@ -416,7 +417,7 @@ export default function ChakraAssessment() {
                 </CardFooter>
               </Card>
             ) : (
-              <OnboardingQuiz 
+              <EnhancedChakraQuiz 
                 onComplete={handleQuizComplete} 
                 isSubmitting={false}
               />
