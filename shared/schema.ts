@@ -51,18 +51,30 @@ export const journalEntries = pgTable("journal_entries", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   content: text("content").notNull(),
+  gratitude: text("gratitude").array(),
+  affirmation: text("affirmation"),
+  shortTermGoals: text("short_term_goals").array(),
+  longTermVision: text("long_term_vision"),
+  language: text("language").default("english"),
   sentimentScore: integer("sentiment_score"),
   emotionTags: text("emotion_tags").array(),
   chakraTags: text("chakra_tags").array(),
+  aiInsights: text("ai_insights"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertJournalEntrySchema = createInsertSchema(journalEntries).pick({
   userId: true,
   content: true,
+  gratitude: true,
+  affirmation: true,
+  shortTermGoals: true,
+  longTermVision: true,
+  language: true,
   sentimentScore: true,
   emotionTags: true,
   chakraTags: true,
+  aiInsights: true,
 });
 
 // Emotion Tracking model

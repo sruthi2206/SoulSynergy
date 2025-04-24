@@ -24,37 +24,66 @@ export function getCoachSystemPrompt(coachType: string): string {
 }
 
 // Analyze journal entry for sentiment, emotions, and chakra connections
-export async function analyzeJournalEntry(text: string): Promise<{
+export async function analyzeJournalEntry(journalData: any): Promise<{
   sentimentScore: number;
   emotions: string[];
   chakras: string[];
   summary: string;
+  aiInsights: string;
+  progressNotes: string;
 }> {
   try {
+    // Extract all the journal sections
+    const content = journalData.content || '';
+    const gratitude = journalData.gratitude || [];
+    const affirmation = journalData.affirmation || '';
+    const shortTermGoals = journalData.shortTermGoals || [];
+    const longTermVision = journalData.longTermVision || '';
+    const language = journalData.language || 'english';
+    
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
           content: 
-            "You are an expert in emotional analysis and chakra energy. Analyze the journal entry for emotional content, sentiment, and chakra associations. Return JSON with: sentimentScore (1-10), emotions (array of emotions detected), chakras (array of chakras that need attention), and summary (brief insights from the entry)."
+            `You are an expert in emotional analysis, chakra energy, and personal growth coaching. 
+            Analyze the journal entry with its various sections for emotional content, sentiment, chakra associations, and provide growth insights.
+            If the journal is in a language other than English (indicated by 'language' field), provide your analysis in that language.
+            Pay special attention to the user's goals (both short and long term) and provide practical advice for progress.
+            Return JSON with: 
+            - sentimentScore (1-10)
+            - emotions (array of emotions detected)
+            - chakras (array of chakras that need attention)
+            - summary (brief insights from the entry)
+            - aiInsights (deeper analysis of patterns, blockages, and spiritual growth opportunities)
+            - progressNotes (specific feedback on the user's goals and practical next steps)`
         },
         {
           role: "user",
-          content: text
+          content: JSON.stringify({
+            content,
+            gratitude,
+            affirmation,
+            shortTermGoals,
+            longTermVision,
+            language
+          })
         }
       ],
       response_format: { type: "json_object" }
     });
 
-    const content = response.choices[0].message.content || '{}';
-    const result = JSON.parse(content);
+    const responseContent = response.choices[0].message.content || '{}';
+    const result = JSON.parse(responseContent);
     
     return {
       sentimentScore: result.sentimentScore || 5,
       emotions: result.emotions || [],
       chakras: result.chakras || [],
-      summary: result.summary || "No insights detected."
+      summary: result.summary || "No insights detected.",
+      aiInsights: result.aiInsights || "Begin your journey with daily reflection.",
+      progressNotes: result.progressNotes || "Track your goals and celebrate small wins."
     };
   } catch (error) {
     console.error("Failed to analyze journal entry:", error);
@@ -62,7 +91,9 @@ export async function analyzeJournalEntry(text: string): Promise<{
       sentimentScore: 5,
       emotions: ["neutral"],
       chakras: [],
-      summary: "Unable to analyze entry. Please try again later."
+      summary: "Unable to analyze entry. Please try again later.",
+      aiInsights: "We'll provide deeper insights when our analysis system is back online.",
+      progressNotes: "Continue working toward your goals. We'll have specific feedback soon."
     };
   }
 }
