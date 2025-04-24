@@ -470,17 +470,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               root: chakraProfile.rootChakra
             };
             
-            // Simple fallback to show chakra context
-            systemMessage += `\n\nUser's Chakra Profile:
-              - Crown: ${chakraValues.crown}/10
-              - Third Eye: ${chakraValues.thirdEye}/10
-              - Throat: ${chakraValues.throat}/10
-              - Heart: ${chakraValues.heart}/10
-              - Solar Plexus: ${chakraValues.solarPlexus}/10
-              - Sacral: ${chakraValues.sacral}/10
-              - Root: ${chakraValues.root}/10
-              
-              Consider this chakra profile when providing guidance.`;
+            // Use the prepareChakraCoachingContext function from openai.ts
+            const { prepareChakraCoachingContext } = require('./openai');
+            const chakraContext = prepareChakraCoachingContext(chakraValues);
+            
+            // Add chakra context to system message
+            systemMessage += "\n\n" + chakraContext;
           }
           
           currentMessages = [
@@ -508,40 +503,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             root: chakraProfile.rootChakra
           };
           
-          // Import chakraCoaching utility and prepare context
-          const path = require('path');
-          const fs = require('fs');
+          // Use the prepareChakraCoachingContext function from openai.ts
+          const { prepareChakraCoachingContext } = require('./openai');
+          const chakraContext = prepareChakraCoachingContext(chakraValues);
           
-          // Define the path to the chakraCoaching module
-          const chakraCoachingPath = path.join(process.cwd(), 'client', 'src', 'lib', 'chakraCoaching.js');
-          
-          // Check if the file exists
-          if (fs.existsSync(chakraCoachingPath)) {
-            try {
-              // Use dynamic import to load the module
-              const { prepareChakraCoachingContext } = require(chakraCoachingPath);
-              const chakraContext = prepareChakraCoachingContext(chakraValues);
-              
-              // Add chakra context to system message
-              systemMessage += "\n\n" + chakraContext;
-            } catch (err) {
-              console.warn('Could not load chakraCoaching utility:', err);
-            }
-          } else {
-            console.warn('Could not find chakraCoaching.js file');
-            
-            // Simple fallback if the module isn't available
-            systemMessage += `\n\nUser's Chakra Profile: 
-              - Crown: ${chakraValues.crown}/10
-              - Third Eye: ${chakraValues.thirdEye}/10
-              - Throat: ${chakraValues.throat}/10
-              - Heart: ${chakraValues.heart}/10
-              - Solar Plexus: ${chakraValues.solarPlexus}/10
-              - Sacral: ${chakraValues.sacral}/10
-              - Root: ${chakraValues.root}/10
-              
-              Consider this chakra profile when providing guidance.`;
-          }
+          // Add chakra context to system message
+          systemMessage += "\n\n" + chakraContext;
         }
         
         currentMessages = [
