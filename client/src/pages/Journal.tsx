@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
-import { useLanguage, LANGUAGES, TRANSLATIONS } from "@/hooks/use-language";
+import { useLanguage } from "@/hooks/use-language";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ import {
 
 export default function Journal() {
   const { user } = useAuth();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, LANGUAGES } = useLanguage();
   const [activeTab, setActiveTab] = useState("general");
   const [journalContent, setJournalContent] = useState("");
   const [gratitude, setGratitude] = useState<string[]>(["", "", ""]);
@@ -207,7 +207,7 @@ export default function Journal() {
                   <SelectValue placeholder="Select Language" />
                 </SelectTrigger>
                 <SelectContent>
-                  {LANGUAGES.map((lang) => (
+                  {LANGUAGES.map((lang: { code: string, name: string }) => (
                     <SelectItem key={lang.code} value={lang.code}>
                       <div className="flex items-center">
                         <Languages className="h-4 w-4 mr-2" />
@@ -404,12 +404,12 @@ export default function Journal() {
                     {isVoiceActive ? (
                       <>
                         <MicOff className="h-4 w-4 mr-1" />
-                        <span>Stop Recording</span>
+                        <span>{t('stopRecording') || "Stop Recording"}</span>
                       </>
                     ) : (
                       <>
                         <Mic className="h-4 w-4 mr-1" />
-                        <span>Voice Journal</span>
+                        <span>{t('voiceJournal') || "Voice Journal"}</span>
                       </>
                     )}
                   </Button>
@@ -553,8 +553,8 @@ export default function Journal() {
                 ) : (
                   <div className="text-center py-8 text-neutral-500">
                     <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                    <p>No journal entries yet</p>
-                    <p className="text-sm mt-1">Start writing to see your insights here</p>
+                    <p>{t('noEntries') || "No journal entries yet"}</p>
+                    <p className="text-sm mt-1">{t('startWriting') || "Start writing to see your insights here"}</p>
                   </div>
                 )}
               </CardContent>
