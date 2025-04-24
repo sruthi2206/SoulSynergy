@@ -264,12 +264,12 @@ export default function Journal() {
                     
                     <TabsContent value="general">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.generalTitle || "💭 General Reflections"}</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{t('generalTitle') || "💭 General Reflections"}</h3>
                         <p className="text-sm text-neutral-600">
-                          {TRANSLATIONS[language]?.generalDescription || "Write freely about your thoughts, emotions, and experiences"}
+                          {t('generalDescription') || "Write freely about your thoughts, emotions, and experiences"}
                         </p>
                         <Textarea
-                          placeholder={TRANSLATIONS[language]?.generalPlaceholder || "How are you feeling today? What's on your mind?"}
+                          placeholder={t('generalPlaceholder') || "How are you feeling today? What's on your mind?"}
                           className="min-h-[200px] resize-none"
                           value={journalContent}
                           onChange={(e) => setJournalContent(e.target.value)}
@@ -279,16 +279,16 @@ export default function Journal() {
                     
                     <TabsContent value="gratitude">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.gratitudeTitle || "✨ I am grateful for..."}</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{t('gratitudeTitle') || "✨ I am grateful for..."}</h3>
                         <p className="text-sm text-neutral-600">
-                          {TRANSLATIONS[language]?.gratitudeDescription || "List things that brought you joy, peace, or inspiration today"}
+                          {t('gratitudeDescription') || "List things that brought you joy, peace, or inspiration today"}
                         </p>
                         
                         <div className="space-y-2">
                           {gratitude.map((item, index) => (
                             <div key={`gratitude-${index}`} className="flex gap-2">
                               <Input
-                                placeholder={`${TRANSLATIONS[language]?.gratitudePlaceholder || "Gratitude"} ${index + 1}`}
+                                placeholder={`${t('gratitudePlaceholder') || "Gratitude"} ${index + 1}`}
                                 value={item}
                                 onChange={(e) => updateGratitude(index, e.target.value)}
                                 className="flex-grow"
@@ -314,7 +314,7 @@ export default function Journal() {
                             className="mt-2"
                           >
                             <PlusCircle className="h-4 w-4 mr-2" />
-                            {TRANSLATIONS[language]?.addAnother || "Add Another"}
+                            {t('addAnother') || "Add Another"}
                           </Button>
                         </div>
                       </div>
@@ -322,12 +322,12 @@ export default function Journal() {
                     
                     <TabsContent value="affirmation">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.affirmationTitle || "🌟 Today's Affirmation"}</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{t('affirmationTitle') || "🌟 Today's Affirmation"}</h3>
                         <p className="text-sm text-neutral-600">
-                          {TRANSLATIONS[language]?.affirmationDescription || "Write a positive I AM statement to align your energy"}
+                          {t('affirmationDescription') || "Write a positive I AM statement to align your energy"}
                         </p>
                         <Input
-                          placeholder={TRANSLATIONS[language]?.affirmationPlaceholder || "I am..."}
+                          placeholder={t('affirmationPlaceholder') || "I am..."}
                           value={affirmation}
                           onChange={(e) => setAffirmation(e.target.value)}
                           className="w-full"
@@ -337,16 +337,16 @@ export default function Journal() {
                     
                     <TabsContent value="shortterm">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.shortTermTitle || "🎯 Steps I will take today"}</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{t('shortTermTitle') || "🎯 Steps I will take today"}</h3>
                         <p className="text-sm text-neutral-600">
-                          {TRANSLATIONS[language]?.shortTermDescription || "What key actions will move you forward today?"}
+                          {t('shortTermDescription') || "What key actions will move you forward today?"}
                         </p>
                         
                         <div className="space-y-2">
                           {shortTermGoals.map((goal, index) => (
                             <div key={`goal-${index}`} className="flex gap-2">
                               <Input
-                                placeholder={`${TRANSLATIONS[language]?.shortTermPlaceholder || "Step"} ${index + 1}`}
+                                placeholder={`${t('shortTermPlaceholder') || "Step"} ${index + 1}`}
                                 value={goal}
                                 onChange={(e) => updateShortTermGoal(index, e.target.value)}
                                 className="flex-grow"
@@ -372,7 +372,7 @@ export default function Journal() {
                             className="mt-2"
                           >
                             <PlusCircle className="h-4 w-4 mr-2" />
-                            {TRANSLATIONS[language]?.addAnother || "Add Another"}
+                            {t('addAnother') || "Add Another"}
                           </Button>
                         </div>
                       </div>
@@ -380,12 +380,12 @@ export default function Journal() {
                     
                     <TabsContent value="longterm">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.longTermTitle || "🚀 Steps toward my long-term goals"}</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{t('longTermTitle') || "🚀 Steps toward my long-term goals"}</h3>
                         <p className="text-sm text-neutral-600">
-                          {TRANSLATIONS[language]?.longTermDescription || "What aligned actions or habits will move you toward your vision?"}
+                          {t('longTermDescription') || "What aligned actions or habits will move you toward your vision?"}
                         </p>
                         <Textarea
-                          placeholder={TRANSLATIONS[language]?.longTermPlaceholder || "My long-term vision includes..."}
+                          placeholder={t('longTermPlaceholder') || "My long-term vision includes..."}
                           className="min-h-[150px] resize-none"
                           value={longTermVision}
                           onChange={(e) => setLongTermVision(e.target.value)}
