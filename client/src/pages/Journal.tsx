@@ -50,6 +50,118 @@ const LANGUAGES = [
   { name: "Urdu", code: "urdu" }
 ];
 
+// Define translations for UI elements in different languages
+const TRANSLATIONS: Record<string, Record<string, string>> = {
+  english: {
+    title: "Daily Alignment Journal",
+    subtitle: "Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey",
+    newEntry: "New Journal Entry",
+    newEntryDescription: "Express your thoughts, emotions, and aspirations in this structured journal",
+    general: "General",
+    gratitude: "Gratitude",
+    affirmation: "Affirmation",
+    shortTerm: "Short-Term",
+    longTerm: "Long-Term",
+    insightsTitle: "Journal Insights",
+    insightsDescription: "AI-generated insights from your journal entries",
+    generalTitle: "💭 General Reflections",
+    generalDescription: "Write freely about your thoughts, emotions, and experiences",
+    generalPlaceholder: "How are you feeling today? What's on your mind?",
+    gratitudeTitle: "✨ I am grateful for...",
+    gratitudeDescription: "List things that brought you joy, peace, or inspiration today",
+    gratitudePlaceholder: "Gratitude",
+    affirmationTitle: "🌟 Today's Affirmation",
+    affirmationDescription: "Write a positive I AM statement to align your energy",
+    affirmationPlaceholder: "I am...",
+    shortTermTitle: "🎯 Steps I will take today",
+    shortTermDescription: "What key actions will move you forward today?",
+    shortTermPlaceholder: "Step",
+    longTermTitle: "🚀 Steps toward my long-term goals",
+    longTermDescription: "What aligned actions or habits will move you toward your vision?",
+    longTermPlaceholder: "My long-term vision includes...",
+    saveButton: "Save Entry",
+    addAnother: "Add Another",
+    emotionPatterns: "Emotion Patterns",
+    chakraBalance: "Chakra Balance",
+    goalProgress: "Goal Progress",
+    personalizedWisdom: "Personalized Wisdom",
+    noEntries: "No journal entries yet",
+    startWriting: "Start writing to see your insights here"
+  },
+  hindi: {
+    title: "दैनिक संरेखण जर्नल",
+    subtitle: "अपने उपचार यात्रा को मार्गदर्शन करने के लिए AI-संचालित अंतर्दृष्टि के साथ अपने विचारों, भावनाओं और लक्ष्यों को रिकॉर्ड करें",
+    newEntry: "नई जर्नल एंट्री",
+    newEntryDescription: "इस संरचित जर्नल में अपने विचारों, भावनाओं और आकांक्षाओं को व्यक्त करें",
+    general: "सामान्य",
+    gratitude: "कृतज्ञता",
+    affirmation: "दृढ़ीकरण",
+    shortTerm: "अल्पकालिक",
+    longTerm: "दीर्घकालिक",
+    insightsTitle: "जर्नल अंतर्दृष्टि",
+    insightsDescription: "आपकी जर्नल प्रविष्टियों से AI-निर्मित अंतर्दृष्टि",
+    generalTitle: "💭 सामान्य चिंतन",
+    generalDescription: "अपने विचारों, भावनाओं और अनुभवों के बारे में स्वतंत्र रूप से लिखें",
+    generalPlaceholder: "आज आप कैसा महसूस कर रहे हैं? आपके मन में क्या है?",
+    gratitudeTitle: "✨ मैं इसके लिए आभारी हूँ...",
+    gratitudeDescription: "उन चीजों की सूची बनाएं जिन्होंने आपको आज खुशी, शांति या प्रेरणा दी",
+    gratitudePlaceholder: "कृतज्ञता",
+    affirmationTitle: "🌟 आज का दृढ़ीकरण",
+    affirmationDescription: "अपनी ऊर्जा को संरेखित करने के लिए एक सकारात्मक मैं हूँ कथन लिखें",
+    affirmationPlaceholder: "मैं हूँ...",
+    shortTermTitle: "🎯 आज मैं जो कदम उठाऊंगा",
+    shortTermDescription: "कौन से प्रमुख कार्य आपको आज आगे बढ़ाएंगे?",
+    shortTermPlaceholder: "कदम",
+    longTermTitle: "🚀 मेरे दीर्घकालिक लक्ष्यों की ओर कदम",
+    longTermDescription: "कौन से संरेखित कार्य या आदतें आपको अपनी दृष्टि की ओर ले जाएंगी?",
+    longTermPlaceholder: "मेरी दीर्घकालिक दृष्टि में शामिल है...",
+    saveButton: "प्रविष्टि सहेजें",
+    addAnother: "एक और जोड़ें",
+    emotionPatterns: "भावना पैटर्न",
+    chakraBalance: "चक्र संतुलन",
+    goalProgress: "लक्ष्य प्रगति",
+    personalizedWisdom: "व्यक्तिगत ज्ञान",
+    noEntries: "अभी तक कोई जर्नल प्रविष्टियाँ नहीं हैं",
+    startWriting: "अपनी अंतर्दृष्टि यहां देखने के लिए लिखना शुरू करें"
+  },
+  tamil: {
+    title: "தினசரி சீரமைப்பு பதிவேடு",
+    subtitle: "உங்கள் குணமாக்கல் பயணத்தை வழிநடத்த AI-உருவாக்கிய நுண்ணறிவுகளுடன் உங்கள் எண்ணங்கள், உணர்வுகள் மற்றும் இலக்குகளைப் பதிவு செய்யுங்கள்",
+    newEntry: "புதிய பதிவேடு உள்ளீடு",
+    newEntryDescription: "இந்த கட்டமைக்கப்பட்ட பதிவேட்டில் உங்கள் எண்ணங்கள், உணர்வுகள் மற்றும் விருப்பங்களை வெளிப்படுத்துங்கள்",
+    general: "பொது",
+    gratitude: "நன்றி",
+    affirmation: "உறுதிமொழி",
+    shortTerm: "குறுகிய கால",
+    longTerm: "நீண்ட கால",
+    insightsTitle: "பதிவேடு நுண்ணறிவுகள்",
+    insightsDescription: "உங்கள் பதிவுகளில் இருந்து AI உருவாக்கிய நுண்ணறிவுகள்",
+    generalTitle: "💭 பொது சிந்தனைகள்",
+    generalDescription: "உங்கள் எண்ணங்கள், உணர்வுகள் மற்றும் அனுபவங்களை சுதந்திரமாக எழுதுங்கள்",
+    generalPlaceholder: "இன்று நீங்கள் எப்படி உணர்கிறீர்கள்? உங்கள் மனதில் என்ன உள்ளது?",
+    gratitudeTitle: "✨ நான் இதற்கு நன்றியுள்ளவன்...",
+    gratitudeDescription: "இன்று உங்களுக்கு மகிழ்ச்சி, அமைதி அல்லது ஊக்கத்தை அளித்த விஷயங்களை பட்டியலிடுங்கள்",
+    gratitudePlaceholder: "நன்றி",
+    affirmationTitle: "🌟 இன்றைய உறுதிமொழி",
+    affirmationDescription: "உங்கள் சக்தியை சீரமைக்க ஒரு நேர்மறையான நான் இருக்கிறேன் அறிக்கையை எழுதுங்கள்",
+    affirmationPlaceholder: "நான் இருக்கிறேன்...",
+    shortTermTitle: "🎯 இன்று நான் எடுக்கும் நடவடிக்கைகள்",
+    shortTermDescription: "எந்த முக்கிய செயல்கள் உங்களை இன்று முன்னேற்றும்?",
+    shortTermPlaceholder: "படி",
+    longTermTitle: "🚀 என் நீண்ட கால இலக்குகளை நோக்கிய படிகள்",
+    longTermDescription: "எந்த சீரமைக்கப்பட்ட செயல்கள் அல்லது பழக்கங்கள் உங்களை உங்கள் தொலைநோக்கை நோக்கி நகர்த்தும்?",
+    longTermPlaceholder: "என் நீண்ட கால தொலைநோக்கில் உள்ளவை...",
+    saveButton: "பதிவை சேமி",
+    addAnother: "மற்றொன்றை சேர்",
+    emotionPatterns: "உணர்வு முறைகள்",
+    chakraBalance: "சக்கர சமநிலை",
+    goalProgress: "இலக்கு முன்னேற்றம்",
+    personalizedWisdom: "தனிப்பயனாக்கப்பட்ட அறிவு",
+    noEntries: "இதுவரை பதிவேடு உள்ளீடுகள் இல்லை",
+    startWriting: "உங்கள் நுண்ணறிவுகளை இங்கே பார்க்க எழுத தொடங்குங்கள்"
+  }
+};
+
 export default function Journal() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("general");
@@ -205,10 +317,10 @@ export default function Journal() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-3xl md:text-4xl font-heading font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#483D8B] to-[#008080]">
-            Daily Alignment Journal
+            {TRANSLATIONS[language]?.title || "Daily Alignment Journal"}
           </h1>
           <p className="text-neutral-600 max-w-xl mx-auto">
-            Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey
+            {TRANSLATIONS[language]?.subtitle || "Record your thoughts, emotions, and goals with AI-powered insights to guide your healing journey"}
           </p>
           
           {/* Language Selection */}
@@ -243,9 +355,9 @@ export default function Journal() {
           >
             <Card className="shadow-md border-0">
               <CardHeader>
-                <CardTitle>New Journal Entry</CardTitle>
+                <CardTitle>{TRANSLATIONS[language]?.newEntry || "New Journal Entry"}</CardTitle>
                 <CardDescription>
-                  Express your thoughts, emotions, and aspirations in this structured journal
+                  {TRANSLATIONS[language]?.newEntryDescription || "Express your thoughts, emotions, and aspirations in this structured journal"}
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
@@ -254,23 +366,23 @@ export default function Journal() {
                     <TabsList className="grid grid-cols-5 mb-6">
                       <TabsTrigger value="general" className="flex items-center">
                         <MessageSquareText className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">General</span>
+                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.general || "General"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="gratitude" className="flex items-center">
                         <Star className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Gratitude</span>
+                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.gratitude || "Gratitude"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="affirmation" className="flex items-center">
                         <Bookmark className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Affirmation</span>
+                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.affirmation || "Affirmation"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="shortterm" className="flex items-center">
                         <ListTodo className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Short-Term</span>
+                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.shortTerm || "Short-Term"}</span>
                       </TabsTrigger>
                       <TabsTrigger value="longterm" className="flex items-center">
                         <Rocket className="h-4 w-4 mr-2" />
-                        <span className="hidden sm:inline">Long-Term</span>
+                        <span className="hidden sm:inline">{TRANSLATIONS[language]?.longTerm || "Long-Term"}</span>
                       </TabsTrigger>
                     </TabsList>
                     
@@ -437,7 +549,7 @@ export default function Journal() {
             </Card>
           </motion.div>
           
-          {/* Journal History and Insights */}
+          {/* Journal Insights Panel */}
           <motion.div 
             className="md:col-span-4"
             initial={{ opacity: 0, y: 20 }}
@@ -446,9 +558,9 @@ export default function Journal() {
           >
             <Card className="shadow-md border-0">
               <CardHeader>
-                <CardTitle>Journal History</CardTitle>
+                <CardTitle>{TRANSLATIONS[language]?.insightsTitle || "Journal Insights"}</CardTitle>
                 <CardDescription>
-                  Your previous entries and insights
+                  {TRANSLATIONS[language]?.insightsDescription || "AI-generated insights from your journal entries"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -458,120 +570,85 @@ export default function Journal() {
                   </div>
                 ) : journalEntries && Array.isArray(journalEntries) && journalEntries.length > 0 ? (
                   <div className="space-y-6">
-                    {journalEntries.map((entry: any) => (
-                      <motion.div 
-                        key={entry.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="border-b border-neutral-200 pb-6 last:border-0 last:pb-0"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center text-sm text-neutral-500">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            <span>{formatDate(entry.createdAt)}</span>
-                          </div>
-                          <div className="text-xs font-medium text-[#008080]">
-                            Sentiment: {entry.sentimentScore}/10
-                          </div>
-                        </div>
-                        
-                        {/* Show different content based on what's available */}
-                        {entry.content && (
-                          <p className="text-neutral-800 mb-3 line-clamp-2">
-                            {entry.content}
-                          </p>
-                        )}
-                        
-                        {/* Show gratitude if available */}
-                        {entry.gratitude && entry.gratitude.length > 0 && (
-                          <div className="mb-2">
-                            <p className="text-xs font-medium text-neutral-500 mb-1">Grateful for:</p>
-                            <ul className="text-xs text-neutral-600 pl-3">
-                              {entry.gratitude.slice(0, 2).map((item: string, i: number) => (
-                                <li key={`gratitude-${i}`} className="list-disc">{item}</li>
-                              ))}
-                              {entry.gratitude.length > 2 && <li className="list-none text-xs">...</li>}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        {/* Show affirmation if available */}
-                        {entry.affirmation && (
-                          <div className="mb-2">
-                            <p className="text-xs font-medium text-neutral-500 mb-1">Affirmation:</p>
-                            <p className="text-xs text-neutral-600 italic">"{entry.affirmation}"</p>
-                          </div>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {entry.emotionTags && entry.emotionTags.map((tag: string, i: number) => (
-                            <Badge key={`emotion-${i}`} variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
-                              {tag}
-                            </Badge>
-                          ))}
-                          
-                          {entry.chakraTags && entry.chakraTags.map((tag: string, i: number) => (
-                            <Badge key={`chakra-${i}`} variant="secondary" className="bg-[#483D8B]/10 text-[#483D8B] hover:bg-[#483D8B]/20">
-                              {tag} chakra
-                            </Badge>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                    {/* Emotion Tracking */}
+                    <div className="bg-rose-50 p-4 rounded-lg border border-rose-100">
+                      <div className="flex items-center mb-3">
+                        <Sparkles className="h-5 w-5 mr-2 text-rose-600" />
+                        <span className="font-medium text-rose-800">Emotion Patterns</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
+                          joy
+                        </Badge>
+                        <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
+                          gratitude
+                        </Badge>
+                        <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
+                          reflection
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-rose-700">
+                        Your emotional state has been positive recently, with a focus on reflection and gratitude.
+                      </p>
+                    </div>
+                    
+                    {/* Chakra Focus */}
+                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                      <div className="flex items-center mb-3">
+                        <Sparkles className="h-5 w-5 mr-2 text-indigo-600" />
+                        <span className="font-medium text-indigo-800">Chakra Balance</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <Badge variant="secondary" className="bg-[#483D8B]/10 text-[#483D8B] hover:bg-[#483D8B]/20">
+                          throat chakra
+                        </Badge>
+                        <Badge variant="secondary" className="bg-[#483D8B]/10 text-[#483D8B] hover:bg-[#483D8B]/20">
+                          heart chakra
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-indigo-700">
+                        Your journal entries show focus on expressing yourself (throat chakra) and processing emotions (heart chakra).
+                      </p>
+                    </div>
+                    
+                    {/* Goal Progress */}
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                      <div className="flex items-center mb-3">
+                        <Target className="h-5 w-5 mr-2 text-emerald-600" />
+                        <span className="font-medium text-emerald-800">Goal Progress</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-emerald-700">
+                        <li className="flex items-start">
+                          <div className="w-2 h-2 rounded-full bg-emerald-600 mr-2 mt-1.5"></div>
+                          <span>You're making steady progress on your meditation practice consistency</span>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="w-2 h-2 rounded-full bg-emerald-600 mr-2 mt-1.5"></div>
+                          <span>Focus on completing one short-term goal each day for better results</span>
+                        </li>
+                      </ul>
+                    </div>
+                    
+                    {/* Wisdom & Advice */}
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                      <div className="flex items-center mb-3">
+                        <Sparkles className="h-5 w-5 mr-2 text-amber-600" />
+                        <span className="font-medium text-amber-800">Personalized Wisdom</span>
+                      </div>
+                      <p className="text-sm text-amber-700 mb-2 italic">
+                        "Your consistent journaling practice is building self-awareness. Consider adding a 5-minute meditation before journaling to deepen insights."
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-8 text-neutral-500">
                     <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />
                     <p>No journal entries yet</p>
-                    <p className="text-sm mt-1">Start writing to see your entries here</p>
+                    <p className="text-sm mt-1">Start writing to see your insights here</p>
                   </div>
                 )}
               </CardContent>
             </Card>
-            
-            {/* AI Insights */}
-            {journalEntries && Array.isArray(journalEntries) && journalEntries.length > 0 && (
-              <Card className="mt-6 shadow-md border-0">
-                <CardHeader>
-                  <CardTitle>AI Growth Assistant</CardTitle>
-                  <CardDescription>
-                    Personalized insights from your journal entries
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                      <div className="flex items-center mb-3">
-                        <Sparkles className="h-5 w-5 mr-2 text-blue-600" />
-                        <span className="font-medium text-blue-800">Recent Patterns</span>
-                      </div>
-                      <ul className="space-y-2 text-sm text-blue-700">
-                        <li className="flex items-start">
-                          <div className="w-2 h-2 rounded-full bg-blue-600 mr-2 mt-1.5"></div>
-                          <span>Developing stronger throat chakra expression</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="w-2 h-2 rounded-full bg-blue-600 mr-2 mt-1.5"></div>
-                          <span>Working through anxiety around creative expression</span>
-                        </li>
-                      </ul>
-                    </div>
-                    
-                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                      <div className="flex items-center mb-3">
-                        <Target className="h-5 w-5 mr-2 text-purple-600" />
-                        <span className="font-medium text-purple-800">Goal Progress</span>
-                      </div>
-                      <p className="text-sm text-purple-700 mb-2">
-                        You're making steady progress on your meditation practice consistency. 
-                        Consider adding one more session per week to accelerate results.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </motion.div>
         </div>
       </div>
