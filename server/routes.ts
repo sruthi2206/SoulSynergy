@@ -425,6 +425,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let currentMessages;
       let conversationHistory = [];
       
+      // Get user's chakra profile for context
+      const chakraProfile = await storage.getChakraProfile(userId);
+      
       // If conversationId is provided, update existing conversation
       if (conversationId) {
         conversation = await storage.getCoachConversation(conversationId);
