@@ -49,8 +49,6 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     darkMode: "Dark Mode",
     lightMode: "Light Mode",
     logout: "Logout",
-    login: "Login",
-    register: "Register",
     
     // Common
     loading: "Loading...",
