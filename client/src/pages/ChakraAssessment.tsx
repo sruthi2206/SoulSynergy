@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ChakraWheel from "@/components/ChakraWheel";
 import OnboardingQuiz from "@/components/OnboardingQuiz";
+import ChakraIntroduction from "@/components/ChakraIntroduction";
 
 export default function ChakraAssessment() {
   const { toast } = useToast();
@@ -21,6 +22,7 @@ export default function ChakraAssessment() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("manual");
   const [completeStep, setCompleteStep] = useState(false);
+  const [showIntroduction, setShowIntroduction] = useState(true);
   
   // Fetch user's chakra profile
   const { data: chakraProfile, isLoading: isLoadingChakraProfile } = useQuery({
@@ -187,7 +189,10 @@ export default function ChakraAssessment() {
           </p>
         </motion.div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-5xl mx-auto">
+        {showIntroduction ? (
+          <ChakraIntroduction onStartTest={() => setShowIntroduction(false)} />
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-5xl mx-auto">
           <TabsList className="grid grid-cols-2 mb-6">
             <TabsTrigger value="manual">Manual Adjustment</TabsTrigger>
             <TabsTrigger value="quiz">Guided Assessment Quiz</TabsTrigger>
@@ -418,6 +423,7 @@ export default function ChakraAssessment() {
             )}
           </TabsContent>
         </Tabs>
+        )}
       </div>
     </div>
   );
