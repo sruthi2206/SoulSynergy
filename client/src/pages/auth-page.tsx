@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
+import { Languages } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -19,6 +21,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Login form schema
 const loginSchema = z.object({
@@ -46,6 +55,7 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { user, loginMutation, registerMutation } = useAuth();
+  const { language, setLanguage, t, LANGUAGES } = useLanguage();
   
   // Redirect if user is already logged in
   useEffect(() => {
@@ -131,6 +141,31 @@ export default function AuthPage() {
               <p className="text-neutral-600">
                 Your journey to inner healing and spiritual growth begins here
               </p>
+              
+              {/* Language Selection */}
+              <div className="mt-4 mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Select Your Language
+                </label>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LANGUAGES.map((lang: { code: string, name: string }) => (
+                      <SelectItem key={lang.code} value={lang.code}>
+                        <div className="flex items-center">
+                          <Languages className="h-4 w-4 mr-2" />
+                          {lang.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Choose your preferred language. This will be applied throughout the entire application.
+                </p>
+              </div>
             </div>
             
             <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
