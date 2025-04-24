@@ -1,18 +1,7 @@
 import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 
-// List of supported languages
-export const LANGUAGES = [
-  { name: "English", code: "english" },
-  { name: "Hindi", code: "hindi" },
-  { name: "Tamil", code: "tamil" },
-  { name: "Telugu", code: "telugu" },
-  { name: "Malayalam", code: "malayalam" },
-  { name: "Kannada", code: "kannada" },
-  { name: "Urdu", code: "urdu" }
-];
-
 // Define translations for UI elements in different languages
-export const TRANSLATIONS: Record<string, Record<string, string>> = {
+const TRANSLATIONS: Record<string, Record<string, string>> = {
   english: {
     // Navigation
     home: "Home",
@@ -73,7 +62,9 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     goalProgress: "Goal Progress",
     personalizedWisdom: "Personalized Wisdom",
     noEntries: "No journal entries yet",
-    startWriting: "Start writing to see your insights here"
+    startWriting: "Start writing to see your insights here",
+    voiceJournal: "Voice Journal",
+    stopRecording: "Stop Recording"
   },
   hindi: {
     // Navigation
@@ -135,7 +126,9 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     goalProgress: "लक्ष्य प्रगति",
     personalizedWisdom: "व्यक्तिगत ज्ञान",
     noEntries: "अभी तक कोई जर्नल प्रविष्टियाँ नहीं हैं",
-    startWriting: "अपनी अंतर्दृष्टि यहां देखने के लिए लिखना शुरू करें"
+    startWriting: "अपनी अंतर्दृष्टि यहां देखने के लिए लिखना शुरू करें",
+    voiceJournal: "आवाज जर्नल",
+    stopRecording: "रिकॉर्डिंग बंद करें"
   },
   tamil: {
     // Navigation
@@ -197,7 +190,9 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     goalProgress: "இலக்கு முன்னேற்றம்",
     personalizedWisdom: "தனிப்பயனாக்கப்பட்ட அறிவு",
     noEntries: "இதுவரை பதிவேடு உள்ளீடுகள் இல்லை",
-    startWriting: "உங்கள் நுண்ணறிவுகளை இங்கே பார்க்க எழுத தொடங்குங்கள்"
+    startWriting: "உங்கள் நுண்ணறிவுகளை இங்கே பார்க்க எழுத தொடங்குங்கள்",
+    voiceJournal: "குரல் பதிவேடு",
+    stopRecording: "பதிவை நிறுத்து"
   }
 };
 
@@ -237,10 +232,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// List of supported languages
+const LANGUAGES = [
+  { name: "English", code: "english" },
+  { name: "Hindi", code: "hindi" },
+  { name: "Tamil", code: "tamil" },
+  { name: "Telugu", code: "telugu" },
+  { name: "Malayalam", code: "malayalam" },
+  { name: "Kannada", code: "kannada" },
+  { name: "Urdu", code: "urdu" }
+];
+
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error("useLanguage must be used within a LanguageProvider");
   }
-  return context;
+  return { ...context, LANGUAGES };
 }
