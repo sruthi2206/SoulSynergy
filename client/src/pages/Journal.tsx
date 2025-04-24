@@ -98,12 +98,10 @@ export default function Journal() {
       setShortTermGoals(["", "", ""]);
       setLongTermVision("");
       
-      toast({
-        title: "Journal Entry Saved",
-        description: "Your reflection has been recorded and insights generated.",
-      });
+      // No toast notification - save silently for better user experience
     },
     onError: (error) => {
+      // Only show notification on errors
       toast({
         title: "Error",
         description: "Failed to save your journal entry. Please try again.",
@@ -458,7 +456,7 @@ export default function Journal() {
                   <div className="flex justify-center py-8">
                     <div className="h-8 w-8 rounded-full border-4 border-t-transparent border-[#483D8B] animate-spin"></div>
                   </div>
-                ) : journalEntries && journalEntries.length > 0 ? (
+                ) : journalEntries && Array.isArray(journalEntries) && journalEntries.length > 0 ? (
                   <div className="space-y-6">
                     {journalEntries.map((entry: any) => (
                       <motion.div 
@@ -533,7 +531,7 @@ export default function Journal() {
             </Card>
             
             {/* AI Insights */}
-            {journalEntries && journalEntries.length > 0 && (
+            {journalEntries && Array.isArray(journalEntries) && journalEntries.length > 0 && (
               <Card className="mt-6 shadow-md border-0">
                 <CardHeader>
                   <CardTitle>AI Growth Assistant</CardTitle>
