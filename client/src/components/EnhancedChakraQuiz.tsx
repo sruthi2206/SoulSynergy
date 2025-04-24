@@ -7,259 +7,22 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { chakras } from "@/lib/chakras";
+import { 
+  ChakraQuestion, 
+  QuestionOption, 
+  generateQuestions, 
+  getOptionsForQuestion as getOptions,
+  getStepTitle,
+  getStepDescription
+} from "@/lib/chakraQuestionGenerator";
 
 interface EnhancedChakraQuizProps {
   onComplete: (values: Record<string, number>) => void;
   isSubmitting: boolean;
 }
 
-// Define question interface
-interface QuizQuestion {
-  id: string;
-  text: string;
-  chakra: string;
-  inverseScoring: boolean;
-}
-
-// Questions for the 5-step chakra assessment
-const questionsByStep: QuizQuestion[][] = [
-  // Step 1: Mind Level Questions
-  [
-    {
-      id: "q1",
-      text: "Do you prefer being planned and organized over being spontaneous and free-flowing?",
-      chakra: "root",
-      inverseScoring: false
-    },
-    {
-      id: "q2",
-      text: "Do you find it difficult to market yourself in a work setting and social gatherings?",
-      chakra: "solarPlexus",
-      inverseScoring: true
-    },
-    {
-      id: "q3",
-      text: "Are you often told to speak loudly and clearly?",
-      chakra: "throat", 
-      inverseScoring: true
-    },
-    {
-      id: "q4",
-      text: "Do you tend to hide your emotions, keeping a poker face?",
-      chakra: "heart",
-      inverseScoring: true
-    },
-    {
-      id: "q5",
-      text: "Are you often curious to know higher purposes of life such as enlightenment, super-consciousness, etc.?",
-      chakra: "crown",
-      inverseScoring: false
-    },
-    {
-      id: "q6",
-      text: "Do you like to ideate or brainstorm a lot to have creative solutions?",
-      chakra: "thirdEye",
-      inverseScoring: false
-    },
-    {
-      id: "q7",
-      text: "Do you feel that it's you against the world?",
-      chakra: "root",
-      inverseScoring: true
-    },
-  ],
-  // Step 2: Thought Process Questions
-  [
-    {
-      id: "q8",
-      text: "Do you feel like thinking analytically comes to you naturally?",
-      chakra: "thirdEye",
-      inverseScoring: false
-    },
-    {
-      id: "q9",
-      text: "Do you like to follow instructions to a tee?",
-      chakra: "root",
-      inverseScoring: false
-    },
-    {
-      id: "q10",
-      text: "Do you feel that all events are meaningful and intended?",
-      chakra: "crown",
-      inverseScoring: false
-    },
-    {
-      id: "q11",
-      text: "Do you feel that the universe is a safe place?",
-      chakra: "root",
-      inverseScoring: false
-    },
-    {
-      id: "q12",
-      text: "Are you comfortable carrying out routine activities such as daily chores, paying bills, etc.?",
-      chakra: "root",
-      inverseScoring: false
-    },
-    {
-      id: "q13",
-      text: "Are you mostly able to be assertive when necessary?",
-      chakra: "solarPlexus",
-      inverseScoring: false
-    },
-    {
-      id: "q14",
-      text: "Do you tend to keep people at a distance?",
-      chakra: "heart",
-      inverseScoring: true
-    },
-  ],
-  // Step 3: Practical Implementation Questions
-  [
-    {
-      id: "q15",
-      text: "Do you dislike engaging with abstract topics like philosophy and spirituality?",
-      chakra: "crown",
-      inverseScoring: true
-    },
-    {
-      id: "q16",
-      text: "Do you feel good about expressing yourself through any type of media eg. public speaking, singing, fine art, writing, etc.?",
-      chakra: "throat",
-      inverseScoring: false
-    },
-    {
-      id: "q17",
-      text: "Do you feel guilty when it comes to indulging in pleasurable activities e.g. self-care, and recreation?",
-      chakra: "sacral",
-      inverseScoring: true
-    },
-    {
-      id: "q18",
-      text: "Do you frequently rely on your own intuition and logical frameworks to make decisions?",
-      chakra: "thirdEye",
-      inverseScoring: false
-    },
-    {
-      id: "q19",
-      text: "Do you find it easy to introduce yourself socially like in school, work, social gatherings, etc.?",
-      chakra: "throat",
-      inverseScoring: false
-    },
-    {
-      id: "q20",
-      text: "Do you express your feelings freely, letting them flow without holding back?",
-      chakra: "heart",
-      inverseScoring: false
-    },
-  ],
-  // Step 4: Hypothetical Scenarios
-  [
-    {
-      id: "hs1",
-      text: "Imagine you're in a room full of strangers at an important networking event. How likely are you to approach people and introduce yourself?",
-      chakra: "throat",
-      inverseScoring: false
-    },
-    {
-      id: "hs2",
-      text: "Your friend is going through a difficult emotional time. How comfortable are you providing emotional support and expressing empathy?",
-      chakra: "heart",
-      inverseScoring: false
-    },
-    {
-      id: "hs3",
-      text: "You're given a complex problem to solve at work with little guidance. How confident are you in your ability to find a creative solution?",
-      chakra: "thirdEye",
-      inverseScoring: false
-    },
-    {
-      id: "hs4",
-      text: "You suddenly need to relocate to a new city for work. How secure do you feel about this major life change?",
-      chakra: "root",
-      inverseScoring: false
-    },
-    {
-      id: "hs5",
-      text: "You're asked to lead a project and make important decisions. How comfortable are you in this position of authority?",
-      chakra: "solarPlexus",
-      inverseScoring: false
-    },
-  ],
-  // Step 5: Reflection and Integration
-  [
-    {
-      id: "r1",
-      text: "How consistently do you practice what you consider important for your personal growth?",
-      chakra: "all",
-      inverseScoring: false
-    },
-    {
-      id: "r2",
-      text: "When faced with challenges, how often do you reflect on lessons rather than feeling victimized?",
-      chakra: "crown",
-      inverseScoring: false
-    },
-    {
-      id: "r3",
-      text: "How effectively do you balance your practical responsibilities with your need for joy and creativity?",
-      chakra: "sacral",
-      inverseScoring: false
-    },
-    {
-      id: "r4",
-      text: "How well do you maintain your personal boundaries while remaining open to others?",
-      chakra: "heart",
-      inverseScoring: false
-    },
-    {
-      id: "r5",
-      text: "How connected do you feel to a sense of purpose or deeper meaning in your life?",
-      chakra: "crown",
-      inverseScoring: false
-    },
-  ]
-];
-
-// Define option interface
-interface QuestionOption {
-  value: string;
-  label: string;
-  description?: string;
-}
-
-// Dynamic options based on question type
-const getOptionsForQuestion = (questionId: string): QuestionOption[] => {
-  // For situational responses (step 4)
-  if (questionId.startsWith("hs")) {
-    return [
-      { value: "1", label: "Very uncomfortable", description: "I would avoid this completely" },
-      { value: "2", label: "Somewhat uncomfortable", description: "I would feel anxious but try" },
-      { value: "3", label: "Neutral", description: "I could manage this situation" },
-      { value: "4", label: "Somewhat comfortable", description: "I would feel at ease" },
-      { value: "5", label: "Very comfortable", description: "I would thrive in this situation" }
-    ];
-  }
-  
-  // For reflection questions (step 5)
-  if (questionId.startsWith("r")) {
-    return [
-      { value: "1", label: "Not at all", description: "This is a significant challenge for me" },
-      { value: "2", label: "Slightly", description: "I struggle with this frequently" },
-      { value: "3", label: "Moderately", description: "I have mixed success with this" },
-      { value: "4", label: "Considerably", description: "I do this well most of the time" },
-      { value: "5", label: "Completely", description: "This is a consistent strength of mine" }
-    ];
-  }
-  
-  // Default frequency options for most questions
-  return [
-    { value: "1", label: "Never", description: "This doesn't apply to me at all" },
-    { value: "2", label: "Rarely", description: "This applies to me occasionally" },
-    { value: "3", label: "Sometimes", description: "This applies to me about half the time" },
-    { value: "4", label: "Often", description: "This applies to me most of the time" },
-    { value: "5", label: "Always", description: "This applies to me consistently" }
-  ];
-};
+// Generate dynamic questions for the 5-step chakra assessment
+const questionsByStep: ChakraQuestion[][] = generateQuestions();
 
 export default function EnhancedChakraQuiz({ onComplete, isSubmitting }: EnhancedChakraQuizProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -446,7 +209,7 @@ export default function EnhancedChakraQuiz({ onComplete, isSubmitting }: Enhance
                 className="space-y-3"
                 onValueChange={handleAnswer}
               >
-                {getOptionsForQuestion(currentQuestion.id).map((option) => (
+                {getOptions(currentQuestion).map((option) => (
                   <div key={option.value} className="flex items-start space-x-2 border border-neutral-200 rounded-lg p-3 hover:bg-neutral-50 transition-colors">
                     <div className="pt-1">
                       <RadioGroupItem 
