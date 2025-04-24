@@ -60,6 +60,11 @@ export default function Navigation() {
       ]
     },
     {
+      name: "Chakra Assessment",
+      path: "/chakra-assessment",
+      icon: <ShieldCheck className="h-5 w-5" />
+    },
+    {
       name: "Healing Rituals",
       path: "/healing-rituals",
       icon: <Sparkles className="h-5 w-5" />
