@@ -87,36 +87,48 @@ export default function ChakraAssessment() {
       if (!user) throw new Error("User not authenticated");
       
       try {
+        // Round all values to integers to avoid floating point errors
+        const roundedValues = {
+          crown: Math.round(chakraValues.crown),
+          thirdEye: Math.round(chakraValues.thirdEye),
+          throat: Math.round(chakraValues.throat),
+          heart: Math.round(chakraValues.heart),
+          solarPlexus: Math.round(chakraValues.solarPlexus),
+          sacral: Math.round(chakraValues.sacral),
+          root: Math.round(chakraValues.root)
+        };
+        
+        console.log("Original values:", chakraValues);
+        console.log("Rounded values:", roundedValues);
+        
         if (chakraProfile) {
           // Update existing profile
           console.log("Updating existing profile:", chakraProfile.id);
-          console.log("With values:", chakraValues);
           
           const response = await apiRequest("PATCH", `/api/chakra-profiles/${chakraProfile.id}`, {
-            crownChakra: chakraValues.crown,
-            thirdEyeChakra: chakraValues.thirdEye,
-            throatChakra: chakraValues.throat,
-            heartChakra: chakraValues.heart,
-            solarPlexusChakra: chakraValues.solarPlexus,
-            sacralChakra: chakraValues.sacral,
-            rootChakra: chakraValues.root
+            crownChakra: roundedValues.crown,
+            thirdEyeChakra: roundedValues.thirdEye,
+            throatChakra: roundedValues.throat,
+            heartChakra: roundedValues.heart,
+            solarPlexusChakra: roundedValues.solarPlexus,
+            sacralChakra: roundedValues.sacral,
+            rootChakra: roundedValues.root
           });
           
           return await response.json();
         } else {
           // Create new profile
           console.log("Creating new profile for user:", user.id);
-          console.log("With values:", chakraValues);
           
           const response = await apiRequest("POST", "/api/chakra-profiles", {
             userId: user.id,
-            crownChakra: chakraValues.crown,
-            thirdEyeChakra: chakraValues.thirdEye,
-            throatChakra: chakraValues.throat,
-            heartChakra: chakraValues.heart,
-            solarPlexusChakra: chakraValues.solarPlexus,
-            sacralChakra: chakraValues.sacral,
-            rootChakra: chakraValues.root
+            crownChakra: roundedValues.crown,
+            thirdEyeChakra: roundedValues.thirdEye,
+            throatChakra: roundedValues.throat,
+            heartChakra: roundedValues.heart,
+            solarPlexusChakra: roundedValues.solarPlexus,
+            sacralChakra: roundedValues.sacral,
+            rootChakra: roundedValues.root
           });
           
           return await response.json();
