@@ -136,16 +136,16 @@ export default function AuthPage() {
           >
             <div className="mb-8">
               <h1 className="text-2xl font-heading font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#483D8B] to-[#008080]">
-                Welcome to SoulSync
+                {t('welcomeTitle') || "Welcome to SoulSync"}
               </h1>
               <p className="text-neutral-600">
-                Your journey to inner healing and spiritual growth begins here
+                {t('welcomeSubtitle') || "Your journey to inner healing and spiritual growth begins here"}
               </p>
               
               {/* Language Selection */}
               <div className="mt-4 mb-5">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Select Your Language
+                  {t('selectLanguage') || "Select Your Language"}
                 </label>
                 <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger className="w-full">
@@ -163,23 +163,23 @@ export default function AuthPage() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Choose your preferred language. This will be applied throughout the entire application.
+                  {t('languageHint') || "Choose your preferred language. This will be applied throughout the entire application."}
                 </p>
               </div>
             </div>
             
             <Tabs defaultValue="login" value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")}>
               <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Create Account</TabsTrigger>
+                <TabsTrigger value="login">{t('login') || "Login"}</TabsTrigger>
+                <TabsTrigger value="register">{t('register') || "Create Account"}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="login">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Login to Your Account</CardTitle>
+                    <CardTitle>{t('loginTitle') || "Login to Your Account"}</CardTitle>
                     <CardDescription>
-                      Enter your credentials to access your dashboard
+                      {t('loginDescription') || "Enter your credentials to access your dashboard"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -190,9 +190,9 @@ export default function AuthPage() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('username') || "Username"}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your username" {...field} />
+                                <Input placeholder={t('usernamePlaceholder') || "Your username"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -204,9 +204,9 @@ export default function AuthPage() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>{t('password') || "Password"}</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Your password" {...field} />
+                                <Input type="password" placeholder={t('passwordPlaceholder') || "Your password"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -221,10 +221,10 @@ export default function AuthPage() {
                           {loginMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Logging in...
+                              {t('loggingIn') || "Logging in..."}
                             </>
                           ) : (
-                            "Login"
+                            t('login') || "Login"
                           )}
                         </Button>
                       </form>
@@ -236,9 +236,9 @@ export default function AuthPage() {
               <TabsContent value="register">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Create New Account</CardTitle>
+                    <CardTitle>{t('registerTitle') || "Create New Account"}</CardTitle>
                     <CardDescription>
-                      Join SoulSync to begin your healing journey
+                      {t('registerDescription') || "Join SoulSync to begin your healing journey"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -249,9 +249,9 @@ export default function AuthPage() {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Name</FormLabel>
+                              <FormLabel>{t('name') || "Name"}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your name" {...field} />
+                                <Input placeholder={t('namePlaceholder') || "Your name"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -263,9 +263,9 @@ export default function AuthPage() {
                           name="username"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Username</FormLabel>
+                              <FormLabel>{t('username') || "Username"}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Choose a username" {...field} />
+                                <Input placeholder={t('usernamePlaceholder2') || "Choose a username"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -277,9 +277,9 @@ export default function AuthPage() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t('email') || "Email"}</FormLabel>
                               <FormControl>
-                                <Input type="email" placeholder="Your email address" {...field} />
+                                <Input type="email" placeholder={t('emailPlaceholder') || "Your email address"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -291,9 +291,9 @@ export default function AuthPage() {
                           name="password"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Password</FormLabel>
+                              <FormLabel>{t('password') || "Password"}</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Create a password" {...field} />
+                                <Input type="password" placeholder={t('passwordPlaceholder2') || "Create a password"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -305,9 +305,9 @@ export default function AuthPage() {
                           name="confirmPassword"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Confirm Password</FormLabel>
+                              <FormLabel>{t('confirmPassword') || "Confirm Password"}</FormLabel>
                               <FormControl>
-                                <Input type="password" placeholder="Confirm your password" {...field} />
+                                <Input type="password" placeholder={t('confirmPasswordPlaceholder') || "Confirm your password"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -322,10 +322,10 @@ export default function AuthPage() {
                           {registerMutation.isPending ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Creating account...
+                              {t('creatingAccount') || "Creating account..."}
                             </>
                           ) : (
-                            "Create Account"
+                            t('register') || "Create Account"
                           )}
                         </Button>
                       </form>
@@ -344,11 +344,9 @@ export default function AuthPage() {
             className="hidden md:block bg-gradient-to-br from-[#483D8B] to-[#008080] p-8 text-white flex items-center"
           >
             <div>
-              <h2 className="text-3xl font-heading font-bold mb-6">Transform Your Inner World</h2>
+              <h2 className="text-3xl font-heading font-bold mb-6">{t('transformTitle') || "Transform Your Inner World"}</h2>
               <p className="mb-8 opacity-90">
-                SoulSync uses advanced AI to guide you through a personalized journey of healing, 
-                self-discovery, and spiritual growth. Unlock your full potential and find balance 
-                in your chakras, emotions, and consciousness.
+                {t('transformDescription') || "SoulSync uses advanced AI to guide you through a personalized journey of healing, self-discovery, and spiritual growth. Unlock your full potential and find balance in your chakras, emotions, and consciousness."}
               </p>
               
               <div className="space-y-4">
@@ -357,8 +355,8 @@ export default function AuthPage() {
                     <span className="text-white text-sm">1</span>
                   </div>
                   <div>
-                    <h3 className="font-medium text-lg mb-1">Personalized Chakra Analysis</h3>
-                    <p className="opacity-80 text-sm">Discover your unique energy balance and areas for healing</p>
+                    <h3 className="font-medium text-lg mb-1">{t('feature1Title') || "Personalized Chakra Analysis"}</h3>
+                    <p className="opacity-80 text-sm">{t('feature1Description') || "Discover your unique energy balance and areas for healing"}</p>
                   </div>
                 </div>
                 
@@ -367,8 +365,8 @@ export default function AuthPage() {
                     <span className="text-white text-sm">2</span>
                   </div>
                   <div>
-                    <h3 className="font-medium text-lg mb-1">AI-Guided Healing Rituals</h3>
-                    <p className="opacity-80 text-sm">Follow customized practices to release blockages and restore balance</p>
+                    <h3 className="font-medium text-lg mb-1">{t('feature2Title') || "AI-Guided Healing Rituals"}</h3>
+                    <p className="opacity-80 text-sm">{t('feature2Description') || "Follow customized practices to release blockages and restore balance"}</p>
                   </div>
                 </div>
                 
@@ -377,8 +375,8 @@ export default function AuthPage() {
                     <span className="text-white text-sm">3</span>
                   </div>
                   <div>
-                    <h3 className="font-medium text-lg mb-1">Track Your Progress</h3>
-                    <p className="opacity-80 text-sm">Visualize your spiritual growth and emotional evolution over time</p>
+                    <h3 className="font-medium text-lg mb-1">{t('feature3Title') || "Track Your Progress"}</h3>
+                    <p className="opacity-80 text-sm">{t('feature3Description') || "Visualize your spiritual growth and emotional evolution over time"}</p>
                   </div>
                 </div>
               </div>
