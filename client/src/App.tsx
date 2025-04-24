@@ -22,6 +22,7 @@ import RitualCoursePage from "@/pages/RitualCoursePage";
 import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
+import { LanguageProvider } from "@/hooks/use-language";
 import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
@@ -69,8 +70,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router />
-        <Toaster />
+        <LanguageProvider>
+          <Router />
+          <Toaster />
+        </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
