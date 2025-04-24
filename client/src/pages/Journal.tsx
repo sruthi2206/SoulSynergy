@@ -388,12 +388,12 @@ export default function Journal() {
                     
                     <TabsContent value="general">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">💭 General Reflections</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.generalTitle || "💭 General Reflections"}</h3>
                         <p className="text-sm text-neutral-600">
-                          Write freely about your thoughts, emotions, and experiences
+                          {TRANSLATIONS[language]?.generalDescription || "Write freely about your thoughts, emotions, and experiences"}
                         </p>
                         <Textarea
-                          placeholder="How are you feeling today? What's on your mind?"
+                          placeholder={TRANSLATIONS[language]?.generalPlaceholder || "How are you feeling today? What's on your mind?"}
                           className="min-h-[200px] resize-none"
                           value={journalContent}
                           onChange={(e) => setJournalContent(e.target.value)}
@@ -403,16 +403,16 @@ export default function Journal() {
                     
                     <TabsContent value="gratitude">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">✨ I am grateful for...</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.gratitudeTitle || "✨ I am grateful for..."}</h3>
                         <p className="text-sm text-neutral-600">
-                          List things that brought you joy, peace, or inspiration today
+                          {TRANSLATIONS[language]?.gratitudeDescription || "List things that brought you joy, peace, or inspiration today"}
                         </p>
                         
                         <div className="space-y-2">
                           {gratitude.map((item, index) => (
                             <div key={`gratitude-${index}`} className="flex gap-2">
                               <Input
-                                placeholder={`Gratitude ${index + 1}`}
+                                placeholder={`${TRANSLATIONS[language]?.gratitudePlaceholder || "Gratitude"} ${index + 1}`}
                                 value={item}
                                 onChange={(e) => updateGratitude(index, e.target.value)}
                                 className="flex-grow"
@@ -438,7 +438,7 @@ export default function Journal() {
                             className="mt-2"
                           >
                             <PlusCircle className="h-4 w-4 mr-2" />
-                            Add Another
+                            {TRANSLATIONS[language]?.addAnother || "Add Another"}
                           </Button>
                         </div>
                       </div>
@@ -446,12 +446,12 @@ export default function Journal() {
                     
                     <TabsContent value="affirmation">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">🌟 Today's Affirmation</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.affirmationTitle || "🌟 Today's Affirmation"}</h3>
                         <p className="text-sm text-neutral-600">
-                          Write a positive I AM statement to align your energy
+                          {TRANSLATIONS[language]?.affirmationDescription || "Write a positive I AM statement to align your energy"}
                         </p>
                         <Input
-                          placeholder="I am..."
+                          placeholder={TRANSLATIONS[language]?.affirmationPlaceholder || "I am..."}
                           value={affirmation}
                           onChange={(e) => setAffirmation(e.target.value)}
                           className="w-full"
@@ -461,16 +461,16 @@ export default function Journal() {
                     
                     <TabsContent value="shortterm">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">🎯 Steps I will take today</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.shortTermTitle || "🎯 Steps I will take today"}</h3>
                         <p className="text-sm text-neutral-600">
-                          What key actions will move you forward today?
+                          {TRANSLATIONS[language]?.shortTermDescription || "What key actions will move you forward today?"}
                         </p>
                         
                         <div className="space-y-2">
                           {shortTermGoals.map((goal, index) => (
                             <div key={`goal-${index}`} className="flex gap-2">
                               <Input
-                                placeholder={`Step ${index + 1}`}
+                                placeholder={`${TRANSLATIONS[language]?.shortTermPlaceholder || "Step"} ${index + 1}`}
                                 value={goal}
                                 onChange={(e) => updateShortTermGoal(index, e.target.value)}
                                 className="flex-grow"
@@ -496,7 +496,7 @@ export default function Journal() {
                             className="mt-2"
                           >
                             <PlusCircle className="h-4 w-4 mr-2" />
-                            Add Another
+                            {TRANSLATIONS[language]?.addAnother || "Add Another"}
                           </Button>
                         </div>
                       </div>
@@ -504,12 +504,12 @@ export default function Journal() {
                     
                     <TabsContent value="longterm">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-neutral-800">🛤 Steps toward my long-term goals</h3>
+                        <h3 className="text-lg font-medium text-neutral-800">{TRANSLATIONS[language]?.longTermTitle || "🚀 Steps toward my long-term goals"}</h3>
                         <p className="text-sm text-neutral-600">
-                          What aligned actions or habits will move you toward your vision?
+                          {TRANSLATIONS[language]?.longTermDescription || "What aligned actions or habits will move you toward your vision?"}
                         </p>
                         <Textarea
-                          placeholder="My long-term vision includes..."
+                          placeholder={TRANSLATIONS[language]?.longTermPlaceholder || "My long-term vision includes..."}
                           className="min-h-[150px] resize-none"
                           value={longTermVision}
                           onChange={(e) => setLongTermVision(e.target.value)}
@@ -542,7 +542,7 @@ export default function Journal() {
                     className="bg-gradient-to-r from-[#483D8B] to-[#008080] text-white hover:opacity-90"
                     disabled={createJournalMutation.isPending}
                   >
-                    {createJournalMutation.isPending ? "Saving..." : "Save Entry"}
+                    {createJournalMutation.isPending ? "Saving..." : TRANSLATIONS[language]?.saveButton || "Save Entry"}
                   </Button>
                 </CardFooter>
               </form>
@@ -574,21 +574,27 @@ export default function Journal() {
                     <div className="bg-rose-50 p-4 rounded-lg border border-rose-100">
                       <div className="flex items-center mb-3">
                         <Sparkles className="h-5 w-5 mr-2 text-rose-600" />
-                        <span className="font-medium text-rose-800">Emotion Patterns</span>
+                        <span className="font-medium text-rose-800">{TRANSLATIONS[language]?.emotionPatterns || "Emotion Patterns"}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-2">
                         <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
-                          joy
+                          {language === "english" ? "joy" : language === "hindi" ? "आनंद" : language === "tamil" ? "மகிழ்ச்சி" : "joy"}
                         </Badge>
                         <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
-                          gratitude
+                          {language === "english" ? "gratitude" : language === "hindi" ? "कृतज्ञता" : language === "tamil" ? "நன்றி" : "gratitude"}
                         </Badge>
                         <Badge variant="secondary" className="bg-[#FF69B4]/10 text-[#FF69B4] hover:bg-[#FF69B4]/20">
-                          reflection
+                          {language === "english" ? "reflection" : language === "hindi" ? "चिंतन" : language === "tamil" ? "பிரதிபலிப்பு" : "reflection"}
                         </Badge>
                       </div>
                       <p className="text-sm text-rose-700">
-                        Your emotional state has been positive recently, with a focus on reflection and gratitude.
+                        {language === "english" 
+                          ? "Your emotional state has been positive recently, with a focus on reflection and gratitude."
+                          : language === "hindi" 
+                            ? "आपकी भावनात्मक स्थिति हाल ही में सकारात्मक रही है, जिसमें चिंतन और कृतज्ञता पर ध्यान केंद्रित है।"
+                            : language === "tamil"
+                              ? "உங்கள் உணர்ச்சி நிலை சமீபத்தில் நேர்மறையாக இருந்துள்ளது, பிரதிபலிப்பு மற்றும் நன்றியுணர்வை மையமாகக் கொண்டது."
+                              : "Your emotional state has been positive recently, with a focus on reflection and gratitude."}
                       </p>
                     </div>
                     
@@ -596,18 +602,24 @@ export default function Journal() {
                     <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
                       <div className="flex items-center mb-3">
                         <Sparkles className="h-5 w-5 mr-2 text-indigo-600" />
-                        <span className="font-medium text-indigo-800">Chakra Balance</span>
+                        <span className="font-medium text-indigo-800">{TRANSLATIONS[language]?.chakraBalance || "Chakra Balance"}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-2">
                         <Badge variant="secondary" className="bg-[#483D8B]/10 text-[#483D8B] hover:bg-[#483D8B]/20">
-                          throat chakra
+                          {language === "english" ? "throat chakra" : language === "hindi" ? "कंठ चक्र" : language === "tamil" ? "தொண்டை சக்கரம்" : "throat chakra"}
                         </Badge>
                         <Badge variant="secondary" className="bg-[#483D8B]/10 text-[#483D8B] hover:bg-[#483D8B]/20">
-                          heart chakra
+                          {language === "english" ? "heart chakra" : language === "hindi" ? "हृदय चक्र" : language === "tamil" ? "இதய சக்கரம்" : "heart chakra"}
                         </Badge>
                       </div>
                       <p className="text-sm text-indigo-700">
-                        Your journal entries show focus on expressing yourself (throat chakra) and processing emotions (heart chakra).
+                        {language === "english" 
+                          ? "Your journal entries show focus on expressing yourself (throat chakra) and processing emotions (heart chakra)."
+                          : language === "hindi" 
+                            ? "आपकी जर्नल प्रविष्टियां स्वयं को व्यक्त करने (कंठ चक्र) और भावनाओं को संसाधित करने (हृदय चक्र) पर ध्यान केंद्रित करती हैं।"
+                            : language === "tamil"
+                              ? "உங்கள் பதிவேடு உள்ளீடுகள் உங்களை வெளிப்படுத்துவதில் (தொண்டை சக்கரம்) மற்றும் உணர்வுகளை செயலாக்குவதில் (இதய சக்கரம்) கவனம் செலுத்துகின்றன."
+                              : "Your journal entries show focus on expressing yourself (throat chakra) and processing emotions (heart chakra)."}
                       </p>
                     </div>
                     
@@ -615,16 +627,32 @@ export default function Journal() {
                     <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
                       <div className="flex items-center mb-3">
                         <Target className="h-5 w-5 mr-2 text-emerald-600" />
-                        <span className="font-medium text-emerald-800">Goal Progress</span>
+                        <span className="font-medium text-emerald-800">{TRANSLATIONS[language]?.goalProgress || "Goal Progress"}</span>
                       </div>
                       <ul className="space-y-2 text-sm text-emerald-700">
                         <li className="flex items-start">
                           <div className="w-2 h-2 rounded-full bg-emerald-600 mr-2 mt-1.5"></div>
-                          <span>You're making steady progress on your meditation practice consistency</span>
+                          <span>
+                            {language === "english" 
+                              ? "You're making steady progress on your meditation practice consistency"
+                              : language === "hindi" 
+                                ? "आप अपने ध्यान अभ्यास की निरंतरता पर स्थिर प्रगति कर रहे हैं"
+                                : language === "tamil"
+                                  ? "நீங்கள் உங்கள் தியான பயிற்சி நிலைத்தன்மையில் நிலையான முன்னேற்றம் அடைகிறீர்கள்"
+                                  : "You're making steady progress on your meditation practice consistency"}
+                          </span>
                         </li>
                         <li className="flex items-start">
                           <div className="w-2 h-2 rounded-full bg-emerald-600 mr-2 mt-1.5"></div>
-                          <span>Focus on completing one short-term goal each day for better results</span>
+                          <span>
+                            {language === "english" 
+                              ? "Focus on completing one short-term goal each day for better results"
+                              : language === "hindi" 
+                                ? "बेहतर परिणामों के लिए प्रतिदिन एक अल्पकालिक लक्ष्य को पूरा करने पर ध्यान दें"
+                                : language === "tamil"
+                                  ? "சிறந்த முடிவுகளுக்கு ஒவ்வொரு நாளும் ஒரு குறுகிய கால இலக்கை நிறைவு செய்வதில் கவனம் செலுத்துங்கள்"
+                                  : "Focus on completing one short-term goal each day for better results"}
+                          </span>
                         </li>
                       </ul>
                     </div>
@@ -633,10 +661,16 @@ export default function Journal() {
                     <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
                       <div className="flex items-center mb-3">
                         <Sparkles className="h-5 w-5 mr-2 text-amber-600" />
-                        <span className="font-medium text-amber-800">Personalized Wisdom</span>
+                        <span className="font-medium text-amber-800">{TRANSLATIONS[language]?.personalizedWisdom || "Personalized Wisdom"}</span>
                       </div>
                       <p className="text-sm text-amber-700 mb-2 italic">
-                        "Your consistent journaling practice is building self-awareness. Consider adding a 5-minute meditation before journaling to deepen insights."
+                        {language === "english" 
+                          ? "\"Your consistent journaling practice is building self-awareness. Consider adding a 5-minute meditation before journaling to deepen insights.\""
+                          : language === "hindi" 
+                            ? "\"आपका निरंतर जर्नलिंग अभ्यास आत्म-जागरूकता का निर्माण कर रहा है। अंतर्दृष्टि को गहरा करने के लिए जर्नलिंग से पहले 5-मिनट का ध्यान जोड़ने पर विचार करें।\""
+                            : language === "tamil"
+                              ? "\"உங்கள் தொடர்ச்சியான பதிவு செய்யும் பயிற்சி சுய விழிப்புணர்வை உருவாக்குகிறது. பதிவு செய்வதற்கு முன் 5-நிமிட தியானத்தைச் சேர்த்து நுண்ணறிவுகளை ஆழப்படுத்த முயற்சிக்கவும்.\""
+                              : "\"Your consistent journaling practice is building self-awareness. Consider adding a 5-minute meditation before journaling to deepen insights.\""}
                       </p>
                     </div>
                   </div>
