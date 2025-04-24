@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { chakras } from "@/lib/chakras";
 
 interface EnhancedChakraQuizProps {
@@ -13,8 +13,16 @@ interface EnhancedChakraQuizProps {
   isSubmitting: boolean;
 }
 
+// Define question interface
+interface QuizQuestion {
+  id: string;
+  text: string;
+  chakra: string;
+  inverseScoring: boolean;
+}
+
 // Questions for the 5-step chakra assessment
-const questionsByStep = [
+const questionsByStep: QuizQuestion[][] = [
   // Step 1: Mind Level Questions
   [
     {
@@ -212,14 +220,46 @@ const questionsByStep = [
   ]
 ];
 
-// Options for the Likert scale
-const options = [
-  { value: "1", label: "Never" },
-  { value: "2", label: "Rarely" },
-  { value: "3", label: "Sometimes" },
-  { value: "4", label: "Often" },
-  { value: "5", label: "Always" }
-];
+// Define option interface
+interface QuestionOption {
+  value: string;
+  label: string;
+  description?: string;
+}
+
+// Dynamic options based on question type
+const getOptionsForQuestion = (questionId: string): QuestionOption[] => {
+  // For situational responses (step 4)
+  if (questionId.startsWith("hs")) {
+    return [
+      { value: "1", label: "Very uncomfortable", description: "I would avoid this completely" },
+      { value: "2", label: "Somewhat uncomfortable", description: "I would feel anxious but try" },
+      { value: "3", label: "Neutral", description: "I could manage this situation" },
+      { value: "4", label: "Somewhat comfortable", description: "I would feel at ease" },
+      { value: "5", label: "Very comfortable", description: "I would thrive in this situation" }
+    ];
+  }
+  
+  // For reflection questions (step 5)
+  if (questionId.startsWith("r")) {
+    return [
+      { value: "1", label: "Not at all", description: "This is a significant challenge for me" },
+      { value: "2", label: "Slightly", description: "I struggle with this frequently" },
+      { value: "3", label: "Moderately", description: "I have mixed success with this" },
+      { value: "4", label: "Considerably", description: "I do this well most of the time" },
+      { value: "5", label: "Completely", description: "This is a consistent strength of mine" }
+    ];
+  }
+  
+  // Default frequency options for most questions
+  return [
+    { value: "1", label: "Never", description: "This doesn't apply to me at all" },
+    { value: "2", label: "Rarely", description: "This applies to me occasionally" },
+    { value: "3", label: "Sometimes", description: "This applies to me about half the time" },
+    { value: "4", label: "Often", description: "This applies to me most of the time" },
+    { value: "5", label: "Always", description: "This applies to me consistently" }
+  ];
+};
 
 export default function EnhancedChakraQuiz({ onComplete, isSubmitting }: EnhancedChakraQuizProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -406,17 +446,22 @@ export default function EnhancedChakraQuiz({ onComplete, isSubmitting }: Enhance
                 className="space-y-3"
                 onValueChange={handleAnswer}
               >
-                {options.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
-                    <RadioGroupItem 
-                      value={option.value} 
-                      id={`${currentQuestion.id}-${option.value}`}
-                    />
+                {getOptionsForQuestion(currentQuestion.id).map((option) => (
+                  <div key={option.value} className="flex items-start space-x-2 border border-neutral-200 rounded-lg p-3 hover:bg-neutral-50 transition-colors">
+                    <div className="pt-1">
+                      <RadioGroupItem 
+                        value={option.value} 
+                        id={`${currentQuestion.id}-${option.value}`}
+                      />
+                    </div>
                     <Label 
                       htmlFor={`${currentQuestion.id}-${option.value}`}
-                      className="flex-1 py-2 cursor-pointer"
+                      className="flex-1 cursor-pointer"
                     >
-                      {option.label}
+                      <div className="font-medium">{option.label}</div>
+                      {option.description && (
+                        <div className="text-sm text-neutral-500 mt-1">{option.description}</div>
+                      )}
                     </Label>
                   </div>
                 ))}
