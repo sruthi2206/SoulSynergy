@@ -138,23 +138,8 @@ export default function EnhancedChakraQuiz({ onComplete, isSubmitting }: Enhance
   // Check if assessment is complete
   const isAssessmentComplete = stepComplete.every(step => step);
   
-  // Get step title
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 0:
-        return "Mind Level Assessment";
-      case 1:
-        return "Thought Process Assessment";
-      case 2:
-        return "Practical Implementation";
-      case 3:
-        return "Situational Response";
-      case 4:
-        return "Reflection & Integration";
-      default:
-        return "Chakra Assessment";
-    }
-  };
+  // Use step title from the library
+  const stepTitle = getStepTitle(currentStep);
   
   return (
     <div className="max-w-3xl mx-auto">
@@ -191,7 +176,7 @@ export default function EnhancedChakraQuiz({ onComplete, isSubmitting }: Enhance
       {/* Current question card */}
       <Card className="mb-8">
         <CardHeader className="text-center">
-          <CardTitle>{getStepTitle()}</CardTitle>
+          <CardTitle>{stepTitle}</CardTitle>
         </CardHeader>
         <CardContent>
           <AnimatePresence mode="wait">
