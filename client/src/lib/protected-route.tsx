@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
+import { Redirect, Route, useLocation } from "wouter";
 
 export function ProtectedRoute({
   path,
@@ -10,6 +10,7 @@ export function ProtectedRoute({
   component: () => React.JSX.Element;
 }) {
   const { user, isLoading } = useAuth();
+  const [location] = useLocation();
 
   if (isLoading) {
     return (
@@ -25,6 +26,32 @@ export function ProtectedRoute({
     return (
       <Route path={path}>
         <Redirect to="/auth" />
+      </Route>
+    );
+  }
+
+  // Check if user is within trial period (7 days from account creation)
+  const shouldRedirectToMembership = () => {
+    if (path === "/membership") return false; // Don't redirect if already on membership page
+    
+    // Admin users don't need to be redirected to membership
+    if (user.isAdmin) return false;
+    
+    // Make sure createdAt exists before trying to use it
+    if (!user.createdAt) return false;
+    
+    const createdAt = new Date(user.createdAt);
+    const now = new Date();
+    const differenceInDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Redirect if trial period (7 days) has ended
+    return differenceInDays > 7;
+  };
+
+  if (shouldRedirectToMembership()) {
+    return (
+      <Route path={path}>
+        <Redirect to="/membership" />
       </Route>
     );
   }
