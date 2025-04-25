@@ -64,6 +64,7 @@ export default function Journal() {
       const filteredGratitude = gratitude.filter(item => item.trim() !== "");
       const filteredShortTermGoals = shortTermGoals.filter(item => item.trim() !== "");
       
+      // Always use "english" for language to ensure consistency
       const response = await apiRequest("POST", "/api/journal-entries", {
         userId: user?.id,
         content: journalContent,
@@ -71,7 +72,7 @@ export default function Journal() {
         affirmation,
         shortTermGoals: filteredShortTermGoals,
         longTermVision,
-        language
+        language: "english" // Force English language for journal entries
       });
       return response.json();
     },
