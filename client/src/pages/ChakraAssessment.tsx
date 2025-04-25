@@ -5,7 +5,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, ArrowRight, Download, Check } from "lucide-react";
 import { chakras, getChakraStatus } from "@/lib/chakras";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -19,9 +21,9 @@ export default function ChakraAssessment() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("quiz");
+  const [activeTab, setActiveTab] = useState("manual");
   const [completeStep, setCompleteStep] = useState(false);
-  const [showIntroduction, setShowIntroduction] = useState(false); // Start with quiz directly, no introduction
+  const [showIntroduction, setShowIntroduction] = useState(true);
   
   // Fetch user's chakra profile
   const { data: chakraProfile, isLoading: isLoadingChakraProfile } = useQuery({
@@ -295,7 +297,7 @@ export default function ChakraAssessment() {
                 isSubmitting={false}
               />
             )}
-          </div>
+          </Tabs>
         )}
       </div>
     </div>
