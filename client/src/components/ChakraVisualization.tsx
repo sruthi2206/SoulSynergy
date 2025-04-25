@@ -117,15 +117,20 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
         <p className="text-neutral-600 max-w-xl mx-auto mb-4">
           Explore your energy centers and receive personalized insights based on your unique chakra configuration.
         </p>
-        <Button 
-          onClick={() => setLocation('/chakra-assessment')}
-          className="mx-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 animate-pulse transform hover:scale-105 transition-all"
-          size="lg"
-        >
-          <ClipboardList className="mr-2 h-5 w-5" />
-          Take Guided Chakra Assessment
-        </Button>
-        <p className="text-sm text-purple-600 mt-2 font-medium">Discover your complete energy profile with our in-depth assessment!</p>
+        <div className="relative inline-block">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-lg blur-lg opacity-70 animate-pulse"></div>
+          <Button 
+            onClick={() => setLocation('/chakra-assessment')}
+            className="relative mx-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 transform hover:scale-105 transition-all"
+            size="lg"
+          >
+            <ClipboardList className="mr-2 h-5 w-5" />
+            Take Guided Chakra Assessment
+          </Button>
+        </div>
+        <div className="mt-4 px-4 py-2 bg-purple-50 rounded-lg inline-block border border-purple-100">
+          <p className="text-sm text-purple-800 font-medium">✨ Discover your complete energy profile with our in-depth assessment! ✨</p>
+        </div>
       </div>
       
       <Tabs defaultValue="visualization" className="w-full">
@@ -199,13 +204,16 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                 </div>
               </CardContent>
               <CardFooter>
-                <Button 
-                  onClick={() => setLocation('/chakra-assessment')}
-                  className="w-full bg-[#7c3aed] hover:bg-opacity-90 animate-pulse"
-                >
-                  <ClipboardList className="mr-2 h-4 w-4" />
-                  Take Full Chakra Assessment
-                </Button>
+                <div className="w-full relative">
+                  <div className="absolute inset-0 bg-purple-500 rounded-md blur opacity-60 animate-pulse"></div>
+                  <Button 
+                    onClick={() => setLocation('/chakra-assessment')}
+                    className="w-full relative bg-[#7c3aed] hover:bg-opacity-90"
+                  >
+                    <ClipboardList className="mr-2 h-4 w-4" />
+                    Take Full Chakra Assessment
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
             
