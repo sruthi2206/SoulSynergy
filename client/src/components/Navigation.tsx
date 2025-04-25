@@ -17,21 +17,19 @@ export default function Navigation() {
   // Check if user is in trial period
   useEffect(() => {
     if (user) {
-      // For demo, make HNO22 always within trial period
-      const withinTrial = user.username === "HNO22";
-      setInTrialPeriod(withinTrial);
+      // For demo purposes, set trial status regardless of username
+      setInTrialPeriod(false);
       
-      // Conditionally show menu items based on trial period status
-      if (user.isAdmin || withinTrial) {
-        // Show all menu items during trial period
+      // Hide premium sections completely for now
+      // Only show essential navigation items for all users
+      setVisibleItems([
+        "Dashboard", "Journal", "AI Coaches", "Chakra Assessment"
+      ]);
+      
+      // Admin users can see all items if needed
+      if (user.isAdmin) {
         setVisibleItems([
-          "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", 
-          "Healing Rituals", "Community", "Membership"
-        ]);
-      } else {
-        // Outside trial period, only show essential items plus membership
-        setVisibleItems([
-          "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", "Membership"
+          "Dashboard", "Journal", "AI Coaches", "Chakra Assessment"
         ]);
       }
     }
