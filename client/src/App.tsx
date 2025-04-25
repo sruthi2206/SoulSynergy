@@ -17,6 +17,7 @@ import AdminDashboardPage from "@/pages/AdminDashboardPage";
 import AdminLoginPage from "@/pages/AdminLoginPage";
 import ChakraAssessment from "@/pages/ChakraAssessment";
 import ChakraReport from "@/pages/ChakraReport";
+import ChakraInformation from "@/pages/ChakraInformation";
 import HealingRitualsPage from "@/pages/HealingRitualsPage";
 import RitualCoursePage from "@/pages/RitualCoursePage";
 import AuthPage from "@/pages/auth-page";
@@ -52,6 +53,7 @@ function Router() {
           <ProtectedRoute path="/membership" component={Membership} />
           <ProtectedRoute path="/chakra-assessment" component={ChakraAssessment} />
           <ProtectedRoute path="/chakra-report" component={ChakraReport} />
+          <ProtectedRoute path="/chakra-information" component={ChakraInformation} />
           <ProtectedRoute path="/healing-rituals" component={HealingRitualsPage} />
           <ProtectedRoute path="/courses/:courseId" component={RitualCoursePage} />
           
