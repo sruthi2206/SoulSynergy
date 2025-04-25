@@ -401,6 +401,21 @@ export default function Membership() {
   const [, setLocation] = useLocation();
   const [trialInfo, setTrialInfo] = useState<{ daysLeft: number; isTrialEnded: boolean } | null>(null);
   
+  // Calculate trial period information when user data is available
+  useEffect(() => {
+    if (user && user.createdAt) {
+      const createdAt = new Date(user.createdAt);
+      const now = new Date();
+      const differenceInDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+      const daysLeft = Math.max(0, 7 - differenceInDays);
+      
+      setTrialInfo({
+        daysLeft,
+        isTrialEnded: differenceInDays > 7
+      });
+    }
+  }, [user]);
+
   const handleSelectPlan = (plan: PricingPlan) => {
     if (!user) {
       toast({
@@ -446,6 +461,52 @@ export default function Membership() {
           </div>
         ) : (
           <>
+            {/* Trial Banner */}
+            {trialInfo && (
+              <motion.div
+                className={`mb-8 p-4 rounded-xl shadow-md ${
+                  trialInfo.isTrialEnded 
+                    ? "bg-red-50 border border-red-100" 
+                    : "bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100"
+                }`}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="flex flex-col md:flex-row items-center justify-between">
+                  <div className="flex items-center mb-4 md:mb-0">
+                    {trialInfo.isTrialEnded ? (
+                      <AlertTriangle className="h-10 w-10 text-red-500 mr-4 flex-shrink-0" />
+                    ) : (
+                      <Star className="h-10 w-10 text-purple-500 mr-4 flex-shrink-0" />
+                    )}
+                    <div>
+                      <h3 className={`text-lg font-medium ${trialInfo.isTrialEnded ? "text-red-700" : "text-purple-700"}`}>
+                        {trialInfo.isTrialEnded 
+                          ? "Your Free Trial Has Ended" 
+                          : `Your Free Trial: ${trialInfo.daysLeft} ${trialInfo.daysLeft === 1 ? "day" : "days"} remaining`
+                        }
+                      </h3>
+                      <p className={trialInfo.isTrialEnded ? "text-red-600" : "text-purple-600"}>
+                        {trialInfo.isTrialEnded 
+                          ? "Please subscribe to continue enjoying premium features" 
+                          : "Subscribe now to maintain uninterrupted access to all premium features"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  {trialInfo.isTrialEnded && (
+                    <Button 
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                      onClick={() => document.getElementById("pricing-plans")?.scrollIntoView({ behavior: "smooth" })}
+                    >
+                      Subscribe Now
+                    </Button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             <motion.div
               className="text-center mb-12"
               initial={{ opacity: 0, y: -20 }}
@@ -462,6 +523,7 @@ export default function Membership() {
             
             {/* Pricing Plans */}
             <motion.div
+              id="pricing-plans"
               className="mb-20"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -572,6 +634,7 @@ export default function Membership() {
                           {plan.interval === "year" && (
                             <div className="text-sm text-gray-500 mt-1">Billed annually, cancel anytime</div>
                           )}
+                          <div className="text-xs text-indigo-600 font-medium mt-1">Includes 7-day free trial for new users</div>
                         </div>
                         
                         <Button

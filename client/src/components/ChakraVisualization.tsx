@@ -114,9 +114,17 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-heading font-bold mb-2">Your Chakra Balance</h2>
-        <p className="text-neutral-600 max-w-xl mx-auto">
+        <p className="text-neutral-600 max-w-xl mx-auto mb-4">
           Explore your energy centers and receive personalized insights based on your unique chakra configuration.
         </p>
+        <Button 
+          onClick={() => setLocation('/chakra-assessment')}
+          className="mx-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200"
+          size="lg"
+        >
+          <ClipboardList className="mr-2 h-5 w-5" />
+          Take Guided Chakra Assessment
+        </Button>
       </div>
       
       <Tabs defaultValue="visualization" className="w-full">
