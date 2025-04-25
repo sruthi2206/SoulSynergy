@@ -5,9 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, ArrowRight, Download, Check, ClipboardCheck, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { chakras, getChakraStatus } from "@/lib/chakras";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -206,12 +204,17 @@ export default function ChakraAssessment() {
               <div className="relative inline-block mb-4">
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-lg blur-lg opacity-70 animate-pulse"></div>
                 <Button 
-                  onClick={() => setActiveTab("quiz")}
+                  onClick={() => {
+                    // Show quiz directly without showing tabs
+                    setActiveTab("quiz");
+                    // Start a new quiz immediately
+                    setCompleteStep(false);
+                  }}
                   className="relative w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 transform hover:scale-105 transition-all"
                   size="lg"
                 >
                   <Check className="mr-2 h-5 w-5" />
-                  Take Guided Chakra Assessment
+                  Start Guided Chakra Assessment
                 </Button>
               </div>
               <div className="px-4 py-2 bg-purple-50 rounded-lg inline-block border border-purple-100">
@@ -224,157 +227,8 @@ export default function ChakraAssessment() {
         {showIntroduction ? (
           <ChakraIntroduction onStartTest={() => setShowIntroduction(false)} />
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-5xl mx-auto">
-          <TabsList className="grid grid-cols-2 mb-6">
-            <TabsTrigger value="manual">Manual Adjustment</TabsTrigger>
-            <TabsTrigger value="quiz">Guided Assessment Quiz</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="manual" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Chakra Wheel Visualization */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Chakra Visualization</CardTitle>
-                  <CardDescription>
-                    A visual representation of your energy centers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center justify-center p-6">
-                  <ChakraWheel 
-                    size={300} 
-                    animated={true} 
-                    values={chakraValues}
-                  />
-                </CardContent>
-              </Card>
-              
-              {/* Chakra Sliders */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Adjust Your Chakras</CardTitle>
-                  <CardDescription>
-                    Slide to match your current energy state for each chakra
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {chakras.map((chakra) => {
-                      const status = getChakraStatus(chakraValues[chakra.key]);
-                      return (
-                        <div key={chakra.key}>
-                          <div className="flex justify-between mb-2">
-                            <div className="flex items-center">
-                              <div 
-                                className="w-4 h-4 rounded-full mr-2"
-                                style={{ backgroundColor: chakra.color }}
-                              ></div>
-                              <span className="font-medium">{chakra.name}</span>
-                            </div>
-                            <span 
-                              className="text-sm" 
-                              style={{ color: chakra.color }}
-                            >
-                              {status.status}
-                            </span>
-                          </div>
-                          <Slider
-                            value={[chakraValues[chakra.key]]}
-                            min={1}
-                            max={10}
-                            step={1}
-                            onValueChange={(value) => handleChakraChange(chakra.key, value)}
-                            className="mb-1"
-                          />
-                          <div className="text-xs text-neutral-500 flex justify-between">
-                            <span>Blocked</span>
-                            <span>Balanced</span>
-                            <span>Overactive</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    onClick={handleSave} 
-                    className="w-full bg-[#483D8B] hover:bg-opacity-90"
-                    disabled={saveProfileMutation.isPending}
-                  >
-                    {saveProfileMutation.isPending ? (
-                      <>
-                        <div className="w-4 h-4 mr-2 rounded-full border-2 border-t-transparent border-white animate-spin"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        Save and Continue to Report
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
-                    )}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-            
-            {/* Chakra Descriptions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Understanding Your Chakras</CardTitle>
-                <CardDescription>
-                  Learn about each energy center and what its balance means for your well-being
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {chakras.map((chakra) => (
-                    <div 
-                      key={chakra.key} 
-                      className="p-4 border rounded-lg"
-                      style={{ borderLeftWidth: '4px', borderLeftColor: chakra.color }}
-                    >
-                      <div className="flex items-center mb-2">
-                        <div 
-                          className="w-6 h-6 rounded-full mr-3"
-                          style={{ backgroundColor: chakra.color }}
-                        ></div>
-                        <h3 className="font-medium text-lg">{chakra.name} ({chakra.sanskritName})</h3>
-                      </div>
-                      
-                      <p className="text-neutral-700 mb-3">{chakra.description}</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <h4 className="font-semibold mb-1">Physical Associations</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {chakra.physicalAssociations.map((item, index) => (
-                              <span key={index} className="bg-neutral-100 px-2 py-1 rounded-full">
-                                {item}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-semibold mb-1">Psychological Associations</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {chakra.psychologicalAssociations.map((item, index) => (
-                              <span key={index} className="bg-neutral-100 px-2 py-1 rounded-full">
-                                {item}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="quiz" className="space-y-6">
+          <div className="max-w-5xl mx-auto">
+            {/* Always show either the quiz or its results */}
             {completeStep ? (
               <Card>
                 <CardHeader>
@@ -453,8 +307,7 @@ export default function ChakraAssessment() {
                 isSubmitting={false}
               />
             )}
-          </TabsContent>
-        </Tabs>
+          </div>
         )}
       </div>
     </div>
