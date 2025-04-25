@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,35 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
+  const [inTrialPeriod, setInTrialPeriod] = useState(true);
+  const [visibleItems, setVisibleItems] = useState<string[]>([
+    "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", "Membership"
+  ]);
+  
+  // Check if user is in trial period
+  useEffect(() => {
+    if (user && user.createdAt) {
+      const createdAt = new Date(user.createdAt);
+      const now = new Date();
+      const differenceInDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // If within 7 days trial or user is admin, show all menu items
+      const withinTrial = differenceInDays <= 7;
+      setInTrialPeriod(withinTrial);
+      
+      if (user.isAdmin || withinTrial) {
+        setVisibleItems([
+          "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", 
+          "Healing Rituals", "Community", "Membership"
+        ]);
+      } else {
+        // Outside trial period, only show essential items plus membership
+        setVisibleItems([
+          "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", "Membership"
+        ]);
+      }
+    }
+  }, [user]);
   
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -94,7 +123,7 @@ export default function Navigation() {
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
-              {navItems.map((item, index) => {
+              {navItems.filter(item => visibleItems.includes(item.name)).map((item, index) => {
                 if (item.dropdownItems) {
                   return (
                     <div key={index} className="relative group">
@@ -183,7 +212,7 @@ export default function Navigation() {
           >
             <div className="container mx-auto px-4 py-4">
               <div className="flex flex-col space-y-2">
-                {navItems.map((item, index) => {
+                {navItems.filter(item => visibleItems.includes(item.name)).map((item, index) => {
                   if (item.dropdownItems) {
                     return (
                       <div key={index} className="space-y-1">
