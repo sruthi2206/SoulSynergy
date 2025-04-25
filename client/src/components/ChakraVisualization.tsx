@@ -318,20 +318,14 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                 <Button 
                   variant="outline" 
                   className="flex-1" 
-                  onClick={() => {
-                    const loc = window.location;
-                    loc.assign(`${loc.protocol}//${loc.host}/chakra-assessment`);
-                  }}
+                  onClick={() => window.location.href = '/chakra-assessment'}
                 >
                   Update Assessment
                 </Button>
                 <Button 
                   variant="outline" 
                   className="flex-1" 
-                  onClick={() => {
-                    const loc = window.location;
-                    loc.assign(`${loc.protocol}//${loc.host}/chakra-report`);
-                  }}
+                  onClick={() => window.location.href = '/chakra-report'}
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   View Detailed Report
@@ -542,7 +536,10 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                 <Download className="w-4 h-4 mr-2" />
                 Download Report
               </Button>
-              <Button className="bg-[#483D8B] hover:bg-opacity-90">
+              <Button 
+                className="bg-[#483D8B] hover:bg-opacity-90"
+                onClick={() => window.location.href = `/coach/integration`}
+              >
                 Book a Healing Session
               </Button>
             </CardFooter>
