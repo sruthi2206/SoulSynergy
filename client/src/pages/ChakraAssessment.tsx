@@ -19,9 +19,9 @@ export default function ChakraAssessment() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("manual");
+  const [activeTab, setActiveTab] = useState("quiz");
   const [completeStep, setCompleteStep] = useState(false);
-  const [showIntroduction, setShowIntroduction] = useState(true);
+  const [showIntroduction, setShowIntroduction] = useState(false); // Start with quiz directly, no introduction
   
   // Fetch user's chakra profile
   const { data: chakraProfile, isLoading: isLoadingChakraProfile } = useQuery({
@@ -199,29 +199,17 @@ export default function ChakraAssessment() {
             Evaluate your energy centers to receive personalized insights and healing recommendations
           </p>
           
-          {!showIntroduction && (
-            <div className="max-w-md mx-auto">
-              <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-lg blur-lg opacity-70 animate-pulse"></div>
-                <Button 
-                  onClick={() => {
-                    // Show quiz directly without showing tabs
-                    setActiveTab("quiz");
-                    // Start a new quiz immediately
-                    setCompleteStep(false);
-                  }}
-                  className="relative w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 transform hover:scale-105 transition-all"
-                  size="lg"
-                >
-                  <Check className="mr-2 h-5 w-5" />
-                  Start Guided Chakra Assessment
-                </Button>
-              </div>
-              <div className="px-4 py-2 bg-purple-50 rounded-lg inline-block border border-purple-100">
-                <p className="text-sm text-purple-800 font-medium">✨ Discover your complete energy profile with our in-depth assessment! ✨</p>
+          <div className="max-w-xl mx-auto mb-8">
+            <div className="px-6 py-4 bg-purple-50 rounded-lg border border-purple-100 text-center">
+              <h3 className="text-lg font-medium text-purple-800 mb-2">Instructions</h3>
+              <p className="text-purple-700 mb-4">Answer honestly for the most accurate assessment of your chakra energy centers.</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <span className="bg-purple-100 px-3 py-1 rounded-full text-sm text-purple-800">35 questions</span>
+                <span className="bg-purple-100 px-3 py-1 rounded-full text-sm text-purple-800">5-10 minutes</span>
+                <span className="bg-purple-100 px-3 py-1 rounded-full text-sm text-purple-800">Personalized results</span>
               </div>
             </div>
-          )}
+          </div>
         </motion.div>
         
         {showIntroduction ? (
