@@ -119,12 +119,13 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
         </p>
         <Button 
           onClick={() => setLocation('/chakra-assessment')}
-          className="mx-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200"
+          className="mx-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 animate-pulse transform hover:scale-105 transition-all"
           size="lg"
         >
           <ClipboardList className="mr-2 h-5 w-5" />
           Take Guided Chakra Assessment
         </Button>
+        <p className="text-sm text-purple-600 mt-2 font-medium">Discover your complete energy profile with our in-depth assessment!</p>
       </div>
       
       <Tabs defaultValue="visualization" className="w-full">
@@ -200,10 +201,10 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
               <CardFooter>
                 <Button 
                   onClick={() => setLocation('/chakra-assessment')}
-                  className="w-full bg-[#7c3aed] hover:bg-opacity-90"
+                  className="w-full bg-[#7c3aed] hover:bg-opacity-90 animate-pulse"
                 >
                   <ClipboardList className="mr-2 h-4 w-4" />
-                  Guided Assessment Quiz
+                  Take Full Chakra Assessment
                 </Button>
               </CardFooter>
             </Card>
