@@ -124,10 +124,7 @@ export default function DashboardOverview({
                   variant="outline" 
                   size="sm" 
                   className="w-full"
-                  onClick={() => {
-                    const loc = window.location;
-                    loc.assign(`${loc.protocol}//${loc.host}/chakra-report`);
-                  }}
+                  onClick={() => window.location.href = '/chakra-report'}
                 >
                   <Info className="h-4 w-4 mr-2" />
                   View Details
