@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import ChakraWheel from "@/components/ChakraWheel";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
