@@ -120,15 +120,16 @@ export default function DashboardOverview({
                   </span>
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => window.location.href = '/chakra-report'}
-                >
-                  <Info className="h-4 w-4 mr-2" />
-                  View Details
-                </Button>
+                <Link href="/chakra-report">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                  >
+                    <Info className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
@@ -189,11 +190,13 @@ export default function DashboardOverview({
               ) : (
                 <div className="text-center py-4">
                   <div className="text-sm text-neutral-500 mb-3">No emotion tracked yet</div>
-                  <Link href="/dashboard?tab=emotions">
-                    <Button size="sm" className="bg-[#483D8B] hover:bg-opacity-90">
-                      Track Emotion
-                    </Button>
-                  </Link>
+                  <Button 
+                    size="sm" 
+                    className="bg-[#483D8B] hover:bg-opacity-90"
+                    onClick={() => window.location.href = "/dashboard?tab=emotions"}
+                  >
+                    Track Emotion
+                  </Button>
                 </div>
               )}
             </CardContent>
