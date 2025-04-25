@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -8,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { chakras, getChakraStatus, getOverallChakraBalance, getChakraRecommendations } from "@/lib/chakras";
-import { ChevronDown, ChevronUp, Download, FilePlus, FileText } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, FilePlus, FileText, ClipboardList } from "lucide-react";
 
 interface ChakraVisualizationProps {
   chakraProfile?: any;
@@ -17,6 +18,7 @@ interface ChakraVisualizationProps {
 export default function ChakraVisualization({ chakraProfile }: ChakraVisualizationProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [expandedChakra, setExpandedChakra] = useState<string | null>(null);
   
   // Create state for chakra values (initialize from profile or default)
@@ -187,6 +189,15 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                   </svg>
                 </div>
               </CardContent>
+              <CardFooter>
+                <Button 
+                  onClick={() => setLocation('/chakra-assessment')}
+                  className="w-full bg-[#7c3aed] hover:bg-opacity-90"
+                >
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  Guided Assessment Quiz
+                </Button>
+              </CardFooter>
             </Card>
             
             {/* Chakra Sliders */}
