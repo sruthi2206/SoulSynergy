@@ -316,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Journal entry routes
   app.post(`${apiRouter}/journal-entries`, async (req, res) => {
     try {
-      const {
+      let {
         content = "",
         gratitude = [],
         affirmation = "",
@@ -334,6 +334,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!content && gratitude.length === 0 && !affirmation && shortTermGoals.length === 0 && !longTermVision) {
         return res.status(400).json({ message: 'At least one journal section must be filled' });
       }
+      
+      // Force English language for consistency
+      language = "english";
       
       // Analyze the journal entry with OpenAI
       const analysis = await analyzeJournalEntry({
