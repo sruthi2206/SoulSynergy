@@ -106,7 +106,7 @@ const faqData = [
   },
   {
     question: "Is there a free trial available?",
-    answer: "We don't currently offer a free trial, but we do have a 14-day money-back guarantee if you're not satisfied with your membership."
+    answer: "Yes! We offer a 7-day free trial for all new users. After your trial period ends, you'll need to subscribe to continue accessing premium features."
   },
   {
     question: "Can I switch between monthly and yearly plans?",
@@ -399,6 +399,7 @@ export default function Membership() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const [trialInfo, setTrialInfo] = useState<{ daysLeft: number; isTrialEnded: boolean } | null>(null);
   
   const handleSelectPlan = (plan: PricingPlan) => {
     if (!user) {
