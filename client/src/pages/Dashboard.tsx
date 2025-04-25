@@ -171,7 +171,10 @@ export default function Dashboard() {
                 </TabsContent>
                 
                 <TabsContent value="chakra" className="mt-0">
-                  <ChakraVisualization chakraProfile={chakraProfile} />
+                  {/* Remove any wrapping Card component for ChakraVisualization */}
+                  <div className="bg-white rounded-lg p-6 shadow-sm">
+                    <ChakraVisualization chakraProfile={chakraProfile} />
+                  </div>
                 </TabsContent>
                 
 
