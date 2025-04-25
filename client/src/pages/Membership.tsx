@@ -430,9 +430,46 @@ export default function Membership() {
     setShowCheckout(true);
   };
   
+  // For demo purposes - hardcode trial info for HNO22 user
+  useEffect(() => {
+    if (user && user.username === "HNO22") {
+      setTrialInfo({
+        daysLeft: 5,
+        isTrialEnded: false
+      });
+    }
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-neutral-50 pt-20 pb-16">
       <div className="container mx-auto px-4">
+        {/* Trial Period Banner - Only show if trial data is available */}
+        {trialInfo && !trialInfo.isTrialEnded && (
+          <div className="mb-8 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-full p-2 mr-4">
+                  <Star className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Your Free Trial Period: {trialInfo.daysLeft} days remaining
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    You're currently enjoying all premium features! Subscribe before your trial ends to continue.
+                  </p>
+                </div>
+              </div>
+              <Button 
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow"
+                onClick={() => setBillingInterval("year")}
+              >
+                Subscribe Now
+              </Button>
+            </div>
+          </div>
+        )}
+        
         {showCheckout ? (
           <div className="max-w-md mx-auto">
             <Button 

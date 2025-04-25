@@ -14,24 +14,16 @@ export default function Navigation() {
     "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", "Membership"
   ]);
   
-  // Check if user is in trial period - for demo purposes, we'll use a fixed demo user
+  // Check if user is in trial period
   useEffect(() => {
     if (user) {
-      // Demo data for trial period - will be true for username HNO22 (for demo)
-      // In a real application, we would use the actual createdAt date
+      // For demo, make HNO22 always within trial period
       const withinTrial = user.username === "HNO22";
       setInTrialPeriod(withinTrial);
       
-      // For demo, we'll always show all menu items
-      // In a real implementation, we would check the trial period
-      setVisibleItems([
-        "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", 
-        "Healing Rituals", "Community", "Membership"
-      ]);
-      
-      // Uncomment this for real implementation
-      /*
+      // Conditionally show menu items based on trial period status
       if (user.isAdmin || withinTrial) {
+        // Show all menu items during trial period
         setVisibleItems([
           "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", 
           "Healing Rituals", "Community", "Membership"
@@ -42,7 +34,6 @@ export default function Navigation() {
           "Dashboard", "Journal", "AI Coaches", "Chakra Assessment", "Membership"
         ]);
       }
-      */
     }
   }, [user]);
   

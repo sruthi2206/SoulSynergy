@@ -37,6 +37,9 @@ export function ProtectedRoute({
     // Admin users don't need to be redirected to membership
     if (user.isAdmin) return false;
     
+    // For demo purposes only: HNO22 user is always considered within trial period
+    if (user.username === "HNO22") return false;
+    
     // Make sure createdAt exists before trying to use it
     if (!user.createdAt) return false;
     
