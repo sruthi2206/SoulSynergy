@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, ArrowRight, Download, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, Check, ClipboardCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { chakras, getChakraStatus } from "@/lib/chakras";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -197,9 +197,28 @@ export default function ChakraAssessment() {
           <h1 className="text-3xl font-heading font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#483D8B] to-[#008080]">
             Chakra Assessment
           </h1>
-          <p className="text-neutral-600 max-w-xl mx-auto">
+          <p className="text-neutral-600 max-w-xl mx-auto mb-6">
             Evaluate your energy centers to receive personalized insights and healing recommendations
           </p>
+          
+          {!showIntroduction && (
+            <div className="max-w-md mx-auto">
+              <div className="relative inline-block mb-4">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-lg blur-lg opacity-70 animate-pulse"></div>
+                <Button 
+                  onClick={() => setActiveTab("quiz")}
+                  className="relative w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 transform hover:scale-105 transition-all"
+                  size="lg"
+                >
+                  <Check className="mr-2 h-5 w-5" />
+                  Take Guided Chakra Assessment
+                </Button>
+              </div>
+              <div className="px-4 py-2 bg-purple-50 rounded-lg inline-block border border-purple-100">
+                <p className="text-sm text-purple-800 font-medium">✨ Discover your complete energy profile with our in-depth assessment! ✨</p>
+              </div>
+            </div>
+          )}
         </motion.div>
         
         {showIntroduction ? (
