@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -8,7 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { chakras, getChakraStatus, getOverallChakraBalance, getChakraRecommendations } from "@/lib/chakras";
-import { ChevronDown, ChevronUp, Download, FilePlus, FileText } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, FilePlus, FileText, ClipboardList } from "lucide-react";
 
 interface ChakraVisualizationProps {
   chakraProfile?: any;
@@ -17,6 +18,7 @@ interface ChakraVisualizationProps {
 export default function ChakraVisualization({ chakraProfile }: ChakraVisualizationProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [expandedChakra, setExpandedChakra] = useState<string | null>(null);
   
   // Create state for chakra values (initialize from profile or default)
@@ -112,9 +114,23 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-heading font-bold mb-2">Your Chakra Balance</h2>
-        <p className="text-neutral-600 max-w-xl mx-auto">
+        <p className="text-neutral-600 max-w-xl mx-auto mb-4">
           Explore your energy centers and receive personalized insights based on your unique chakra configuration.
         </p>
+        <div className="relative inline-block">
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-lg blur-lg opacity-70 animate-pulse"></div>
+          <Button 
+            onClick={() => setLocation('/chakra-assessment')}
+            className="relative mx-auto bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white shadow-lg shadow-purple-200 transform hover:scale-105 transition-all"
+            size="lg"
+          >
+            <ClipboardList className="mr-2 h-5 w-5" />
+            Take Guided Chakra Assessment
+          </Button>
+        </div>
+        <div className="mt-4 px-4 py-2 bg-purple-50 rounded-lg inline-block border border-purple-100">
+          <p className="text-sm text-purple-800 font-medium">✨ Discover your complete energy profile with our in-depth assessment! ✨</p>
+        </div>
       </div>
       
       <Tabs defaultValue="visualization" className="w-full">
@@ -187,6 +203,18 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                   </svg>
                 </div>
               </CardContent>
+              <CardFooter>
+                <div className="w-full relative">
+                  <div className="absolute inset-0 bg-purple-500 rounded-md blur opacity-60 animate-pulse"></div>
+                  <Button 
+                    onClick={() => setLocation('/chakra-assessment')}
+                    className="w-full relative bg-[#7c3aed] hover:bg-opacity-90"
+                  >
+                    <ClipboardList className="mr-2 h-4 w-4" />
+                    Take Full Chakra Assessment
+                  </Button>
+                </div>
+              </CardFooter>
             </Card>
             
             {/* Chakra Sliders */}
@@ -290,20 +318,14 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                 <Button 
                   variant="outline" 
                   className="flex-1" 
-                  onClick={() => {
-                    const loc = window.location;
-                    loc.assign(`${loc.protocol}//${loc.host}/chakra-assessment`);
-                  }}
+                  onClick={() => window.location.href = '/chakra-assessment'}
                 >
                   Update Assessment
                 </Button>
                 <Button 
                   variant="outline" 
                   className="flex-1" 
-                  onClick={() => {
-                    const loc = window.location;
-                    loc.assign(`${loc.protocol}//${loc.host}/chakra-report`);
-                  }}
+                  onClick={() => window.location.href = '/chakra-report'}
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   View Detailed Report
@@ -514,7 +536,10 @@ export default function ChakraVisualization({ chakraProfile }: ChakraVisualizati
                 <Download className="w-4 h-4 mr-2" />
                 Download Report
               </Button>
-              <Button className="bg-[#483D8B] hover:bg-opacity-90">
+              <Button 
+                className="bg-[#483D8B] hover:bg-opacity-90"
+                onClick={() => window.location.href = `/coach/integration`}
+              >
                 Book a Healing Session
               </Button>
             </CardFooter>

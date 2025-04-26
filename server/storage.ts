@@ -39,6 +39,7 @@ export interface IStorage {
   getCoachConversation(id: number): Promise<CoachConversation | undefined>;
   createCoachConversation(conversation: InsertCoachConversation): Promise<CoachConversation>;
   updateCoachConversation(id: number, messages: any): Promise<CoachConversation | undefined>;
+  deleteCoachConversation(id: number): Promise<void>;
 
   // Healing ritual operations
   getHealingRituals(): Promise<HealingRitual[]>;
@@ -52,6 +53,25 @@ export interface IStorage {
   getUserRecommendations(userId: number): Promise<UserRecommendation[]>;
   createUserRecommendation(recommendation: InsertUserRecommendation): Promise<UserRecommendation>;
   updateUserRecommendation(id: number, completed: boolean): Promise<UserRecommendation | undefined>;
+  
+  // Community event operations
+  getCommunityEvents(): Promise<CommunityEvent[]>;
+  getCommunityEvent(id: number): Promise<CommunityEvent | undefined>;
+  createCommunityEvent(event: InsertCommunityEvent): Promise<CommunityEvent>;
+  updateCommunityEvent(id: number, event: Partial<InsertCommunityEvent>): Promise<CommunityEvent | undefined>;
+  deleteCommunityEvent(id: number): Promise<void>;
+  
+  // Event attendee operations
+  getEventAttendees(eventId: number): Promise<EventAttendee[]>;
+  getUserEventRegistrations(userId: number): Promise<EventAttendee[]>;
+  registerForEvent(attendee: InsertEventAttendee): Promise<EventAttendee>;
+  markAttendance(id: number, attended: boolean): Promise<EventAttendee | undefined>;
+  
+  // Media library operations
+  getMediaItems(): Promise<MediaItem[]>;
+  getMediaItem(id: number): Promise<MediaItem | undefined>;
+  uploadMedia(media: InsertMediaItem): Promise<MediaItem>;
+  deleteMedia(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -209,16 +229,28 @@ export class MemStorage implements IStorage {
 
   // Coach conversation operations
   async getCoachConversations(userId: number, coachType?: string): Promise<CoachConversation[]> {
-    let conversations = Array.from(this.coachConversations.values())
-      .filter(convo => convo.userId === userId);
-    
-    if (coachType) {
-      conversations = conversations.filter(convo => convo.coachType === coachType);
+    try {
+      // First filter by userId
+      let conversations = Array.from(this.coachConversations.values())
+        .filter(convo => convo.userId === userId);
+      
+      // Then strictly filter by coachType if specified
+      if (coachType) {
+        conversations = conversations.filter(convo => 
+          convo.coachType === coachType
+        );
+      }
+      
+      // Sort by most recent
+      return conversations.sort((a, b) => {
+        const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return timeB - timeA; // Descending order
+      });
+    } catch (error) {
+      console.error("Error fetching coach conversations:", error);
+      return [];
     }
-    
-    return conversations.sort((a, b) => {
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    });
   }
 
   async getCoachConversation(id: number): Promise<CoachConversation | undefined> {
@@ -250,6 +282,10 @@ export class MemStorage implements IStorage {
     
     this.coachConversations.set(id, updatedConversation);
     return updatedConversation;
+  }
+  
+  async deleteCoachConversation(id: number): Promise<void> {
+    this.coachConversations.delete(id);
   }
 
   // Healing ritual operations

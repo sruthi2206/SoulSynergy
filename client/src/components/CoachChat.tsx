@@ -5,9 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Mic, MicOff, RefreshCw } from "lucide-react";
+import { Send, Mic, MicOff, RefreshCw, Trash2, AlertTriangle, History } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface CoachChatProps {
   coachType: string;
@@ -43,7 +52,7 @@ const coachConfig: Record<string, {
     avatar: "🌗",
     color: "#191970",
     iconColor: "text-[#191970]",
-    greeting: "Welcome. I'm your Shadow Self Coach. I'm here to help you identify and integrate the aspects of yourself you may have rejected or hidden. What patterns have you been noticing lately?"
+    greeting: "Hello love, I'm your Shadow Healing Companion. Together, we'll gently uncover the hidden parts of your subconscious that may still carry pain, fear, or limiting beliefs — and release them with compassion. Are you ready to begin?"
   },
   higher_self: {
     name: "Higher Self Coach",
@@ -82,17 +91,35 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       const baseUrl = queryKey[0] as string;
       const params = queryKey[1] as { coachType: string };
       const fullUrl = `${baseUrl}?coachType=${params.coachType}`;
-      const response = await fetch(fullUrl, { credentials: "include" });
-      if (!response.ok) {
-        throw new Error("Failed to fetch conversations");
+      
+      try {
+        const response = await fetch(fullUrl, { credentials: "include" });
+        if (!response.ok) {
+          console.error(`Error fetching conversations: ${response.status}`);
+          if (response.status === 400) {
+            return []; // Return empty array if coachType parameter is missing
+          }
+          throw new Error(`Failed to fetch conversations: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error in conversation fetch:", error);
+        throw error;
       }
-      return response.json();
     },
     // Sort conversations by creation date to ensure newest is first
     select: (data) => {
       if (!Array.isArray(data)) return [];
-      return [...data].sort((a, b) => {
-        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      
+      // Double-check that we're only getting conversations for this coach type
+      const filteredData = data.filter(conversation => 
+        conversation.coachType === coachType
+      );
+      
+      return [...filteredData].sort((a, b) => {
+        return new Date(b.updatedAt || b.createdAt || 0).getTime() - 
+               new Date(a.updatedAt || a.createdAt || 0).getTime();
       });
     }
   });
@@ -103,7 +130,11 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       // Get the most recent conversation
       const latestConversation = conversations[0];
       setConversationId(latestConversation.id);
-      setMessages(latestConversation.messages);
+      // Filter out system messages from displaying
+      const filteredMessages = Array.isArray(latestConversation.messages) 
+        ? latestConversation.messages.filter((msg: any) => msg.role !== "system")
+        : [];
+      setMessages(filteredMessages);
     } else if (!isLoadingConversations) {
       // If no conversation exists, add greeting message
       setMessages([
@@ -132,7 +163,9 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       });
       
       if (!response.ok) {
-        throw new Error("Failed to send message");
+        // Get the error message from the response if available
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to send message");
       }
       
       return response.json();
@@ -160,11 +193,21 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       // Keep the UI clean by removing the failed user message
       setMessages(prev => prev.slice(0, prev.length - 1));
       
+      // Check if the error is related to coach type mismatch
+      const isMismatchError = error.message.includes('coach type mismatch');
+      
       toast({
-        title: "Connection Error",
-        description: `Unable to connect with your coach: ${error.message}`,
+        title: isMismatchError ? "Coach Type Mismatch" : "Connection Error",
+        description: isMismatchError 
+          ? "The conversation you tried to continue belongs to a different coach. Starting a new conversation."
+          : `Unable to connect with your coach: ${error.message}`,
         variant: "destructive",
       });
+      
+      // If it's a coach type mismatch, automatically start a new conversation
+      if (isMismatchError) {
+        startNewConversation();
+      }
     }
   });
   
@@ -220,6 +263,43 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       description: `You're now in a fresh conversation with your ${coach.name}.`
     });
   };
+  
+  // Delete conversation mutation
+  const deleteConversationMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("DELETE", `/api/coach-conversations/${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to delete conversation");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Refresh conversation list
+      refetchConversations();
+      
+      // Start a new conversation
+      startNewConversation();
+      
+      toast({
+        title: "Conversation History Deleted",
+        description: "Your conversation history has been successfully removed.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Deletion Failed",
+        description: `Unable to delete conversation: ${error.message}`,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Handle conversation deletion
+  const handleDeleteConversation = () => {
+    if (conversationId) {
+      deleteConversationMutation.mutate(conversationId);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -240,7 +320,7 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
       <CardContent className="flex-grow overflow-y-auto pb-0">
         <div className="space-y-4">
           <AnimatePresence initial={false}>
-            {messages.map((msg, index) => (
+            {messages.filter(msg => msg.role !== "system").map((msg, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
@@ -316,6 +396,7 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
             variant={isVoiceActive ? "destructive" : "outline"}
             onClick={toggleVoiceInput}
             className="flex-shrink-0"
+            title="Voice input"
           >
             {isVoiceActive ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </Button>
@@ -330,6 +411,63 @@ export default function CoachChat({ coachType, userId }: CoachChatProps) {
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
+          
+          {conversationId && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  className="flex-shrink-0"
+                  title="Delete conversation history"
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-amber-500" />
+                    Delete Conversation History
+                  </DialogTitle>
+                  <DialogDescription>
+                    Deleting your conversation history may impact the coach's ability to provide
+                    accurate healing guidance based on your past interactions. Your coach learns
+                    about your specific healing needs through your conversations.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
+                  <p className="font-medium">Important:</p>
+                  <p className="mt-1">Your healing journey is progressive, and past conversations help your coach provide personalized guidance. Deleting history may reduce the effectiveness of future healing insights.</p>
+                </div>
+                <DialogFooter className="gap-2 sm:justify-end">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {}}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeleteConversation}
+                    disabled={deleteConversationMutation.isPending}
+                  >
+                    {deleteConversationMutation.isPending ? (
+                      <>
+                        <span className="mr-2">Deleting...</span>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      </>
+                    ) : (
+                      'Delete History'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
           
           <div className="relative flex-grow">
             <Input

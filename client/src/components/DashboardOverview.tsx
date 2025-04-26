@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import ChakraWheel from "@/components/ChakraWheel";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -120,18 +120,16 @@ export default function DashboardOverview({
                   </span>
                 </div>
                 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => {
-                    const loc = window.location;
-                    loc.assign(`${loc.protocol}//${loc.host}/chakra-report`);
-                  }}
-                >
-                  <Info className="h-4 w-4 mr-2" />
-                  View Details
-                </Button>
+                <Link href="/chakra-report">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                  >
+                    <Info className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
@@ -182,21 +180,26 @@ export default function DashboardOverview({
                     </div>
                   </div>
                   
-                  <Link href="/dashboard?tab=emotions">
-                    <Button variant="outline" size="sm" className="w-full">
-                      <Activity className="h-4 w-4 mr-2" />
-                      Emotional Tracking
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => window.location.href = "/dashboard?tab=emotions"}
+                  >
+                    <Activity className="h-4 w-4 mr-2" />
+                    Emotional Tracking
+                  </Button>
                 </div>
               ) : (
                 <div className="text-center py-4">
                   <div className="text-sm text-neutral-500 mb-3">No emotion tracked yet</div>
-                  <Link href="/dashboard?tab=emotions">
-                    <Button size="sm" className="bg-[#483D8B] hover:bg-opacity-90">
-                      Track Emotion
-                    </Button>
-                  </Link>
+                  <Button 
+                    size="sm" 
+                    className="bg-[#483D8B] hover:bg-opacity-90"
+                    onClick={() => window.location.href = "/dashboard?tab=emotions"}
+                  >
+                    Track Emotion
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -333,11 +336,12 @@ export default function DashboardOverview({
               ) : (
                 <div className="text-center py-8">
                   <div className="text-sm text-neutral-500 mb-3">No mood data available</div>
-                  <Link href="/dashboard?tab=emotions">
-                    <Button className="bg-[#483D8B] hover:bg-opacity-90">
-                      Track Your Mood
-                    </Button>
-                  </Link>
+                  <Button 
+                    className="bg-[#483D8B] hover:bg-opacity-90"
+                    onClick={() => window.location.href = "/dashboard?tab=emotions"}
+                  >
+                    Track Your Mood
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -374,11 +378,13 @@ export default function DashboardOverview({
                           <div className="text-sm text-neutral-500 mb-3">
                             All practices completed!
                           </div>
-                          <Link href="/dashboard?tab=rituals">
-                            <Button size="sm" className="bg-[#483D8B] hover:bg-opacity-90">
-                              Find More Practices
-                            </Button>
-                          </Link>
+                          <Button 
+                            size="sm" 
+                            className="bg-[#483D8B] hover:bg-opacity-90"
+                            onClick={() => window.location.href = "/dashboard?tab=rituals"}
+                          >
+                            Find More Practices
+                          </Button>
                         </div>
                       );
                     }
@@ -408,11 +414,12 @@ export default function DashboardOverview({
                         </div>
                         
                         <div className="space-y-2">
-                          <Link href="/dashboard?tab=rituals">
-                            <Button className="w-full bg-[#483D8B] hover:bg-opacity-90">
-                              View Practice Details
-                            </Button>
-                          </Link>
+                          <Button 
+                            className="w-full bg-[#483D8B] hover:bg-opacity-90"
+                            onClick={() => window.location.href = "/dashboard?tab=rituals"}
+                          >
+                            View Practice Details
+                          </Button>
                         </div>
                       </div>
                     );
@@ -421,11 +428,13 @@ export default function DashboardOverview({
               ) : (
                 <div className="text-center py-4">
                   <div className="text-sm text-neutral-500 mb-3">No practices added yet</div>
-                  <Link href="/dashboard?tab=rituals">
-                    <Button size="sm" className="bg-[#483D8B] hover:bg-opacity-90">
-                      Discover Practices
-                    </Button>
-                  </Link>
+                  <Button 
+                    size="sm" 
+                    className="bg-[#483D8B] hover:bg-opacity-90"
+                    onClick={() => window.location.href = "/dashboard?tab=rituals"}
+                  >
+                    Discover Practices
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -491,12 +500,15 @@ export default function DashboardOverview({
                   </div>
                 )}
                 
-                <Link href="/dashboard?tab=progress">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    View Progress Details
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full"
+                  onClick={() => window.location.href = "/dashboard?tab=progress"}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  View Progress Details
+                </Button>
               </div>
             </CardContent>
           </Card>
